@@ -1,0 +1,9 @@
+#format:
+#name=clip
+#name is the string to throw at ConsoleAudio.playClip()
+#sound of new target appearing on radar
+newTarget=newTarget.wav
+#collision warning
+collisionAlert=collisionalert.wav
+#banner popup sound
+bannerPopup=popup.wav
