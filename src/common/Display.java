@@ -1,13 +1,22 @@
 package common;
 
 import oscP5.OscMessage;
+import processing.core.PFont;
 
-public interface Display {
+public abstract class Display {
 
-	  public void draw();
-	  public void oscMessage(OscMessage theOscMessage);
-	  public void start();
-	  public void stop();
-	  public void serialEvent(String content);
+	protected PlayerConsole parent;
+	protected PFont font;
+	public Display(PlayerConsole parent){
+		this.parent = parent;
+		font = parent.getGlobalFont();
+		
+	}
+	
+	  public abstract void draw();
+	  public abstract void oscMessage(OscMessage theOscMessage);
+	  public abstract void start();
+	  public abstract void stop();
+	  public abstract void serialEvent(String content);
 	  
 }

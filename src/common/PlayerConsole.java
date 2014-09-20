@@ -1,36 +1,90 @@
 package common;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.util.Hashtable;
+
+import netP5.NetAddress;
+import oscP5.OscP5;
+import ddf.minim.Minim;
 import processing.core.*;
 
-public class PlayerConsole extends PApplet{
-	PImage p;
+public abstract class PlayerConsole extends PApplet{
 	
 	public boolean testMode = false;
-
+	
+	//----- global blink state ----
 	public boolean globalBlinker;
+	long blinkTime = 0;
 	
-	
-	@Override
-	public void setup(){
-		size(200,200);
-		background(0);
-		p = loadImage("data/pilotconsole/destruct.png");
-	}
-	
-	@Override
-	public void draw(){
-		background(0);
-		image(p,0,0,width,height);
+	//---banner overlay class---
+	protected BannerOverlay bannerSystem;
 		
-	}
+	
+	protected String serverIP = "127.0.0.1";    
 
-	public static void main(String[] args) {
-		PApplet.main(new String[] { "PlayerConsole" });
+	//damage effects
+	protected DamageEffect damageEffects;
+	
+	//---- audio stuff
+	protected Minim minim;
+	protected ConsoleAudio consoleAudio;
+	
+	//-----OSC stuff--------
+	protected OscP5 oscP5;
+	protected NetAddress myRemoteLocation;
+	
+	//------ ship sate -----
+	protected ShipState shipState = new ShipState();  //container for ship data
+	
+	//----- common assets ----
+	protected PFont font;  //default font for game
+	
+	//----- display control
+	protected Hashtable<String, Display> displayMap = new Hashtable<String, Display>();
+
+	protected String consoleName = "changeme";
+	
+	public void setup(){
+		size(1024, 768, P3D);
+		  frameRate(25);
+		  hideCursor();
+		bannerSystem = new BannerOverlay(this);
+		  damageEffects = new DamageEffect(this);
+			font = loadFont("common/HanzelExtendedNormal-48.vlw");
 
 	}
+	
+	public void draw(){
+		//common draw things
+		if (blinkTime + 750 < millis()) {
+		    blinkTime = millis();
+		    globalBlinker = ! globalBlinker;
+		  }
+		//translate stuff
+		damageEffects.startTransform();
+		
+		//call draw method
+		drawConsole();
+		
+		//post-draw
+		damageEffects.stopTransform();
+		 damageEffects.draw();
+	}
+	
+	public abstract void drawConsole();
+
+	protected void hideCursor() {
+		  BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		  Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+		  cursorImg, new Point(0, 0), "blank cursor");
+		  frame.setCursor(blankCursor);
+		}
+		
 
 	public ConsoleAudio getConsoleAudio() {
-		// TODO Auto-generated method stub
-		return null;
+		return consoleAudio;
 	}
 
 	public void hardwareEvent(HardwareEvent h) {
@@ -38,9 +92,23 @@ public class PlayerConsole extends PApplet{
 		
 	}
 
+	
+	
+	//--- getters ----
 	public BannerOverlay getBannerSystem() {
-		// TODO Auto-generated method stub
-		return null;
+		return bannerSystem;
 	}
+	public String getConsoleName(){
+		return consoleName;
+	}
+
+	public PFont getGlobalFont(){ return font; }
+	public ShipState getShipState() { return shipState; }
+
+	public String getServerIP() {
+		return serverIP;
+	}
+	
+	
 
 }

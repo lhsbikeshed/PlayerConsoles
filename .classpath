@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="lib" path="lib/core/core.jar"/>
+	<classpathentry kind="lib" path="lib/minim/jl1.0.jar"/>
+	<classpathentry kind="lib" path="lib/minim/jsminim.jar"/>
+	<classpathentry kind="lib" path="lib/minim/minim.jar"/>
+	<classpathentry kind="lib" path="lib/minim/mp3spi1.9.4.jar"/>
+	<classpathentry kind="lib" path="lib/minim/tritonus_aos.jar"/>
+	<classpathentry kind="lib" path="lib/minim/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="lib/serial/jssc.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="VanConsoles/lib/serial/windows64"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/serial/serial.jar"/>
+	<classpathentry kind="lib" path="lib/osc/oscP5/library/oscP5.jar"/>
+	<classpathentry kind="lib" path="lib/joystick/procontroll/library/procontroll.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="VanConsoles/lib/joystick/procontroll/library"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt-natives-linux-armv6hf.jar"/>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="lib/core/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all-natives-linux-armv6hf.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="lib/core/jogl-all.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

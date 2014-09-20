@@ -1,0 +1,229 @@
+[    0.935091] scsi 3:0:1:0: Direct-Access     ATA      ST3750640NS      3.AE PQ: 0 ANSI: 5
+[    0.935396] sd 3:0:1:0: Attached scsi generic sg4 type 0
+[    0.935573]  sdc1 sdc2
+[    0.936039] sd 3:0:1:0: [sdd] 1465149168 512-byte logical blocks: (750 GB/698 GiB)
+[    0.936241] sd 3:0:0:0: [sdc] Attached SCSI disk
+[    0.936374] sd 3:0:1:0: [sdd] Write Protect is off
+[    0.936430] sd 3:0:1:0: [sdd] Mode Sense: 00 3a 00 00
+[    0.936480] sd 3:0:1:0: [sdd] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+[    0.936816]  sdd: sdd1
+[    0.954541] sd 3:0:1:0: [sdd] Attached SCSI disk
+[    0.954616] Freeing unused kernel memory: 664k freed
+[    0.955186] Write protecting the kernel text: 4700k
+[    0.955276] Write protecting the kernel read-only data: 1844k
+[    0.991676] udev: starting version 151
+[    1.088120] md: linear personality registered for level -1
+[    1.136083] usb 5-1: new full speed USB device using uhci_hcd and address 2
+[    1.138553] md: multipath personality registered for level -4
+[    1.256744] md: raid0 personality registered for level 0
+[    1.290215] usb 5-1: configuration #1 chosen from 1 choice
+[    1.345346] md: bind<sdc1>
+[    1.369551] tg3.c:v3.102 (September 1, 2009)
+[    1.369629] tg3 0000:05:00.0: PCI INT A -> GSI 18 (level, low) -> IRQ 18
+[    1.369695] tg3 0000:05:00.0: setting latency timer to 64
+[    1.379005] md: bind<sdc2>
+[    1.391989] md: raid1 personality registered for level 1
+[    1.409711] eth0: Tigon3 [partno(BCM95721) rev 4001] (PCI Express) MAC address 00:12:3f:6d:fe:10
+[    1.409796] eth0: attached PHY is 5750 (10/100/1000Base-T Ethernet) (WireSpeed[1])
+[    1.409872] eth0: RXcsums[1] LinkChgREG[0] MIirq[0] ASF[1] TSOcap[1]
+[    1.409929] eth0: dma_rwctrl[76180000] dma_mask[64-bit]
+[    1.438839] md: bind<sdd1>
+[    1.443510] async_tx: api initialized (async)
+[    1.454465] xor: automatically using best checksumming function: pIII_sse
+[    1.472011]    pIII_sse  :  3881.000 MB/sec
+[    1.472064] xor: using function: pIII_sse (3881.000 MB/sec)
+[    1.540020] raid6: int32x1    699 MB/s
+[    1.608094] raid6: int32x2    630 MB/s
+[    1.676036] raid6: int32x4    638 MB/s
+[    1.744039] raid6: int32x8    465 MB/s
+[    1.812031] raid6: mmxx1     1517 MB/s
+[    1.880031] raid6: mmxx2     1818 MB/s
+[    1.948029] raid6: sse1x1     910 MB/s
+[    2.016023] raid6: sse1x2    1642 MB/s
+[    2.084033] raid6: sse2x1    1862 MB/s
+[    2.152024] raid6: sse2x2    2722 MB/s
+[    2.152075] raid6: using algorithm sse2x2 (2722 MB/s)
+[    2.163431] md: raid6 personality registered for level 6
+[    2.163492] md: raid5 personality registered for level 5
+[    2.163546] md: raid4 personality registered for level 4
+[    2.185217] md: raid10 personality registered for level 10
+[    2.238477] md: bind<sdb1>
+[    2.239066] md: bind<sda2>
+[    2.240604] md: bind<sda1>
+[    2.246041] raid1: raid set md2 active with 2 out of 2 mirrors
+[    2.246141] md2: detected capacity change from 0 to 750153629696
+[    2.249652]  md2:
+[    2.249830] raid1: raid set md0 active with 2 out of 2 mirrors
+[    2.250006] md0: detected capacity change from 0 to 498106368000
+[    2.253386]  md0: unknown partition table
+[    2.260245]  unknown partition table
+[    2.265847] raid1: raid set md1 active with 2 out of 2 mirrors
+[    2.265951] md1: detected capacity change from 0 to 1998651392
+[    2.276884]  md1: unknown partition table
+[    2.461734] SGI XFS with ACLs, security attributes, realtime, large block/inode numbers, no debug enabled
+[    2.463868] SGI XFS Quota Management subsystem
+[    2.509373] XFS mounting filesystem md0
+[    2.666534] Starting XFS recovery on filesystem: md0 (logdev: internal)
+[    4.166501] Ending XFS recovery on filesystem: md0 (logdev: internal)
+[    4.316036] floppy0: no floppy controllers found
+[   21.935549] Adding 1951800k swap on /dev/md1.  Priority:-1 extents:1 across:1951800k
+[   22.538308] udev: starting version 151
+[   22.778432] shpchp: Standard Hot Plug PCI Controller Driver version: 0.4
+[   22.784924] intel_rng: FWH not detected
+[   22.887999] Linux agpgart interface v0.103
+[   23.292591] [drm] Initialized drm 1.1.0 20060810
+[   23.310995] Bluetooth: Core ver 2.15
+[   23.326924] agpgart-intel 0000:00:00.0: Intel E7221 (i915) Chipset
+[   23.327368] agpgart-intel 0000:00:00.0: detected 8060K stolen memory
+[   23.331453] NET: Registered protocol family 31
+[   23.331457] Bluetooth: HCI device and connection manager initialized
+[   23.331462] Bluetooth: HCI socket layer initialized
+[   23.333338] agpgart-intel 0000:00:00.0: AGP aperture is 128M @ 0xd0000000
+[   23.339857] dcdbas dcdbas: Dell Systems Management Base Driver (version 5.6.0-3.2)
+[   23.433209] dell-wmi: No known WMI GUID found
+[   23.466957] lp: driver loaded but no devices found
+[   23.479719] Bluetooth: Generic Bluetooth USB driver ver 0.6
+[   23.480571] usbcore: registered new interface driver btusb
+[   23.505834] parport_pc 00:07: reported by Plug and Play ACPI
+[   23.505924] parport0: PC-style at 0x378 (0x778), irq 7, dma 1 [PCSPP,TRISTATE,COMPAT,ECP,DMA]
+[   23.600270] lp0: using parport0 (interrupt-driven).
+[   23.794422] i801_smbus 0000:00:1f.3: can't derive routing for PCI INT B
+[   23.794429] i801_smbus 0000:00:1f.3: PCI INT B: no GSI
+[   23.822135] ppdev: user-space parallel port driver
+[   23.828210] i915 0000:00:02.0: PCI INT A -> GSI 16 (level, low) -> IRQ 16
+[   23.828219] i915 0000:00:02.0: setting latency timer to 64
+[   23.838347] [drm] set up 7M of stolen space
+[   23.839550] [drm] initialized overlay support
+[   23.942614] RPC: Registered udp transport module.
+[   23.942619] RPC: Registered tcp transport module.
+[   23.942622] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[   23.988049] No connectors reported connected with modes
+[   23.988066] [drm] Initialized i915 1.6.0 20080730 for 0000:00:02.0 on minor 0
+[   24.007447] i2c /dev entries driver
+[   24.142977] Linux video capture interface: v2.00
+[   24.283137] vga16fb: initializing
+[   24.283146] vga16fb: mapped to 0xc00a0000
+[   24.283448] fb0: VGA16 VGA frame buffer device
+[   24.351413] bttv: driver version 0.9.18 loaded
+[   24.351418] bttv: using 8 buffers with 2080k (520 pages) each for capture
+[   24.352640] bttv: Bt8xx card found (0).
+[   24.352660]   alloc irq_desc for 17 on node -1
+[   24.352664]   alloc kstat_irqs on node -1
+[   24.352674] bttv 0000:07:00.0: PCI INT A -> GSI 17 (level, low) -> IRQ 17
+[   24.352689] bttv0: Bt878 (rev 2) at 0000:07:00.0, irq: 17, latency: 32, mmio: 0xd80ff000
+[   24.352726] bttv0: using:  *** UNKNOWN/GENERIC ***  [card=0,autodetected]
+[   24.352730] IRQ 17/bttv0: IRQF_DISABLED is not guaranteed on shared IRQs
+[   24.352777] bttv0: gpio: en=00000000, out=00000000 in=00ffffff [init]
+[   24.385866] bttv0: detected by eeprom: Modular Technology MM201/MM202/MM205/MM210/MM215 PCTV, bt878 [card=23]
+[   24.422470] bttv0: Modtec: Tuner autodetected by eeprom: Alps TSBB5
+[   24.422477] bttv0: tuner type=11
+[   24.820159] Installing knfsd (copyright (C) 1996 okir@monad.swb.de).
+[   24.822306] bttv0: audio absent, no audio device found!
+[   25.009638] Console: switching to colour frame buffer device 80x30
+[   25.112240] type=1505 audit(1371673390.052:2):  operation="profile_load" pid=603 name="/sbin/dhclient3"
+[   25.113108] type=1505 audit(1371673390.052:3):  operation="profile_load" pid=603 name="/usr/lib/NetworkManager/nm-dhcp-client.action"
+[   25.113585] type=1505 audit(1371673390.052:4):  operation="profile_load" pid=603 name="/usr/lib/connman/scripts/dhclient-script"
+[   25.114637] type=1505 audit(1371673390.052:5):  operation="profile_replace" pid=615 name="/sbin/dhclient3"
+[   25.115547] type=1505 audit(1371673390.052:6):  operation="profile_replace" pid=615 name="/usr/lib/NetworkManager/nm-dhcp-client.action"
+[   25.116168] type=1505 audit(1371673390.056:7):  operation="profile_replace" pid=615 name="/usr/lib/connman/scripts/dhclient-script"
+[   25.161396] All bytes are equal. It is not a TEA5767
+[   25.161524] tuner 2-0060: chip found @ 0xc0 (bt878 #0 [sw])
+[   25.194027] type=1505 audit(1371673390.134:8):  operation="profile_load" pid=741 name="/usr/sbin/ntpd"
+[   25.195153] type=1505 audit(1371673390.134:9):  operation="profile_replace" pid=742 name="/usr/sbin/ntpd"
+[   25.289601] tuner-simple 2-0060: creating new instance
+[   25.289608] tuner-simple 2-0060: type set to 11 (Alps TSBB5)
+[   25.290644] bttv0: registered device video0
+[   25.291314] bttv0: registered device vbi0
+[   25.291341] bttv0: PLL: 28636363 => 35468950 .. ok
+[   25.599279] ADDRCONF(NETDEV_UP): eth0: link is not ready
+[   26.001214] type=1505 audit(1371673390.940:10):  operation="profile_replace" pid=847 name="/sbin/dhclient3"
+[   26.002108] type=1505 audit(1371673390.940:11):  operation="profile_replace" pid=847 name="/usr/lib/NetworkManager/nm-dhcp-client.action"
+[   26.321499] ip6_tables: (C) 2000-2006 Netfilter Core Team
+[   26.340048] floppy0: no floppy controllers found
+[   26.481306] nf_conntrack version 0.5.0 (16384 buckets, 65536 max)
+[   26.483754] CONFIG_NF_CT_ACCT is deprecated and will be removed soon. Please use
+[   26.483761] nf_conntrack.acct=1 kernel parameter, acct=1 nf_conntrack module option or
+[   26.483764] sysctl net.netfilter.nf_conntrack_acct=1 to enable it.
+[   26.922681] dahdi: disagrees about version of symbol skb_put
+[   26.922688] dahdi: Unknown symbol skb_put
+[   26.922750] dahdi: disagrees about version of symbol ppp_channel_index
+[   26.922753] dahdi: Unknown symbol ppp_channel_index
+[   26.922819] dahdi: disagrees about version of symbol consume_skb
+[   26.922822] dahdi: Unknown symbol consume_skb
+[   26.922959] dahdi: disagrees about version of symbol ppp_register_channel
+[   26.922962] dahdi: Unknown symbol ppp_register_channel
+[   26.923032] dahdi: disagrees about version of symbol skb_dequeue
+[   26.923035] dahdi: Unknown symbol skb_dequeue
+[   26.923196] dahdi: disagrees about version of symbol ppp_input
+[   26.923199] dahdi: Unknown symbol ppp_input
+[   26.923324] dahdi: disagrees about version of symbol ppp_input_error
+[   26.923327] dahdi: Unknown symbol ppp_input_error
+[   26.923440] dahdi: disagrees about version of symbol skb_queue_tail
+[   26.923443] dahdi: Unknown symbol skb_queue_tail
+[   26.923525] dahdi: disagrees about version of symbol dev_kfree_skb_irq
+[   26.923528] dahdi: Unknown symbol dev_kfree_skb_irq
+[   26.923644] dahdi: disagrees about version of symbol skb_pull
+[   26.923647] dahdi: Unknown symbol skb_pull
+[   26.923982] dahdi: disagrees about version of symbol dev_alloc_skb
+[   26.923985] dahdi: Unknown symbol dev_alloc_skb
+[   26.924147] dahdi: disagrees about version of symbol skb_queue_purge
+[   26.924152] dahdi: Unknown symbol skb_queue_purge
+[   26.924214] dahdi: disagrees about version of symbol ppp_output_wakeup
+[   26.924217] dahdi: Unknown symbol ppp_output_wakeup
+[   26.924359] dahdi: disagrees about version of symbol ppp_unregister_channel
+[   26.924362] dahdi: Unknown symbol ppp_unregister_channel
+[   26.928424] dahdi: disagrees about version of symbol ppp_unit_number
+[   26.928431] dahdi: Unknown symbol ppp_unit_number
+[   26.945268] dahdi: disagrees about version of symbol skb_put
+[   26.945275] dahdi: Unknown symbol skb_put
+[   26.945337] dahdi: disagrees about version of symbol ppp_channel_index
+[   26.945340] dahdi: Unknown symbol ppp_channel_index
+[   26.945406] dahdi: disagrees about version of symbol consume_skb
+[   26.945409] dahdi: Unknown symbol consume_skb
+[   26.945546] dahdi: disagrees about version of symbol ppp_register_channel
+[   26.945549] dahdi: Unknown symbol ppp_register_channel
+[   26.945619] dahdi: disagrees about version of symbol skb_dequeue
+[   26.945622] dahdi: Unknown symbol skb_dequeue
+[   26.945783] dahdi: disagrees about version of symbol ppp_input
+[   26.945786] dahdi: Unknown symbol ppp_input
+[   26.945910] dahdi: disagrees about version of symbol ppp_input_error
+[   26.945913] dahdi: Unknown symbol ppp_input_error
+[   26.946026] dahdi: disagrees about version of symbol skb_queue_tail
+[   26.946029] dahdi: Unknown symbol skb_queue_tail
+[   26.946111] dahdi: disagrees about version of symbol dev_kfree_skb_irq
+[   26.946114] dahdi: Unknown symbol dev_kfree_skb_irq
+[   26.946231] dahdi: disagrees about version of symbol skb_pull
+[   26.946233] dahdi: Unknown symbol skb_pull
+[   26.946568] dahdi: disagrees about version of symbol dev_alloc_skb
+[   26.946571] dahdi: Unknown symbol dev_alloc_skb
+[   26.946670] dahdi: disagrees about version of symbol skb_queue_purge
+[   26.946673] dahdi: Unknown symbol skb_queue_purge
+[   26.946733] dahdi: disagrees about version of symbol ppp_output_wakeup
+[   26.946736] dahdi: Unknown symbol ppp_output_wakeup
+[   26.946876] dahdi: disagrees about version of symbol ppp_unregister_channel
+[   26.946880] dahdi: Unknown symbol ppp_unregister_channel
+[   26.947659] dahdi: disagrees about version of symbol ppp_unit_number
+[   26.947665] dahdi: Unknown symbol ppp_unit_number
+[   27.116162] dahdi: disagrees about version of symbol skb_put
+[   27.116169] dahdi: Unknown symbol skb_put
+[   27.116229] dahdi: disagrees about version of symbol ppp_channel_index
+[   27.116232] dahdi: Unknown symbol ppp_channel_index
+[   27.116296] dahdi: disagrees about version of symbol consume_skb
+[   27.116299] dahdi: Unknown symbol consume_skb
+[   27.116432] dahdi: disagrees about version of symbol ppp_register_channel
+[   27.116435] dahdi: Unknown symbol ppp_register_channel
+[   27.116503] dahdi: disagrees about version of symbol skb_dequeue
+[   27.116506] dahdi: Unknown symbol skb_dequeue
+[   27.116662] dahdi: disagrees about version of symbol ppp_input
+[   27.116665] dahdi: Unknown symbol ppp_input
+[   27.116786] dahdi: disagrees about version of symbol ppp_input_error
+[   27.116788] dahdi: Unknown symbol ppp_input_error
+[   27.116898] dahdi: disagrees about version of symbol skb_queue_tail
+[   27.116901] dahdi: Unknown symbol skb_queue_tail
+[   27.116980] dahdi: disagrees about version of symbol dev_kfree_skb_irq
+[   27.116983] dahdi: Unknown symbol dev_kfree_skb_irq
+[   27.117096] dahdi: disagrees about version of symbol skb_pull
+[   27.117099] dahdi: Unknown symbol skb_pull
+[   27.117423] dahdi: disagrees about version of symbol dev_alloc_skb
+[   27.117426] dahdi: Unknown symbol dev_alloc_skb
+[   27.117522] dahdi: disagrees about version of symbol skb_queue_purge

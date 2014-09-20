@@ -15,14 +15,14 @@ public class DamageEffect {
   
   public DamageEffect(PApplet parent){
 	  this.parent = parent;
-    PApplet.println("generating damage images...");
+    ConsoleLogger.log(this, "generating damage images...");
     noiseImage = parent.createImage(parent.width / tileX, parent.height / tileY, PConstants.RGB);
     noiseImage.loadPixels();
     for (int i = 0; i < noiseImage.width * noiseImage.height; i++){
       noiseImage.pixels[i] = parent.color(parent.random(255));
     }
     noiseImage.updatePixels();
-    PApplet.println("     ...done");
+    ConsoleLogger.log(this, "     ...done");
   } 
 
   public void startTransform(){

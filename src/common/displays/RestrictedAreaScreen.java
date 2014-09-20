@@ -1,17 +1,25 @@
+package common.displays;
+import oscP5.OscMessage;
+import processing.core.PImage;
+import common.Display;
+import common.PlayerConsole;
 
 
-public class RestrictedAreaScreen implements Display {
+
+public class RestrictedAreaScreen extends Display {
  
   
   
   PImage bgImage;
-   public RestrictedAreaScreen() {
-     bgImage = loadImage("restrictedscreen/bg.png");
+  
+   public RestrictedAreaScreen(PlayerConsole parent) {
+	 super(parent);
+     bgImage = parent.loadImage("common/RestrictedAreaScreen/bg.png");
    }
    
    
   public void start() {
-     consoleAudio.playClip("structuralFailure");
+     parent.getConsoleAudio().playClip("structuralFailure");
   }
   public void stop() {
   }
@@ -19,8 +27,8 @@ public class RestrictedAreaScreen implements Display {
   public void draw() {
     
     //signalStrength = map(mouseY, 0, height, 0, 1.0f);
-    background(0, 0, 0);
-    image(bgImage, 0, 0, width, height);
+    parent.background(0, 0, 0);
+    parent.image(bgImage, 0, 0, parent.width, parent.height);
     
   }
 

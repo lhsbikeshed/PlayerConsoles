@@ -6,7 +6,7 @@ import common.Display;
 import common.PlayerConsole;
 
 
-public class FailureScreen implements Display {
+public class FailureScreen extends Display {
 
   PImage background;
   PImage warningImage;
@@ -15,17 +15,15 @@ public class FailureScreen implements Display {
   int animTime = 0;
   float leftIconPos = 309f;
   float rightIconPos = 435f;
-  
-  PlayerConsole parent;
-  
+    
   
   public FailureScreen(PlayerConsole parent){
-	  this.parent = parent;
-    background = parent.loadImage("failure/bg.png");
-    warningImage = parent.loadImage("failure/warning.png");
-    
-    leftIcon = parent.loadImage("failure/leftPart.png");
-    rightIcon = parent.loadImage("failure/rightPart.png");
+super(parent);
+background = parent.loadImage("common/failureScreen/bg.png");
+warningImage = parent.loadImage("common/failureScreen/warning.png");
+
+leftIcon = parent.loadImage("common/failureScreen/leftPart.png");
+rightIcon = parent.loadImage("common/failureScreen/rightPart.png");
   }
   
   public void start(){

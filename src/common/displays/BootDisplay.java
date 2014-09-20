@@ -6,11 +6,11 @@ import processing.core.*;
 import common.*;
 
 
-public class BootDisplay implements Display {
+public class BootDisplay extends Display {
   
   PImage bgImage;
   public  int bootCount = 0;
-  PFont font;
+ 
   
   public boolean brokenBoot = false;
   
@@ -21,15 +21,14 @@ public class BootDisplay implements Display {
   
   String[] bootText;
   
-  PlayerConsole parent;
   BannerOverlay bannerSystem;
   
   public BootDisplay(PlayerConsole parent){
-	  this.parent = parent;
+	  super(parent);
+	  
 	  bannerSystem = parent.getBannerSystem();
-    font = parent.loadFont("HanzelExtendedNormal-48.vlw");
-    bgImage = parent.loadImage("bootlogo.png");
-    bootText = parent.loadStrings("boottext.txt");
+    bgImage = parent.loadImage("common/bootScreen/bootlogo.png");
+    bootText = parent.loadStrings("common/bootScreen/boottext.txt");
   }
   
   

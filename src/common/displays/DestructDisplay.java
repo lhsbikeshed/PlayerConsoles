@@ -6,23 +6,19 @@ import common.Display;
 import common.PlayerConsole;
 
 
-public class DestructDisplay implements Display {
+public class DestructDisplay extends Display {
   
   PImage bgImage, criticalImg;
   int time;
-  
-  PFont font;
-  
+    
   int blinkTime = 0;
   boolean blinker = false;
   
-  PlayerConsole parent;
   
   public DestructDisplay(PlayerConsole parent){
-	  this.parent = parent;
-    font = parent.loadFont("HanzelExtendedNormal-48.vlw");
-    bgImage = parent.loadImage("destruct.png");
-    criticalImg = parent.loadImage("critical.png");
+	  super(parent);
+    bgImage = parent.loadImage("common/selfDestructScreen/destruct.png");
+    criticalImg = parent.loadImage("common/selfDestructScreen/critical.png");
   }
   
   
