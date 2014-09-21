@@ -480,7 +480,6 @@ public class EngineerConsole extends PlayerConsole {
 	public void setup() {
 		super.setup();
 		consoleName = "engineerconsole";
-		testMode = true;
 		if (testMode) {
 			serialEnabled = false;
 			serverIP = "127.0.0.1";

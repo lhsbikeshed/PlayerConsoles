@@ -346,7 +346,6 @@ public class PilotConsole extends PlayerConsole {
 	@Override
 	public void setup() {
 		super.setup();
-		testMode = true;
 		consoleName = "pilotconsole";
 
 		if (testMode) {

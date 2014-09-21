@@ -111,6 +111,7 @@ public abstract class PlayerConsole extends PApplet {
 
 	}
 
+	/* hide the cursor by substituting it for an empty icon */
 	protected void hideCursor() {
 		BufferedImage cursorImg = new BufferedImage(16, 16,
 				BufferedImage.TYPE_INT_ARGB);
@@ -121,6 +122,9 @@ public abstract class PlayerConsole extends PApplet {
 
 	@Override
 	public void setup() {
+		//read config from the command line args
+		testMode = GlobalConfig.testMode;
+		
 		size(1024, 768, P3D);
 		frameRate(25);
 		hideCursor();
@@ -129,9 +133,53 @@ public abstract class PlayerConsole extends PApplet {
 		font = loadFont("common/HanzelExtendedNormal-48.vlw");
 
 	}
-	public static void main(String[] args) {
-		System.out.println("Running as : " + args[0]);
-		PApplet.main(new String[] {args[0] });
+	public static void main(String[] args) {	
+		System.out.println("Start PlayerConsole.....");
+		//scan the args for params
+		//console:pilot/tactical/engineer
+		//testmode:true/false
+		String consoleString = "";
+		boolean testMode = false;
+		try {
+			for (int i = 0; i < args.length; i++){
+				if(args[i].startsWith("console:")){
+					String[] parts = args[i].split(":");
+					switch (parts[1]){
+						case "pilot":
+							consoleString = "pilot.PilotConsole";
+							break;
+						case "tactical":
+							consoleString = "tactical.TacticalConsole";
+							break;
+						case "engineer":
+							consoleString = "engineer.EngineerConsole";
+							break;
+						default:
+							System.out.println("Invalid conesole specified");
+							showHelp();
+							break;
+					}
+							
+					
+				} else if(args[i].equals("testMode")){
+					GlobalConfig.testMode = true;
+					System.out.println("running in TEST MODE");
+				}
+			}
+		} catch (Exception e){
+			showHelp();
+		}
+		if(consoleString.equals("")) showHelp();
+		
+		System.out.println("Running as : " + consoleString);
+		PApplet.main(new String[] {consoleString });
 
+	}
+	
+	public static void showHelp(){
+		System.out.println("USAGE:\r\nPlayerConsole console:engineer/tactical/pilot\r\n\twhich console to start\r\ntestMode\r\n\tif present will start in test mode");
+		
+		System.exit(1);
+	
 	}
 }

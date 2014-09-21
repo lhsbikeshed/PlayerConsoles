@@ -423,7 +423,6 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	public void setup() {
 		super.setup();
-		testMode = true;
 		consoleName = "tacticalconsole";
 
 		if (testMode) {
