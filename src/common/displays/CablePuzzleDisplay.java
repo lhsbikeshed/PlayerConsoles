@@ -1,19 +1,17 @@
-package tactical;
-
+package common.displays;
 import oscP5.OscMessage;
 import common.Display;
 import common.PlayerConsole;
 import processing.core.*;
 
+/* display for the large cable puzzle 
+ * just flashes an error code from the game
+ */
 public class CablePuzzleDisplay extends Display {
   
   PImage bannerImg;
   int time;
-  
-  PFont font;
-  
-  int blinkTime = 0;
-  boolean blinker = false;
+
   
   /*  sockets - > plugs
    *  [8, 6, 3] , [5, 12, 10]
@@ -27,8 +25,7 @@ public class CablePuzzleDisplay extends Display {
   
   public CablePuzzleDisplay(PlayerConsole parent){
 	  super(parent);
-    
-    bannerImg = parent.loadImage("tacticalconsole/cablepuzzle/banner.png");
+    bannerImg = parent.loadImage("common/cablepuzzle/banner.png");
     
   }
   
@@ -41,11 +38,11 @@ public class CablePuzzleDisplay extends Display {
   }
   
   public void draw(){
-    parent.background(0,0,0);
+	  parent.background(0,0,0);
     if(parent.globalBlinker){
-      parent.image(bannerImg, 247, 315);
-      parent.textFont(font, 15);
-      parent.text("Error code " + errorCodes[selectedPatch], 418,408);
+    	parent.image(bannerImg, 247, 315);
+    	parent.textFont(font, 15);
+    	parent.text("Error code " + errorCodes[selectedPatch], 418,408);
     }
     
   }

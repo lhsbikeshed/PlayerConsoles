@@ -1,0 +1,6 @@
+Engineers Log 22/04/2137 13:56:00
+
+The jump system failed catastrophically during the last jump, neutron flows spiked 250% above normal causing the Freibecker coils to overheat. 
+
+As of yet we have no idea where we are, whilst I attempt to repair the ship the crew are playing Minesweeper which has been left installed on ShipOS (I thought we took that out??)
+

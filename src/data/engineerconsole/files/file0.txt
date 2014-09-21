@@ -1,0 +1,7 @@
+Engineers Log 22/04/2137 11:43:00
+
+We noticed some instabilities in our jump system during the first jump out of base. Whilst the we arrived at our destination with no problems I'm officially logging this problem for investigation when we return
+
+Our next jump is in approximately 3 hours time and will cover 1.2 Light Years. No other issues to report, the ship is performing well.
+
+Weapons tests to start shortly

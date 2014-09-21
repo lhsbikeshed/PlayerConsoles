@@ -1,24 +1,46 @@
 package common;
 import java.util.Hashtable;
 
+import ddf.minim.AudioOutput;
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
+import ddf.minim.ugens.Oscil;
+import ddf.minim.ugens.Waves;
 
 public class ConsoleAudio {
 
 	PlayerConsole parent;
   Minim minim;
   
-  
+  public boolean muteBeeps = false;
   Hashtable<String, AudioPlayer> audioList;
   
   AudioPlayer[] beepList = new AudioPlayer[4];
+//tone generation
+  AudioOutput toneOutput;
+  Oscil fm;
+  Oscil wave;
   
+  Oscil dialWave = new Oscil(440, 0.8f, Waves.SINE);
   
   public ConsoleAudio(PlayerConsole parent, Minim minim) {
 	  this.parent = parent;
     this.minim = minim;
     loadSounds();
+    
+  //set up tone gen
+    toneOutput   = minim.getLineOut();
+    wave = new Oscil( 200, 0.8f, Waves.TRIANGLE );
+    fm   = new Oscil( 10, 2, Waves.SINE );
+    // set the offset of fm so that it generates values centered around 200 Hz
+    fm.offset.setLastValue( 200 );
+    // patch it to the frequency of wave so it controls it
+    fm.patch( wave.frequency );
+    // and patch wave to the output
+
+    wave.patch( toneOutput );
+    toneOutput.setPan(1.0f);
+    setToneState(false);
   }
 
   private void loadSounds() {
@@ -69,5 +91,57 @@ public class ConsoleAudio {
     }
       
   }
+  public void setToneState(boolean state) {
+	    if (state) {
+	      wave.patch( toneOutput );
+	    } 
+	    else {
+	      wave.unpatch( toneOutput );
+	    }
+	  }
+
+	  //x should range from 220 - 50;
+	  //y should range from 0.1 - 100
+	  public void setToneValue(float x,  float y) {
+	    fm.frequency.setLastValue( y );
+	    fm.amplitude.setLastValue( x );
+	  }
+
+	  public void playClipForce(String name, float pan){
+		    AudioPlayer c = audioList.get(name);
+		    if (c != null) {
+		      c.setPan(pan);
+		      c.rewind();
+		      c.play();
+		    } 
+		    else {
+		      ConsoleLogger.log(this, "ALERT: tried to play " + name + " but not found");
+		    }
+		  }
+		  /* does a given name exist? */
+		  public boolean clipExists(String name){
+		    if(audioList.get(name) != null){
+		      return true;
+		    } else {
+		      return false;
+		    }
+		  }
+
+		/* forces a sound to play even when ship os powered off*/
+		  public void playClipForce(String name){
+		    
+		    playClipForce(name, 1.0f);
+		  }
+		  public void playClip(String name, float pan){
+			    if (!parent.getShipState().poweredOn) {
+			      return;
+			    }
+			    playClipForce(name,pan);
+			  }
+
+
 }
+
+
+
 

@@ -1,0 +1,13 @@
+#format:
+#name=clip
+#name is the string to throw at ConsoleAudio.playClip()
+#banner popup sound
+bannerPopup=popup.wav
+#reactor is about to fail warning
+failWarning=collisionalert.wav
+#code failure sound
+codeFail=collisionalert.wav
+#code ok
+codeOk=codesuccess.wav
+#jamming attempt
+jamattempt=jamattempt.wav

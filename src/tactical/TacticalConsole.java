@@ -76,11 +76,11 @@ public class TacticalConsole extends PlayerConsole {
 		super.setup();
 	  testMode = true;
 	  consoleName = "tacticalconsole";
-	  shipState.poweredOn = true;
+	  
 	  if (testMode) {
 	    serialEnabled = false;
 	    serverIP = "127.0.0.1";
-	    //shipState.poweredOn = true;
+	    shipState.poweredOn = true;
 	  } 
 	  else {
 	    serialEnabled = true;
@@ -128,9 +128,7 @@ public class TacticalConsole extends PlayerConsole {
 	  minim = new Minim(this);
 	  consoleAudio = new ConsoleAudio(this, minim);
 	
-	  //damage stuff
-	  damageEffects = new DamageEffect(this);
-	
+	 
 	  //set initial screen, probably gets overwritten from game shortly
 	  changeDisplay(displayMap.get("weapons"));
 	
@@ -252,7 +250,7 @@ public class TacticalConsole extends PlayerConsole {
 	    }
 	  } 
 	  else {
-	    damageEffects.startTransform();
+	   
 	    if (shipState.poweredOn) {
 	      currentScreen.draw();
 	    } 
@@ -273,7 +271,7 @@ public class TacticalConsole extends PlayerConsole {
 	    }
 	    hint(DISABLE_DEPTH_TEST) ;
 	    bannerSystem.draw();
-	    damageEffects.stopTransform();
+	    
 	  }
 	
 	  if (heartBeatTimer > 0) {

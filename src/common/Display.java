@@ -12,6 +12,11 @@ public abstract class Display {
 		font = parent.getGlobalFont();
 		
 	}
+	public void keyPressed(char key){
+		
+	}
+	
+	public void keyReleased(char key){}
 	
 	  public abstract void draw();
 	  public abstract void oscMessage(OscMessage theOscMessage);
