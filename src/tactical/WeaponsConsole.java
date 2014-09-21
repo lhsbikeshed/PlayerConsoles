@@ -129,6 +129,7 @@ public class WeaponsConsole extends Display {
 		super(parent);
 		osc = parent.getOscClient();
 		serverIP = parent.getServerIP();
+		ConsoleLogger.log(this, "wep console ip:" + serverIP);
 		// load resources
 		bgImage = parent.loadImage("tacticalconsole/tacticalscreen3.png");
 		titleImage = parent.loadImage("tacticalconsole/weaponsTitle.png");
@@ -404,7 +405,7 @@ public class WeaponsConsole extends Display {
 						OscMessage myMessage = new OscMessage(
 								"/system/targetting/targetObject");
 						myMessage.add(t.hashCode);
-						OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
+						osc.send(myMessage, new NetAddress(serverIP, 12000));
 						currentTarget = t;
 						parent.getConsoleAudio().playClip("targetLocked");
 						scanningState = SCAN_OK;
@@ -583,7 +584,7 @@ public class WeaponsConsole extends Display {
 							OscMessage myMessage = new OscMessage(
 									"/system/targetting/untargetObject");
 							myMessage.add(t.hashCode);
-							OscP5.flush(myMessage, new NetAddress(serverIP,
+							osc.send(myMessage, new NetAddress(serverIP,
 									12000));
 						}
 					}
@@ -608,7 +609,7 @@ public class WeaponsConsole extends Display {
 		if (action.equals("FIRELASER")) {
 			OscMessage myMessage = new OscMessage(
 					"/system/targetting/fireAtTarget");
-			OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
+			osc.send(myMessage, new NetAddress(serverIP, 12000));
 			if (currentTarget != null && currentTarget.pos.mag() < maxBeamRange) {
 				parent.getConsoleAudio().playClip("firing");
 			} else {
@@ -625,7 +626,7 @@ public class WeaponsConsole extends Display {
 
 					OscMessage myMessage = new OscMessage(
 							"/system/targetting/fireFlare");
-					OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
+					osc.send(myMessage, new NetAddress(serverIP, 12000));
 
 					parent.getShipState().smartBombsLeft--;
 					smartBombFireTime = parent.millis();

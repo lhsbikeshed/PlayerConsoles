@@ -24,10 +24,13 @@ public class ConsoleAudio {
 	Oscil wave;
 
 	Oscil dialWave = new Oscil(440, 0.8f, Waves.SINE);
+	
+	float pan = 0.0f;
 
-	public ConsoleAudio(PlayerConsole parent, Minim minim) {
+	public ConsoleAudio(PlayerConsole parent, Minim minim, float pan) {
 		this.parent = parent;
 		this.minim = minim;
+		this.pan = pan;
 		loadSounds();
 
 		// set up tone gen
@@ -69,7 +72,7 @@ public class ConsoleAudio {
 				AudioPlayer s = minim.loadFile(parent.getConsoleName()
 						+ "/audio/" + parts[1], 512);
 				// move to left channel
-				s.setPan(-1.0f);
+				s.setPan(pan);
 				audioList.put(parts[0], s);
 
 			}
@@ -80,9 +83,18 @@ public class ConsoleAudio {
 
 			beepList[i] = minim
 					.loadFile("common/audio/buttonBeep" + i + ".wav");
-			beepList[i].setPan(1.0f);
+			beepList[i].setPan(pan);
 		}
 
+	}
+	
+	public void setPan(float pan){
+		for(AudioPlayer ap : audioList.values()){
+			ap.setPan(pan);
+		}
+		for(AudioPlayer ap : beepList){
+			ap.setPan(pan);;
+		}
 	}
 
 	public void playClip(String name) {

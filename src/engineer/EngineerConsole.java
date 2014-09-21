@@ -409,7 +409,7 @@ public class EngineerConsole extends PlayerConsole {
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 
 		//now console is loaded up, load the sound config
-		consoleAudio = new ConsoleAudio(this, minim);
+		consoleAudio = new ConsoleAudio(this, minim, 1.0f);
 
 
 		// set initial screen, probably gets overwritten from game shortly

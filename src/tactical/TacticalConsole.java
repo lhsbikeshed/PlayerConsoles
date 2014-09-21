@@ -25,11 +25,8 @@ public class TacticalConsole extends PlayerConsole {
 	// CHANGE ME for testing
 	// disables serial port access
 	// and sets server to localhost
-	boolean testMode = true;
+	
 	boolean serialEnabled = false;
-
-	String serverIP = "127.0.0.1";
-
 
 	DropDisplay dropDisplay; // display for the drop scene
 	WarpDisplay warpDisplay; // warp scene
@@ -307,10 +304,12 @@ public class TacticalConsole extends PlayerConsole {
 		consoleName = "tacticalconsole";
 
 		if (testMode) {
+			ConsoleLogger.log(this, "running test mode tactical");
 			serialEnabled = false;
 			serverIP = "127.0.0.1";
 			shipState.poweredOn = true;
 		} else {
+			ConsoleLogger.log(this, "running LIVE mode tactical");
 			serialEnabled = true;
 			serverIP = "10.0.0.100";
 			frame.setLocation(1024, 0);
@@ -342,8 +341,12 @@ public class TacticalConsole extends PlayerConsole {
 			serialPort.write("p,");
 		}
 		
+		shipState.smartBombsLeft = 6;
+		
+		
 		//now console is loaded up, load the sound config
-		consoleAudio = new ConsoleAudio(this, minim);
+		consoleAudio = new ConsoleAudio(this, minim, 1.0f);
+		
 
 		// set initial screen, probably gets overwritten from game shortly
 		changeDisplay(displayMap.get("weapons"));

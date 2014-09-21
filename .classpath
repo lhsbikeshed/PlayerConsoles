@@ -16,7 +16,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/serial/serial.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="VanConsoles/lib/serial"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="OldConsole/lib/serial/windows32"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/osc/oscP5/library/oscP5.jar"/>

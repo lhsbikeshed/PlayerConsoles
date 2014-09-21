@@ -286,7 +286,7 @@ public class PilotConsole extends PlayerConsole {
 		setJumpLightState(false);
 
 		//now console is loaded up, load the sound config
-		consoleAudio = new ConsoleAudio(this, minim);
+		consoleAudio = new ConsoleAudio(this, minim, -1.0f);
 
 
 
