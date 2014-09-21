@@ -59,7 +59,12 @@ public abstract class PlayerConsole extends PApplet {
 		}
 
 		System.out.println("Running as : " + consoleString);
-		PApplet.main(new String[] { consoleString });
+		if(GlobalConfig.testMode == false){
+			PApplet.main(new String[] { "--present", "--hide-stop", consoleString });
+		} else {
+			PApplet.main(new String[] { consoleString });	
+		}
+		
 
 	}
 
