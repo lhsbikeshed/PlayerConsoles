@@ -1,18 +1,34 @@
 package common;
 
+import java.util.ArrayList;
+
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
+import processing.core.PVector;
 
 public class DamageEffect {
+	private class CrackItem {
+		public int crackId = 0;
+		public int rotation = 0;
+		public PVector screenPosition = new PVector(0, 0);
+		public float scale = 1f;
+
+	}
+
 	// time we last got damaged
 	long damageTimer = -1000;
+
 	PImage noiseImage; // static image that flashes
 
 	boolean running = false;
-
 	int tileX = 5;
+
 	int tileY = 5;
+	ArrayList<CrackItem> crackList = new ArrayList<CrackItem>();
+	PImage[] crackImages;
+
+	int maxCracks = 3;
 
 	PApplet parent;
 
@@ -27,6 +43,29 @@ public class DamageEffect {
 		}
 		noiseImage.updatePixels();
 		ConsoleLogger.log(this, "     ...done");
+
+		// window crack images
+		ConsoleLogger.log(this, "Loading crack images..");
+		crackImages = new PImage[maxCracks];
+		for (int i = 0; i < maxCracks; i++) {
+			String n = "common/crack" + (i + 1) + ".png";
+			crackImages[i] = parent.loadImage(n);
+		}
+		ConsoleLogger.log(this, "     ...done");
+
+	}
+
+	public void addCrack() {
+		CrackItem c = new CrackItem();
+		c.rotation = (int) parent.random(360);
+		c.screenPosition = new PVector(parent.random(1024), parent.random(768));
+		c.crackId = (int) parent.random(maxCracks);
+		c.scale = 0.8f + parent.random(0.4f);
+		crackList.add(c);
+	}
+
+	public void clearCracks() {
+		crackList.clear();
 	}
 
 	public void draw() {
@@ -45,6 +84,26 @@ public class DamageEffect {
 					}
 				}
 			}
+		}
+
+	}
+
+	/*
+	 * this is called outside of the draw call above so that the shaking effect
+	 * doesnt take place
+	 */
+	public void drawCracks() {
+		for (CrackItem c : crackList) {
+
+			parent.pushMatrix();
+			parent.translate(c.screenPosition.x, c.screenPosition.y);
+			parent.rotate(PApplet.radians(c.rotation));
+			PImage p = crackImages[c.crackId];
+
+			parent.image(p, -(p.width * c.scale) / 2f,
+					-(p.height * c.scale) / 2f, p.width * c.scale, p.height
+							* c.scale);
+			parent.popMatrix();
 		}
 
 	}

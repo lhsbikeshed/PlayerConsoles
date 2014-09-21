@@ -3,7 +3,6 @@ package pilot;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
-import processing.core.PApplet;
 import processing.core.PImage;
 import processing.serial.Serial;
 
@@ -21,7 +20,6 @@ import common.displays.WarpDisplay;
 import ddf.minim.Minim;
 
 public class PilotConsole extends PlayerConsole {
-
 
 	// ---joystick class
 	Joystick joy;
@@ -54,8 +52,6 @@ public class PilotConsole extends PlayerConsole {
 	FailureScreen failureScreen;
 	int systemPower = 2;
 
-	long heartBeatTimer = -1;
-
 	float lastOscTime = 0;
 
 	void dealWithSerial(String vals) {
@@ -83,7 +79,7 @@ public class PilotConsole extends PlayerConsole {
 			int s = Integer.parseInt(parts[2]);
 			msg.add(pl);
 			msg.add(s);
-			oscP5.send(msg, myRemoteLocation);
+			oscP5.send(msg, serverAddress);
 		} else {
 
 			int sw = Integer.parseInt("" + p);
@@ -98,7 +94,7 @@ public class PilotConsole extends PlayerConsole {
 				val = 1 - val;
 			}
 			myMessage.add(val);
-			oscP5.send(myMessage, myRemoteLocation);
+			oscP5.send(myMessage, serverAddress);
 		}
 	}
 
@@ -127,9 +123,9 @@ public class PilotConsole extends PlayerConsole {
 		if (shipState.areWeDead) {
 			fill(255, 255, 255);
 			if (deathTime + 2000 < millis()) {
-				textFont(font, 60);
+				textFont(globalFont, 60);
 				text("YOU ARE DEAD", 50, 300);
-				textFont(font, 20);
+				textFont(globalFont, 20);
 				int pos = (int) textWidth(shipState.deathText);
 				text(shipState.deathText, (width / 2) - pos / 2, 340);
 			}
@@ -162,15 +158,7 @@ public class PilotConsole extends PlayerConsole {
 
 		}
 
-		if (heartBeatTimer > 0) {
-			if (heartBeatTimer + 400 > millis()) {
-				int a = (int) map(millis() - heartBeatTimer, 0, 400, 255, 0);
-				fill(0, 0, 0, a);
-				rect(0, 0, width, height);
-			} else {
-				heartBeatTimer = -1;
-			}
-		}
+	
 
 	}
 
@@ -183,7 +171,10 @@ public class PilotConsole extends PlayerConsole {
 		println(":" + mouseX + "," + mouseY);
 	}
 
-	void oscEvent(OscMessage theOscMessage) {
+	@Override
+	protected void oscEvent(OscMessage theOscMessage) {
+		super.oscEvent(theOscMessage);
+
 		lastOscTime = millis();
 		// println(theOscMessage);
 		if (theOscMessage.checkAddrPattern("/scene/change") == true) {
@@ -258,16 +249,13 @@ public class PilotConsole extends PlayerConsole {
 				bootDisplay.stop();
 				OscMessage myMessage = new OscMessage(
 						"/game/Hello/PilotStation");
-				oscP5.send(myMessage, myRemoteLocation);
+				oscP5.send(myMessage, serverAddress);
 			} else {
 				shipState.poweredOn = false;
 				shipState.poweringOn = false;
 				setJumpLightState(false);
 			}
-		} else if (theOscMessage.checkAddrPattern("/ship/effect/heartbeat") == true) {
-			heartBeatTimer = millis();
-		} else if (theOscMessage.checkAddrPattern("/ship/damage") == true) {
-			damageEffects.startEffect(1000);
+
 		} else if (theOscMessage.checkAddrPattern("/ship/transform") == true) {
 			shipState.shipPos.x = theOscMessage.get(0).floatValue();
 			shipState.shipPos.y = theOscMessage.get(1).floatValue();
@@ -309,14 +297,6 @@ public class PilotConsole extends PlayerConsole {
 			bannerSystem.setTitle(title);
 			bannerSystem.setText(text);
 			bannerSystem.displayFor(duration);
-		} else if (theOscMessage.checkAddrPattern("/system/boot/diskNumbers")) {
-
-			int[] disks = { theOscMessage.get(0).intValue(),
-					theOscMessage.get(1).intValue(),
-					theOscMessage.get(2).intValue() };
-			println(disks);
-
-			bootDisplay.setDisks(disks);
 		} else if (theOscMessage.checkAddrPattern("/ship/sectorChanged")) {
 			radarDisplay.setSector(theOscMessage.get(0).intValue(),
 					theOscMessage.get(1).intValue(), theOscMessage.get(2)
@@ -361,7 +341,7 @@ public class PilotConsole extends PlayerConsole {
 		}
 
 		oscP5 = new OscP5(this, 12002);
-		myRemoteLocation = new NetAddress(serverIP, 12000);
+		serverAddress = new NetAddress(serverIP, 12000);
 		dropDisplay = new DropDisplay(this);
 		radarDisplay = new RadarDisplay(this);
 		warpDisplay = new WarpDisplay(this);
@@ -382,7 +362,7 @@ public class PilotConsole extends PlayerConsole {
 		bootDisplay = new BootDisplay(this);
 		displayMap.put("boot", bootDisplay);
 
-		font = loadFont("common/HanzelExtendedNormal-48.vlw");
+		globalFont = loadFont("common/HanzelExtendedNormal-48.vlw");
 
 		// damage stuff
 		setJumpLightState(false);
@@ -397,11 +377,17 @@ public class PilotConsole extends PlayerConsole {
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");
-		oscP5.send(myMessage, myRemoteLocation);
+		oscP5.send(myMessage, serverAddress);
 
 		// set initial screen
 		Display d = displayMap.get("radar");
 		changeDisplay(d);
+
+	}
+
+	@Override
+	protected void shipDamaged(float amount) {
+		// TODO Auto-generated method stub
 
 	}
 }

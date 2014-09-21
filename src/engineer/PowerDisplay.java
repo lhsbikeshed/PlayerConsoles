@@ -399,7 +399,7 @@ public class PowerDisplay extends Display {
 		if (power[1] == 3) {
 			parent.fill(255, 255, 255);
 			parent.textFont(font, 15);
-			parent.text("Repairing..", 72, 611);
+			parent.text("Repairing..", 196, 757);
 		}
 
 		if (reactorFailWarn && parent.globalBlinker) {
@@ -482,11 +482,6 @@ public class PowerDisplay extends Display {
 			for (SubSystem s : subsystemList) {
 				s.setDifficulty(difficulty);
 			}
-		} else if (theOscMessage.checkAddrPattern("/ship/damage") == true) {
-			float damage = theOscMessage.get(0).floatValue();
-			if (damage >= 9.0f) {
-				damageSomeShit();
-			}
 		} else if (theOscMessage
 				.checkAddrPattern("/system/reactor/stateUpdate")) { // qhen
 																	// reactor
@@ -547,6 +542,12 @@ public class PowerDisplay extends Display {
 					parent.getConsoleAudio().randomBeep();
 				}
 			}
+		}
+	}
+
+	public void shipDamaged(float damage) {
+		if (damage >= 9.0f) {
+			damageSomeShit();
 		}
 	}
 

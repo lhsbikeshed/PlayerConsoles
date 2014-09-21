@@ -3,7 +3,6 @@ package tactical;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
-import processing.core.PApplet;
 import processing.serial.Serial;
 
 import common.ConsoleAudio;
@@ -20,7 +19,7 @@ import common.displays.WarpDisplay;
 import ddf.minim.Minim;
 
 public class TacticalConsole extends PlayerConsole {
-	
+
 	// dont change anything past here. Things will break
 
 	// CHANGE ME for testing
@@ -55,8 +54,6 @@ public class TacticalConsole extends PlayerConsole {
 	String serialBuffer = "";
 
 	String lastSerial = "";
-
-	long heartBeatTimer = 0;
 
 	boolean decoyLightState = false;
 
@@ -132,9 +129,9 @@ public class TacticalConsole extends PlayerConsole {
 		if (shipState.areWeDead) {
 			fill(255, 255, 255);
 			if (deathTime + 2000 < millis()) {
-				textFont(font, 60);
+				textFont(globalFont, 60);
 				text("YOU ARE DEAD", 50, 300);
-				textFont(font, 20);
+				textFont(globalFont, 20);
 				int pos = (int) textWidth(shipState.deathText);
 				text(shipState.deathText, (width / 2) - pos / 2, 340);
 			}
@@ -164,29 +161,7 @@ public class TacticalConsole extends PlayerConsole {
 
 		}
 
-		if (heartBeatTimer > 0) {
-			if (heartBeatTimer + 400 > millis()) {
-				int a = (int) map(millis() - heartBeatTimer, 0, 400, 255, 0);
-				fill(0, 0, 0, a);
-				rect(0, 0, width, height);
-			} else {
-				heartBeatTimer = -1;
-			}
-		}
-
-		damageEffects.draw();
-		// if ( damageTimer + 1000 > millis()) {
-		// if (random(10) > 3) {
-		// image(noiseImage, 0, 0, width, height);
-		// }
-		// }
-		// if (shipState.poweredOn && shipState.hullState < 20.0f) {
-		// if (random(1000) < 10) {
-		// if (serialEnabled) {
-		// serialPort.write("F,");
-		// }
-		// }
-		// }
+		
 	}
 
 	/* these are just for testing when serial devices arent available */
@@ -213,8 +188,9 @@ public class TacticalConsole extends PlayerConsole {
 		ConsoleLogger.log(this, "mx: " + mouseX + ", my: " + mouseY);
 	}
 
-	void oscEvent(OscMessage theOscMessage) {
-
+	@Override
+	protected void oscEvent(OscMessage theOscMessage) {
+		super.oscEvent(theOscMessage);
 		if (theOscMessage.checkAddrPattern("/scene/warzone/weaponState") == true) {
 			int msg = theOscMessage.get(0).intValue();
 			if (msg == 1) {
@@ -304,16 +280,7 @@ public class TacticalConsole extends PlayerConsole {
 			}
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/heartbeat") == true) {
 			heartBeatTimer = millis();
-		} else if (theOscMessage.checkAddrPattern("/ship/damage") == true) {
 
-			// float damage = theOscMessage.get(0).floatValue();
-			damageEffects.startEffect(1000);
-			if (serialEnabled) {
-
-				serialPort.write("S,");
-				charlesPort.write("D1,");
-				// serialPort.write("F,");
-			}
 		} else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
 			int beamPower = theOscMessage.get(3).intValue() - 1; // write charge
 																	// rate
@@ -364,12 +331,7 @@ public class TacticalConsole extends PlayerConsole {
 			bannerSystem.setTitle(title);
 			bannerSystem.setText(text);
 			bannerSystem.displayFor(duration);
-		
-		} else if (theOscMessage.checkAddrPattern("/control/grapplingHookState")) {
 
-			weaponsDisplay.hookArmed = theOscMessage.get(0).intValue() == 1 ? true
-					: false;
-			bannerSystem.displayFor(1500);
 		} else if (theOscMessage.checkAddrPattern("/ship/stats") == true) {
 
 			shipState.hullState = theOscMessage.get(2).floatValue();
@@ -440,7 +402,7 @@ public class TacticalConsole extends PlayerConsole {
 
 		oscP5 = new OscP5(this, 12004);
 
-		font = loadFont("common/HanzelExtendedNormal-48.vlw");
+		globalFont = loadFont("common/HanzelExtendedNormal-48.vlw");
 
 		dropDisplay = new DropDisplay(this);
 		// radarDisplay = new RadarDisplay();
@@ -475,6 +437,18 @@ public class TacticalConsole extends PlayerConsole {
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");
 		oscP5.send(myMessage, new NetAddress(serverIP, 12000));
+
+	}
+
+	@Override
+	protected void shipDamaged(float amount) {
+
+		if (serialEnabled) {
+
+			serialPort.write("S,");
+			charlesPort.write("D1,");
+			// serialPort.write("F,");
+		}
 
 	}
 

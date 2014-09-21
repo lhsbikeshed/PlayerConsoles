@@ -49,6 +49,7 @@ public class WeaponsConsole extends Display {
 			statMap.clear();
 		}
 
+		@Override
 		public int compareTo(TargetObject other) {
 			return (int) (this.pos.mag() - other.pos.mag());
 		}
