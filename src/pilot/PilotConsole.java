@@ -52,7 +52,6 @@ public class PilotConsole extends PlayerConsole {
 	
 	
 	//-----displays-----
-	Display currentScreen;
 	DropDisplay dropDisplay;
 	WarpDisplay warpDisplay;
 	RadarDisplay radarDisplay;
@@ -141,14 +140,6 @@ public class PilotConsole extends PlayerConsole {
 	  
 	}
 	
-	
-	void changeDisplay(Display d) {
-	  if(currentScreen != null){
-	    currentScreen.stop();
-	  }
-	  currentScreen = d;
-	  currentScreen.start();
-	}
 	
 	
 	public void drawConsole() {
@@ -350,7 +341,7 @@ public class PilotConsole extends PlayerConsole {
 	    float y = theOscMessage.get(5).floatValue();
 	    float z = theOscMessage.get(6).floatValue();
 	    shipState.lastShipRot = shipState.shipRot;
-	    shipState.shipRot = new Rot(w, x, y, z, false);
+	    shipState.shipRotQuat = new Rot(w, x, y, z, false);
 	    shipState.shipVel.x = theOscMessage.get(7).floatValue();
 	    shipState.shipVel.y = theOscMessage.get(8).floatValue();
 	    shipState.shipVel.z = theOscMessage.get(9).floatValue();
@@ -466,7 +457,7 @@ public class PilotConsole extends PlayerConsole {
 	//---------------- main method
 	
 	public static void main(String[] args) {
-		PApplet.main(new String[] { "pilot.PilotConsole" });
+		PApplet.main(new String[] { "--present", "pilot.PilotConsole"});
 	
 	}
 }

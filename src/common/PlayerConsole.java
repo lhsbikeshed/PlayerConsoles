@@ -43,7 +43,8 @@ public abstract class PlayerConsole extends PApplet{
 	
 	//----- display control
 	protected Hashtable<String, Display> displayMap = new Hashtable<String, Display>();
-
+	protected Display currentScreen;  //screen that is currently being displayed
+	
 	protected String consoleName = "changeme";
 	
 	public void setup(){
@@ -75,6 +76,16 @@ public abstract class PlayerConsole extends PApplet{
 	
 	public abstract void drawConsole();
 
+	/* switch to a new display */
+	protected void changeDisplay(Display d) {
+	  if(currentScreen != null){
+	    currentScreen.stop();
+	  }
+	  currentScreen = d;
+	  currentScreen.start();
+	}
+	
+	
 	protected void hideCursor() {
 		  BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
 		  Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
@@ -82,6 +93,8 @@ public abstract class PlayerConsole extends PApplet{
 		  frame.setCursor(blankCursor);
 		}
 		
+	
+	
 
 	public ConsoleAudio getConsoleAudio() {
 		return consoleAudio;
@@ -107,6 +120,10 @@ public abstract class PlayerConsole extends PApplet{
 
 	public String getServerIP() {
 		return serverIP;
+	}
+	
+	public OscP5 getOscClient(){
+		return oscP5;
 	}
 	
 	
