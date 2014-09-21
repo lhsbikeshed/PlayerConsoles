@@ -37,11 +37,6 @@ public class TacticalConsole extends PlayerConsole {
 
 	WeaponsConsole weaponsDisplay; // tactical weapons display
 
-	BootDisplay bootDisplay; // boot up sequence
-
-	// time (local ms) in which the ship died
-	long deathTime = 0;
-
 	// is the decoy blinker on?
 	boolean decoyBlinker = false;
 
@@ -127,14 +122,7 @@ public class TacticalConsole extends PlayerConsole {
 		background(0, 0, 0);
 
 		if (shipState.areWeDead) {
-			fill(255, 255, 255);
-			if (deathTime + 2000 < millis()) {
-				textFont(globalFont, 60);
-				text("YOU ARE DEAD", 50, 300);
-				textFont(globalFont, 20);
-				int pos = (int) textWidth(shipState.deathText);
-				text(shipState.deathText, (width / 2) - pos / 2, 340);
-			}
+			drawDeadScreen();
 		} else {
 
 			if (shipState.poweredOn) {
@@ -206,52 +194,9 @@ public class TacticalConsole extends PlayerConsole {
 			}
 
 			currentScreen.oscMessage(theOscMessage);
-		} else if (theOscMessage
-				.checkAddrPattern("/system/reactor/stateUpdate") == true) {
-			int state = theOscMessage.get(0).intValue();
-
-			if (state == 0) {
-				shipState.poweredOn = false;
-				shipState.poweringOn = false;
-				bootDisplay.stop();
-				bootDisplay.stop();
-				bannerSystem.cancel();
-				if (serialEnabled) {
-					serialPort.write("p,");
-					decoyBlinker = false;
-					charlesPort.write("R0,");
-				}
-			} else {
-
-				if (!shipState.poweredOn) {
-					shipState.poweringOn = true;
-
-					changeDisplay(bootDisplay);
-					if (serialEnabled) {
-						serialPort.write("P,");
-						charlesPort.write("R1,");
-					}
-				}
-			}
-		} else if (theOscMessage.checkAddrPattern("/scene/youaredead") == true) {
-			// oh noes we died
-			shipState.areWeDead = true;
-			deathTime = millis();
-			shipState.deathText = theOscMessage.get(0).stringValue();
-			if (serialEnabled) {
-				serialPort.write("p,");
-				charlesPort.write("R0,");
-			}
-		} else if (theOscMessage.checkAddrPattern("/game/reset") == true) {
-			// reset the entire game
-			changeDisplay(weaponsDisplay);
-			shipState.areWeDead = false;
-			shipState.poweredOn = false;
-			shipState.poweringOn = false;
-			if (serialEnabled) {
-				serialPort.write("p,");
-			}
-			shipState.smartBombsLeft = 6;
+		
+		
+		
 		} else if (theOscMessage.checkAddrPattern("/system/subsystemstate") == true) {
 			systemPower = theOscMessage.get(1).intValue() + 1;
 			currentScreen.oscMessage(theOscMessage);
@@ -278,8 +223,7 @@ public class TacticalConsole extends PlayerConsole {
 					charlesPort.write("R0,");
 				}
 			}
-		} else if (theOscMessage.checkAddrPattern("/ship/effect/heartbeat") == true) {
-			heartBeatTimer = millis();
+	
 
 		} else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
 			int beamPower = theOscMessage.get(3).intValue() - 1; // write charge
@@ -296,18 +240,7 @@ public class TacticalConsole extends PlayerConsole {
 				charlesPort.write("I" + (internalPower + 1));
 			}
 			currentScreen.oscMessage(theOscMessage);
-		} else if (theOscMessage.checkAddrPattern("/ship/transform") == true) {
-			shipState.shipPos.x = theOscMessage.get(0).floatValue();
-			shipState.shipPos.y = theOscMessage.get(1).floatValue();
-			shipState.shipPos.z = theOscMessage.get(2).floatValue();
-
-			shipState.shipRot.x = theOscMessage.get(3).floatValue();
-			shipState.shipRot.y = theOscMessage.get(4).floatValue();
-			shipState.shipRot.z = theOscMessage.get(5).floatValue();
-
-			shipState.shipVel.x = theOscMessage.get(6).floatValue();
-			shipState.shipVel.y = theOscMessage.get(7).floatValue();
-			shipState.shipVel.z = theOscMessage.get(8).floatValue();
+		
 		} else if (theOscMessage
 				.checkAddrPattern("/clientscreen/TacticalStation/changeTo")) {
 			String changeTo = theOscMessage.get(0).stringValue();
@@ -322,19 +255,7 @@ public class TacticalConsole extends PlayerConsole {
 				ConsoleLogger.log(this, "no display found for " + changeTo);
 				changeDisplay(weaponsDisplay);
 			}
-		} else if (theOscMessage.checkAddrPattern("/clientscreen/showBanner")) {
-			String title = theOscMessage.get(0).stringValue();
-			String text = theOscMessage.get(1).stringValue();
-			int duration = theOscMessage.get(2).intValue();
-
-			bannerSystem.setSize(700, 300);
-			bannerSystem.setTitle(title);
-			bannerSystem.setText(text);
-			bannerSystem.displayFor(duration);
-
-		} else if (theOscMessage.checkAddrPattern("/ship/stats") == true) {
-
-			shipState.hullState = theOscMessage.get(2).floatValue();
+		
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/openFlap")) {
 			ConsoleLogger.log(this, "popping panel..");
 			if (serialEnabled) {
@@ -346,9 +267,7 @@ public class TacticalConsole extends PlayerConsole {
 			if (serialEnabled) {
 				serialPort.write("F,");
 			}
-		} else if (theOscMessage.checkAddrPattern("/ship/effect/playSound")) {
-			String name = theOscMessage.get(0).stringValue();
-			consoleAudio.playClip(name);
+		
 		} else {
 			if (currentScreen != null) {
 				currentScreen.oscMessage(theOscMessage);
@@ -450,6 +369,47 @@ public class TacticalConsole extends PlayerConsole {
 			// serialPort.write("F,");
 		}
 
+	}
+
+	@Override
+	protected void gameReset() {
+		// reset the entire game
+		changeDisplay(weaponsDisplay);
+		shipState.areWeDead = false;
+		shipState.poweredOn = false;
+		shipState.poweringOn = false;
+		if (serialEnabled) {
+			serialPort.write("p,");
+		}
+		shipState.smartBombsLeft = 6;
+	}
+
+	@Override
+	protected void shipDead() {
+
+		if (serialEnabled) {
+			serialPort.write("p,");
+			charlesPort.write("R0,");
+		}
+	}
+
+	@Override
+	protected void reactorStarted() {
+		
+		if (serialEnabled) {
+			serialPort.write("P,");
+			charlesPort.write("R1,");
+		}
+	}
+
+	@Override
+	protected void reactorStopped() {
+		if (serialEnabled) {
+			serialPort.write("p,");
+			decoyBlinker = false;
+			charlesPort.write("R0,");
+		}
+		
 	}
 
 }

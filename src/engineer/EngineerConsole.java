@@ -32,7 +32,6 @@ public class EngineerConsole extends PlayerConsole {
 	// highlights
 	ArrayList<Highlighter> highlightList = new ArrayList(0);
 
-	long deathTime = 0;
 	// Peripheral things
 	Serial serialPort;
 	String serialBuffer = "";
@@ -50,8 +49,6 @@ public class EngineerConsole extends PlayerConsole {
 	long sillinessStartTime = 0;
 
 	int fuelBeepTimer = 0;
-
-	private BootDisplay bootDisplay;
 
 	public void addHighlight(Highlighter h) {
 		highlightList.add(h);
@@ -173,14 +170,7 @@ public class EngineerConsole extends PlayerConsole {
 		}
 
 		if (shipState.areWeDead) {
-			fill(255, 255, 255);
-			if (deathTime + 2000 < millis()) {
-				textFont(globalFont, 60);
-				text("YOU ARE DEAD", 50, 300);
-				textFont(globalFont, 20);
-				int pos = (int) textWidth(shipState.deathText);
-				text(shipState.deathText, (width / 2) - pos / 2, 340);
-			}
+			drawDeadScreen();
 		} else {
 
 			if (shipState.poweredOn) {
@@ -298,50 +288,7 @@ public class EngineerConsole extends PlayerConsole {
 	protected void oscEvent(OscMessage theOscMessage) {
 		super.oscEvent(theOscMessage);
 
-		// ConsoleLogger.log(this,(theOscMessage);
-		if (theOscMessage.checkAddrPattern("/system/reactor/stateUpdate") == true) {
-			int state = theOscMessage.get(0).intValue();
-
-			// reset flags
-			bootDisplay.brokenBoot = false;
-
-			if (state == 0) {
-				shipState.poweredOn = false;
-				shipState.poweringOn = false;
-				bootDisplay.stop();
-				bannerSystem.cancel();
-				resetDevices();
-			} else {
-
-				if (!shipState.poweredOn) {
-					shipState.poweringOn = true;
-					changeDisplay(bootDisplay);
-				}
-			}
-			currentScreen.oscMessage(theOscMessage);
-		} else if (theOscMessage.checkAddrPattern("/scene/youaredead") == true) {
-			// oh noes we died
-			shipState.areWeDead = true;
-			shipState.deathText = theOscMessage.get(0).stringValue();
-			shipState.fuelLeaking = false;
-			deathTime = millis();
-			if (serialEnabled) {
-				serialPort.write('k');
-			}
-		} else if (theOscMessage.checkAddrPattern("/game/reset") == true) {
-			// reset the entire game
-			if (serialEnabled) {
-				serialPort.write('r');
-				panelPort.write('R');
-			}
-			changeDisplay(displayMap.get("power"));	
-			shipState.poweredOn = false;
-			shipState.poweringOn = false;
-			shipState.areWeDead = false;
-			bootDisplay.stop();
-			ConsoleLogger.log(this, "Game reset");
-			shipState.sillinessLevel = 0;
-		} else if (theOscMessage.checkAddrPattern("/engineer/powerState") == true) {
+		if (theOscMessage.checkAddrPattern("/engineer/powerState") == true) {
 
 			if (theOscMessage.get(0).intValue() == 1) {
 				shipState.poweredOn = true;
@@ -367,15 +314,7 @@ public class EngineerConsole extends PlayerConsole {
 				e.printStackTrace();
 				changeDisplay(displayMap.get("power"));
 			}
-		} else if (theOscMessage.checkAddrPattern("/clientscreen/showBanner")) {
-			String title = theOscMessage.get(0).stringValue();
-			String text = theOscMessage.get(1).stringValue();
-			int duration = theOscMessage.get(2).intValue();
-
-			bannerSystem.setSize(700, 300);
-			bannerSystem.setTitle(title);
-			bannerSystem.setText(text);
-			bannerSystem.displayFor(duration);
+		
 		} else if (theOscMessage.checkAddrPattern("/system/fuelLeakState")) {
 			boolean state = theOscMessage.get(0).intValue() == 1 ? true : false;
 			if (state) {
@@ -403,16 +342,11 @@ public class EngineerConsole extends PlayerConsole {
 		} else if (theOscMessage.addrPattern().startsWith(
 				"/system/powerManagement")) {
 			powerDisplay.oscMessage(theOscMessage);
-		} else if (theOscMessage.addrPattern().startsWith(
-				"/engineer/wormholeStatus/")) {
-
-			wormholeDisplay.oscMessage(theOscMessage);
+		
 		} else if (theOscMessage.addrPattern().startsWith("/system/jammer/")) {
 
 			jamDisplay.oscMessage(theOscMessage);
-		} else if (theOscMessage.checkAddrPattern("/ship/effect/playSound")) {
-			String name = theOscMessage.get(0).stringValue();
-			consoleAudio.playClip(name);
+		
 		} else {
 			if (currentScreen != null) {
 				currentScreen.oscMessage(theOscMessage);
@@ -497,6 +431,44 @@ public class EngineerConsole extends PlayerConsole {
 			((PowerDisplay) powerDisplay).shipDamaged(amount);
 		}
 
+	}
+
+	@Override
+	protected void gameReset() {
+		// reset the entire game
+		if (serialEnabled) {
+			serialPort.write('r');
+			panelPort.write('R');
+		}
+		changeDisplay(displayMap.get("power"));	
+		shipState.poweredOn = false;
+		shipState.poweringOn = false;
+		shipState.areWeDead = false;
+		bootDisplay.stop();
+		ConsoleLogger.log(this, "Game reset");
+		shipState.sillinessLevel = 0;
+		
+	}
+
+	@Override
+	protected void shipDead() {
+		shipState.fuelLeaking = false;
+		deathTime = millis();
+		if (serialEnabled) {
+			serialPort.write('k');
+		}
+	}
+
+	@Override
+	protected void reactorStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void reactorStopped() {
+		resetDevices();
+		
 	}
 
 }

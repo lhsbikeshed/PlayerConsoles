@@ -11,8 +11,8 @@ public class ShipState {
 	public boolean jumpState = false;
 
 	public PVector shipPos = new PVector(0, 0, 0);
-	public PVector shipRot = new PVector(0, 0, 0);
-	public PVector lastShipRot = new PVector(0, 0, 0);
+	//public PVector shipRot = new PVector(0, 0, 0);
+	//public PVector lastShipRot = new PVector(0, 0, 0);
 	public Rot shipRotQuat = Rot.IDENTITY;
 	public Rot lastShipRotQuat = Rot.IDENTITY;
 

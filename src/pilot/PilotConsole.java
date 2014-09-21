@@ -29,7 +29,6 @@ public class PilotConsole extends PlayerConsole {
 
 	PImage autopilotOverlay;
 
-	long deathTime = 0; // what time did we die?
 	// serial stuff
 	Serial serialPort;
 	String serialBuffer = "";
@@ -45,7 +44,6 @@ public class PilotConsole extends PlayerConsole {
 	DropDisplay dropDisplay;
 	WarpDisplay warpDisplay;
 	RadarDisplay radarDisplay;
-	BootDisplay bootDisplay;
 	LaunchDisplay launchDisplay;
 	CablePuzzleDisplay cablePuzzleDisplay;
 
@@ -121,14 +119,7 @@ public class PilotConsole extends PlayerConsole {
 		background(0, 0, 0);
 
 		if (shipState.areWeDead) {
-			fill(255, 255, 255);
-			if (deathTime + 2000 < millis()) {
-				textFont(globalFont, 60);
-				text("YOU ARE DEAD", 50, 300);
-				textFont(globalFont, 20);
-				int pos = (int) textWidth(shipState.deathText);
-				text(shipState.deathText, (width / 2) - pos / 2, 340);
-			}
+			drawDeadScreen();
 		} else {
 
 			// run joystick->osc updates
@@ -179,46 +170,7 @@ public class PilotConsole extends PlayerConsole {
 		// println(theOscMessage);
 		if (theOscMessage.checkAddrPattern("/scene/change") == true) {
 			setJumpLightState(false);
-		} else if (theOscMessage
-				.checkAddrPattern("/system/reactor/stateUpdate") == true) {
-			int state = theOscMessage.get(0).intValue();
-			String flags = theOscMessage.get(1).stringValue();
-			String[] fList = flags.split(";");
-			// reset flags
-			bootDisplay.brokenBoot = false;
-			for (String f : fList) {
-				if (f.equals("BROKENBOOT")) {
-					println("BROKEN BOOT");
-					bootDisplay.brokenBoot = true;
-				}
-			}
-
-			if (state == 0) {
-				shipState.poweredOn = false;
-				shipState.poweringOn = false;
-				bootDisplay.stop();
-				bannerSystem.cancel();
-			} else {
-
-				if (!shipState.poweredOn) {
-					shipState.poweringOn = true;
-					changeDisplay(bootDisplay);
-				}
-			}
-		} else if (theOscMessage.checkAddrPattern("/scene/youaredead") == true) {
-			// oh noes we died
-			shipState.areWeDead = true;
-			shipState.deathText = theOscMessage.get(0).stringValue();
-			deathTime = millis();
-		} else if (theOscMessage.checkAddrPattern("/game/reset") == true) {
-
-			currentScreen.stop();
-			currentScreen = launchDisplay;
-			currentScreen.start();
-			shipState.areWeDead = false;
-			setJumpLightState(false);
-			shipState.poweredOn = false;
-			shipState.poweringOn = false;
+				
 		} else if (theOscMessage.checkAddrPattern("/ship/jumpStatus") == true) {
 			int v = theOscMessage.get(0).intValue();
 			if (v == 0) {
@@ -256,27 +208,7 @@ public class PilotConsole extends PlayerConsole {
 				setJumpLightState(false);
 			}
 
-		} else if (theOscMessage.checkAddrPattern("/ship/transform") == true) {
-			shipState.shipPos.x = theOscMessage.get(0).floatValue();
-			shipState.shipPos.y = theOscMessage.get(1).floatValue();
-			shipState.shipPos.z = theOscMessage.get(2).floatValue();
-			/*
-			 * shipState.shipRot.x = theOscMessage.get(3).floatValue();
-			 * shipState.shipRot.y = theOscMessage.get(4).floatValue();
-			 * shipState.shipRot.z = theOscMessage.get(5).floatValue();
-			 */
-			float w = theOscMessage.get(3).floatValue();
-			float x = theOscMessage.get(4).floatValue();
-			float y = theOscMessage.get(5).floatValue();
-			float z = theOscMessage.get(6).floatValue();
-			shipState.lastShipRotQuat = shipState.shipRotQuat;
-			shipState.shipRotQuat = new Rot(w, x, y, z, false);
-			shipState.shipVel.x = theOscMessage.get(7).floatValue();
-			shipState.shipVel.y = theOscMessage.get(8).floatValue();
-			shipState.shipVel.z = theOscMessage.get(9).floatValue();
-
-			shipState.lastShipVel = shipState.shipVelocity;
-			shipState.lastTransformUpdate = millis();
+		
 		} else if (theOscMessage
 				.checkAddrPattern("/clientscreen/PilotStation/changeTo")) {
 			String changeTo = theOscMessage.get(0).stringValue();
@@ -288,22 +220,12 @@ public class PilotConsole extends PlayerConsole {
 				println("no display found for " + changeTo);
 				changeDisplay(radarDisplay);
 			}
-		} else if (theOscMessage.checkAddrPattern("/clientscreen/showBanner")) {
-			String title = theOscMessage.get(0).stringValue();
-			String text = theOscMessage.get(1).stringValue();
-			int duration = theOscMessage.get(2).intValue();
-
-			bannerSystem.setSize(700, 300);
-			bannerSystem.setTitle(title);
-			bannerSystem.setText(text);
-			bannerSystem.displayFor(duration);
+		
 		} else if (theOscMessage.checkAddrPattern("/ship/sectorChanged")) {
 			radarDisplay.setSector(theOscMessage.get(0).intValue(),
 					theOscMessage.get(1).intValue(), theOscMessage.get(2)
 							.intValue());
-		} else if (theOscMessage.checkAddrPattern("/ship/effect/playSound")) {
-			String name = theOscMessage.get(0).stringValue();
-			consoleAudio.playClip(name);
+		
 		} else {
 			if (currentScreen != null) {
 				currentScreen.oscMessage(theOscMessage);
@@ -387,7 +309,37 @@ public class PilotConsole extends PlayerConsole {
 
 	@Override
 	protected void shipDamaged(float amount) {
-		// TODO Auto-generated method stub
+		//nothing to do here for this console
 
+	}
+
+	@Override
+	protected void gameReset() {
+
+		currentScreen.stop();
+		currentScreen = launchDisplay;
+		currentScreen.start();
+		shipState.areWeDead = false;
+		setJumpLightState(false);
+		shipState.poweredOn = false;
+		shipState.poweringOn = false;
+	}
+
+	@Override
+	protected void shipDead() {
+		//nothing to do here
+		
+	}
+
+	@Override
+	protected void reactorStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void reactorStopped() {
+		// TODO Auto-generated method stub
+		
 	}
 }
