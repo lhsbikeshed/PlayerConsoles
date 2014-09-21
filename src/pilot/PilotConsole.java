@@ -5,8 +5,8 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PImage;
 import processing.serial.Serial;
-
 import common.ConsoleAudio;
+import common.ConsoleLogger;
 import common.Display;
 import common.PlayerConsole;
 import common.Rot;
@@ -16,7 +16,6 @@ import common.displays.DestructDisplay;
 import common.displays.FailureScreen;
 import common.displays.RestrictedAreaScreen;
 import common.displays.WarpDisplay;
-
 import ddf.minim.Minim;
 
 public class PilotConsole extends PlayerConsole {
@@ -281,19 +280,15 @@ public class PilotConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 
-		bootDisplay = new BootDisplay(this);
-		displayMap.put("boot", bootDisplay);
-
-		globalFont = loadFont("common/HanzelExtendedNormal-48.vlw");
+		
 
 		// damage stuff
 		setJumpLightState(false);
 
-		// SOUND!
-		minim = new Minim(this);
+		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim);
-		// consoleAudio.playClip("bannerPopup");
-		// consoleAudio.playClip("newTarget");
+
+
 
 		autopilotOverlay = loadImage("pilotconsole/autopilotoverlay.png");
 
@@ -327,19 +322,19 @@ public class PilotConsole extends PlayerConsole {
 
 	@Override
 	protected void shipDead() {
-		//nothing to do here
+		ConsoleLogger.log(this, "Ship died");
 		
 	}
 
 	@Override
 	protected void reactorStarted() {
-		// TODO Auto-generated method stub
+		ConsoleLogger.log(this, "Reactor started");
 		
 	}
 
 	@Override
 	protected void reactorStopped() {
-		// TODO Auto-generated method stub
+		ConsoleLogger.log(this, "Reactor stopped");
 		
 	}
 }

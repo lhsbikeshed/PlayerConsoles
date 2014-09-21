@@ -13,8 +13,8 @@ public class ShipState {
 	public PVector shipPos = new PVector(0, 0, 0);
 	//public PVector shipRot = new PVector(0, 0, 0);
 	//public PVector lastShipRot = new PVector(0, 0, 0);
-	public Rot shipRotQuat = Rot.IDENTITY;
-	public Rot lastShipRotQuat = Rot.IDENTITY;
+	public Rot shipRot = Rot.IDENTITY;
+	public Rot lastShipRot = Rot.IDENTITY;
 
 	public PVector shipVel = new PVector(0, 0, 0);
 

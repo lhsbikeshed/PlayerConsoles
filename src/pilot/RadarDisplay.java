@@ -168,8 +168,8 @@ public class RadarDisplay extends Display {
 		// draw the background cube ------------------------------
 		parent.box(10);
 		parent.pushMatrix();
-		Rot newRot = Rot.slerp(shipState.lastShipRotQuat,
-				shipState.shipRotQuat,
+		Rot newRot = Rot.slerp(shipState.lastShipRot,
+				shipState.shipRot,
 				(parent.millis() - shipState.lastTransformUpdate) / 250.0f,
 				false);
 		float[] ang = newRot.getAngles(RotOrder.XYZ);

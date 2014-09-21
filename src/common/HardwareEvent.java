@@ -1,6 +1,9 @@
 package common;
 
 public class HardwareEvent {
+	
+	
+	
 	public enum EventSource {
 		KEYBOARD, SERIAL
 	}

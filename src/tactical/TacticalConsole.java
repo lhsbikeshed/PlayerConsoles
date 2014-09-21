@@ -336,18 +336,13 @@ public class TacticalConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 
-		// currentScreen = weaponsDisplay;
-
-		bootDisplay = new BootDisplay(this);
-		displayMap.put("boot", bootDisplay); // /THIS
 
 		/* power down the tac console panel */
 		if (serialEnabled) {
 			serialPort.write("p,");
 		}
-
-		// audio stuff
-		minim = new Minim(this);
+		
+		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim);
 
 		// set initial screen, probably gets overwritten from game shortly
@@ -361,12 +356,11 @@ public class TacticalConsole extends PlayerConsole {
 
 	@Override
 	protected void shipDamaged(float amount) {
-
+		//flash the lights attached to this console
 		if (serialEnabled) {
-
 			serialPort.write("S,");
 			charlesPort.write("D1,");
-			// serialPort.write("F,");
+			
 		}
 
 	}
@@ -386,7 +380,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	@Override
 	protected void shipDead() {
-
+		ConsoleLogger.log(this, "Ship exploded");
 		if (serialEnabled) {
 			serialPort.write("p,");
 			charlesPort.write("R0,");
@@ -395,7 +389,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	@Override
 	protected void reactorStarted() {
-		
+		ConsoleLogger.log(this, "Reactor started");
 		if (serialEnabled) {
 			serialPort.write("P,");
 			charlesPort.write("R1,");
@@ -404,6 +398,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	@Override
 	protected void reactorStopped() {
+		ConsoleLogger.log(this, "Reactor stopped");
 		if (serialEnabled) {
 			serialPort.write("p,");
 			decoyBlinker = false;

@@ -14,6 +14,9 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import ddf.minim.Minim;
 
+/* base class for all player consoles
+ * 
+ */
 public abstract class PlayerConsole extends PApplet {
 
 	public static void main(String[] args) {
@@ -71,8 +74,8 @@ public abstract class PlayerConsole extends PApplet {
 	public boolean testMode = false;
 
 	// ----- global blink state ----
+	// used for animations and anything that has to toggle every 750ms
 	public boolean globalBlinker;
-
 	long blinkTime = 0;
 
 	// ---banner overlay class---
@@ -262,8 +265,8 @@ public abstract class PlayerConsole extends PApplet {
 			float x = theOscMessage.get(4).floatValue();
 			float y = theOscMessage.get(5).floatValue();
 			float z = theOscMessage.get(6).floatValue();
-			shipState.lastShipRotQuat = shipState.shipRotQuat;
-			shipState.shipRotQuat = new Rot(w, x, y, z, false);
+			shipState.lastShipRot = shipState.shipRot;
+			shipState.shipRot = new Rot(w, x, y, z, false);
 			shipState.shipVel.x = theOscMessage.get(7).floatValue();
 			shipState.shipVel.y = theOscMessage.get(8).floatValue();
 			shipState.shipVel.z = theOscMessage.get(9).floatValue();
@@ -287,9 +290,18 @@ public abstract class PlayerConsole extends PApplet {
 		size(1024, 768, P3D);
 		frameRate(25);
 		hideCursor();
+		
+		// SOUND!
+		minim = new Minim(this);
+		
+		
 		bannerSystem = new BannerOverlay(this);
 		damageEffects = new DamageEffect(this);
 		globalFont = loadFont("common/HanzelExtendedNormal-48.vlw");
+		bootDisplay = new BootDisplay(this);
+		displayMap.put("boot", bootDisplay); // /THIS
+		
+		
 	}
 
 	protected abstract void shipDamaged(float amount);

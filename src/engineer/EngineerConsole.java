@@ -410,12 +410,9 @@ public class EngineerConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 
-		bootDisplay = new BootDisplay(this);
-		displayMap.put("boot", bootDisplay);
-
-		// setup sound
-		minim = new Minim(this);
+		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim);
+
 
 		// set initial screen, probably gets overwritten from game shortly
 		changeDisplay(displayMap.get("power"));
@@ -452,6 +449,7 @@ public class EngineerConsole extends PlayerConsole {
 
 	@Override
 	protected void shipDead() {
+		ConsoleLogger.log(this, "Ship exploded");
 		shipState.fuelLeaking = false;
 		deathTime = millis();
 		if (serialEnabled) {
@@ -461,12 +459,12 @@ public class EngineerConsole extends PlayerConsole {
 
 	@Override
 	protected void reactorStarted() {
-		// TODO Auto-generated method stub
-		
+		ConsoleLogger.log(this, "Reactor started");		
 	}
 
 	@Override
 	protected void reactorStopped() {
+		ConsoleLogger.log(this, "Reactor stopped, resetting devices..");
 		resetDevices();
 		
 	}
