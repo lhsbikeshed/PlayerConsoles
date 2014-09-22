@@ -26,8 +26,6 @@ public class EngineerConsole extends PlayerConsole {
 	// display handling
 	Display powerDisplay, wormholeDisplay, jamDisplay, dropDisplay;
 
-	// sound shit
-	Minim minim;
 
 	// highlights
 	ArrayList<Highlighter> highlightList = new ArrayList(0);

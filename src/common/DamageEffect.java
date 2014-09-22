@@ -97,13 +97,27 @@ public class DamageEffect {
 
 			parent.pushMatrix();
 			parent.translate(c.screenPosition.x, c.screenPosition.y);
-			parent.rotate(PApplet.radians(c.rotation));
 			PImage p = crackImages[c.crackId];
+			//now randomly draw black parts behind the crack
+			
+			//now draw the crack
+			parent.rotate(PApplet.radians(c.rotation));
+			
 
 			parent.image(p, -(p.width * c.scale) / 2f,
 					-(p.height * c.scale) / 2f, p.width * c.scale, p.height
 							* c.scale);
+			
+			
+			
 			parent.popMatrix();
+			if(parent.random(10) <= 1){
+				
+				parent.fill(parent.random(255));
+				parent.noStroke();
+				int pos = (int) (c.screenPosition.y + p.height/2f + parent.random(2));
+				parent.rect(0,pos, parent.width, 2);
+			}
 		}
 
 	}

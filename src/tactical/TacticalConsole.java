@@ -30,8 +30,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	String serverIP = "127.0.0.1";
 
-	// audio
-	Minim minim;
+
 	DropDisplay dropDisplay; // display for the drop scene
 	WarpDisplay warpDisplay; // warp scene
 
@@ -174,6 +173,7 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	public void mouseClicked() {
 		ConsoleLogger.log(this, "mx: " + mouseX + ", my: " + mouseY);
+		
 	}
 
 	@Override
