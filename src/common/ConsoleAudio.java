@@ -100,7 +100,7 @@ public class ConsoleAudio {
 	public void playClip(String name) {
 		AudioPlayer c = audioList.get(name);
 		if (c != null) {
-			c.setPan(-1.0f);
+			c.setPan(pan);
 			c.rewind();
 			c.play();
 		} else {
@@ -139,12 +139,14 @@ public class ConsoleAudio {
 		if (!parent.getShipState().poweredOn) {
 			return;
 		}
-		int rand = PApplet.floor(parent.random(beepList.length));
-		while (beepList[rand].isPlaying()) {
-			rand = PApplet.floor(parent.random(beepList.length));
+		if(muteBeeps == false){
+			int rand = PApplet.floor(parent.random(beepList.length));
+			while (beepList[rand].isPlaying()) {
+				rand = PApplet.floor(parent.random(beepList.length));
+			}
+			beepList[rand].rewind();
+			beepList[rand].play();
 		}
-		beepList[rand].rewind();
-		beepList[rand].play();
 	}
 
 	public void setToneState(boolean state) {

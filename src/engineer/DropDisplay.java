@@ -5,7 +5,6 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
-
 import common.ConsoleLogger;
 import common.Display;
 import common.PlayerConsole;
@@ -264,6 +263,7 @@ public class DropDisplay extends Display {
 
 	@Override
 	public void serialEvent(String evt) {
+		
 		if (state == STATE_PATCHING) {
 			if (evt.equals("connectok")) {
 				// we received an ok from the panel hardware
@@ -275,11 +275,16 @@ public class DropDisplay extends Display {
 				state = STATE_AUTH;
 			}
 		} else if (state == STATE_AUTH) {
-			if (evt.length() == 1) {
+			String[] parts = evt.split(":");
+			if (parts.length < 2) {
+				return;
+			}
+			ConsoleLogger.log(this, "received serial event " + parts[1]);
+			if (parts[0].equals("KEY")) {
 				if (authCode.length() < 4) {
-					authCode += evt;
+					authCode += parts[1].charAt(0);
 				} else {
-					authCode += evt;
+					authCode += parts[1].charAt(0);
 					if (authCode.equals(currentAuthCode)) {
 						authResult = true;
 						parent.getConsoleAudio().playClip("codeOk");
@@ -287,7 +292,7 @@ public class DropDisplay extends Display {
 						OscMessage myMessage = new OscMessage(
 								"/scene/drop/droppanelrepaired");
 						myMessage.add(2);
-						OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
+						p5.send(myMessage, new NetAddress(serverIP, 12000));
 					} else {
 						authResult = false;
 						parent.getConsoleAudio().playClip("codeFail");

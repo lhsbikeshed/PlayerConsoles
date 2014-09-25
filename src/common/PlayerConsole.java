@@ -246,10 +246,12 @@ public abstract class PlayerConsole extends PApplet {
 				bootDisplay.stop();
 				bootDisplay.stop();
 				bannerSystem.cancel();
+				reactorStopped();
 				
 			} else {
 
 				if (!shipState.poweredOn) {
+					reactorStarted();
 					shipState.poweringOn = true;
 
 					changeDisplay(bootDisplay);

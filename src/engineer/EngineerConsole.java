@@ -24,8 +24,8 @@ public class EngineerConsole extends PlayerConsole {
 	boolean serialEnabled = false;
 
 	// display handling
-	Display powerDisplay, wormholeDisplay, jamDisplay, dropDisplay;
-
+	Display  wormholeDisplay, jamDisplay, dropDisplay;
+	PowerDisplay powerDisplay;
 
 	// highlights
 	ArrayList<Highlighter> highlightList = new ArrayList(0);
@@ -214,9 +214,10 @@ public class EngineerConsole extends PlayerConsole {
 	@Override
 	public void keyPressed() {
 		consoleAudio.randomBeep();
-
+		
 		currentScreen.keyPressed(key);
 		if (key >= '0' && key <= '9') {
+			
 			currentScreen.serialEvent("KEY:" + key);
 		} else if (key == ' ') {
 			currentScreen.serialEvent("BUTTON:AIRLOCK");
@@ -436,6 +437,7 @@ public class EngineerConsole extends PlayerConsole {
 			panelPort.write('R');
 		}
 		changeDisplay(displayMap.get("power"));	
+		powerDisplay.reset();
 		shipState.poweredOn = false;
 		shipState.poweringOn = false;
 		shipState.areWeDead = false;

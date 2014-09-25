@@ -153,6 +153,7 @@ public class TacticalConsole extends PlayerConsole {
 	public void keyPressed() {
 		if (key >= '0' && key <= '9') {
 			consoleAudio.randomBeep();
+			
 			currentScreen.serialEvent("KEY:" + key);
 		} else if (key == ' ') {
 			currentScreen.serialEvent("KEY:SCAN");

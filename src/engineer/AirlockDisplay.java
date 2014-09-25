@@ -109,7 +109,7 @@ public class AirlockDisplay extends Display {
 	}
 
 	public void keyEntered(int k) {
-
+		ConsoleLogger.log(this, "received key key entered " + k);
 		if (locked) {
 			if (codePtr < 4) {
 				if (failedCode == false) {
@@ -161,11 +161,13 @@ public class AirlockDisplay extends Display {
 	@Override
 	public void serialEvent(String evt) {
 		String[] evtData = evt.split(":");
-
+		
 		if (evtData[0].equals("KEY")) {
 			if (evtData[1].length() == 1) {
 				char c = evtData[1].charAt(0);
+				
 				if (c >= '0' && c <= '9') {
+					
 					keyEntered(c);
 				}
 			}

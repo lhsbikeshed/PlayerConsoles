@@ -557,6 +557,10 @@ public class PowerDisplay extends Display {
 	 */
 	@Override
 	public void start() {
+		reset();
+	}
+
+	public void reset(){
 		for (SubSystem s : subsystemList) {
 			s.reset();
 		}
@@ -566,7 +570,7 @@ public class PowerDisplay extends Display {
 		reactorFailWarn = false;
 		reactorHealth = maxReactorHealth;
 	}
-
+	
 	@Override
 	public void stop() {
 	}

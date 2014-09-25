@@ -31,6 +31,8 @@ public class DamageEffect {
 	int maxCracks = 3;
 
 	PApplet parent;
+	
+	Object lock = new Object();
 
 	public DamageEffect(PApplet parent) {
 		this.parent = parent;
@@ -61,11 +63,19 @@ public class DamageEffect {
 		c.screenPosition = new PVector(parent.random(1024), parent.random(768));
 		c.crackId = (int) parent.random(maxCracks);
 		c.scale = 0.8f + parent.random(0.4f);
-		crackList.add(c);
+		synchronized (lock) {
+			
+		
+			crackList.add(c);
+		}
 	}
 
 	public void clearCracks() {
-		crackList.clear();
+		synchronized (lock) {
+			
+		
+			crackList.clear();
+		}
 	}
 
 	public void draw() {
@@ -93,8 +103,8 @@ public class DamageEffect {
 	 * doesnt take place
 	 */
 	public void drawCracks() {
-		for (CrackItem c : crackList) {
-
+		for(int i = 0; i < crackList.size(); i++){
+			CrackItem c = crackList.get(i);
 			parent.pushMatrix();
 			parent.translate(c.screenPosition.x, c.screenPosition.y);
 			PImage p = crackImages[c.crackId];
