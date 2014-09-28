@@ -3,11 +3,7 @@ package pilot;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
-import procontroll.ControllCoolieHat;
-import procontroll.ControllDevice;
-import procontroll.ControllIO;
-import procontroll.ControllSlider;
-import procontroll.ControllStick;
+import procontroll.*;
 
 import common.PlayerConsole;
 
@@ -19,6 +15,8 @@ public class Joystick {
 	ControllStick rotThrottleStick;
 	ControllCoolieHat cooliehat;
 
+	ControllButton afterburnerButton;
+	
 	long lastUpdateTime = 0;
 	long updateFreq = 100;
 	public float throttle = 0;
@@ -58,6 +56,8 @@ public class Joystick {
 			rotThrottleStick.setTolerance(0.2f);
 
 			cooliehat = device.getCoolieHat(12);
+			
+			afterburnerButton = device.getButton("Button 1");
 		}
 	}
 
@@ -82,6 +82,11 @@ public class Joystick {
 	public void update() {
 		if (testMode) {
 			return;
+		}
+		
+		if(afterburnerButton.pressed()){
+			OscMessage myMessage = new OscMessage("/system/propulsion/afterburner");
+			oscP5.send(myMessage, myRemoteLocation);
 		}
 		if (lastUpdateTime + updateFreq < parent.millis() && state == true) {
 			lastUpdateTime = parent.millis();
