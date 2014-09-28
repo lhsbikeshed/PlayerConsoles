@@ -27,6 +27,9 @@ public class ShipState {
 	public boolean fuelLeaking;
 	public boolean sillinessInProgress;
 	public int sillinessLevel;
+	
+	public boolean afterburnerCharging = true;
+	
 
 	public ShipState() {
 	};

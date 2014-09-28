@@ -225,6 +225,13 @@ public class PilotConsole extends PlayerConsole {
 					theOscMessage.get(1).intValue(), theOscMessage.get(2)
 							.intValue());
 		
+		} else if (theOscMessage.checkAddrPattern("/system/propulsion/afterburnerCharged")){
+			shipState.afterburnerCharging = false;
+		} else if (theOscMessage.checkAddrPattern("/system/propulsion/afterburnerCharging")){
+			shipState.afterburnerCharging = true;
+		
+			
+			
 		} else {
 			if (currentScreen != null) {
 				currentScreen.oscMessage(theOscMessage);

@@ -3,18 +3,18 @@ package engineer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import javax.swing.plaf.SliderUI;
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
-
 import common.ConsoleLogger;
 import common.Display;
 import common.PlayerConsole;
 import common.UsefulShit;
-
 import engineer.powersystems.CoilSubSystem;
 import engineer.powersystems.FuelFlowRateSystem;
 import engineer.powersystems.ModeratorCoilSystem;
@@ -188,7 +188,7 @@ public class PowerDisplay extends Display {
 				for (int i = 0; i < 4; i++) {
 					msg.add(power[i]);
 				}
-				OscP5.flush(msg, new NetAddress(serverIP, 12000));
+				p5.send(msg, new NetAddress(serverIP, 12000));
 			}
 		} else if (slot == 5) {
 			for (int i = 0; i < 4; i++) {
@@ -498,6 +498,13 @@ public class PowerDisplay extends Display {
 			} else {
 				reactorHealth = maxReactorHealth;
 			}
+		} else if (theOscMessage.checkAddrPattern("/system/ship/powerLevels")){
+			power[0] = theOscMessage.get(0).intValue(); //engines
+			power[1] = theOscMessage.get(3).intValue(); //damage
+			power[2] = theOscMessage.get(2).intValue();	//sensors
+			power[3] = theOscMessage.get(1).intValue(); //weapons
+			
+		
 		}
 	}
 
@@ -558,6 +565,9 @@ public class PowerDisplay extends Display {
 	@Override
 	public void start() {
 		reset();
+		//request current power levels from ship
+		OscMessage msg = new OscMessage("/system/ship/getPowerLevels");
+		OscP5.flush(msg, new NetAddress(serverIP, 12000));
 	}
 
 	public void reset(){

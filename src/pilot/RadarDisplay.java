@@ -39,6 +39,8 @@ public class RadarDisplay extends Display {
 
 	Rot backgroundRotation = Rot.IDENTITY;
 	ShipState shipState;
+	
+
 
 	public RadarDisplay(PlayerConsole parent) {
 		super(parent);
@@ -399,7 +401,24 @@ public class RadarDisplay extends Display {
 		parent.text("Prop: " + (propulsionPower * 33) + "%", 680, 630);
 
 		parent.text("speed: " + (int) shipState.shipVelocity, 680, 660);
-
+		
+		
+		parent.text("Afterburner: ", 690, 742);
+		
+		String state = "";
+		if(shipState.afterburnerCharging){
+			state = "charging";
+			parent.fill(255,0,0);
+		} else {
+			state = "READY";
+			if(parent.globalBlinker){
+				parent.fill(0,255,0);
+			} else {
+				parent.fill(0,120,0);
+			}
+		}
+		
+		parent.text( state, 857, 742);
 		parent.fill(255, 255, 0);
 		if (targetted != null) {
 			parent.textFont(font, 20);
@@ -411,6 +430,9 @@ public class RadarDisplay extends Display {
 				41, 740);
 
 		drawGuides();
+		
+		
+		
 	}
 
 	void drawRadarCircle(int num, int sizing, int highlight) {
@@ -529,7 +551,7 @@ public class RadarDisplay extends Display {
 			propulsionPower = theOscMessage.get(0).intValue();
 		} else if (theOscMessage.checkAddrPattern("/radar/wayPointReached")) {
 			parent.getConsoleAudio().playClip("waypointReached");
-		}
+		} 
 	}
 
 	@Override
