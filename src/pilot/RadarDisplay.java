@@ -5,9 +5,9 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
-
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.Rot;
 import common.RotOrder;
@@ -555,7 +555,7 @@ public class RadarDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
+	public void serialEvent(HardwareEvent evt) {
 	}
 
 	public void setSector(int x, int y, int z) {

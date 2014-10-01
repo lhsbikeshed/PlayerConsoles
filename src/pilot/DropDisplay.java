@@ -7,8 +7,8 @@ import processing.core.PApplet;
 import processing.core.PImage;
 /* change this scene to show the altitude and predicted death time*/
 import processing.core.PVector;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class DropDisplay extends Display {
@@ -171,7 +171,7 @@ public class DropDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String content) {
+	public void serialEvent(HardwareEvent content) {
 	}
 
 	@Override

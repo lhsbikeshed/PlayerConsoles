@@ -203,6 +203,10 @@ public abstract class PlayerConsole extends PApplet {
 	public String getServerIP() {
 		return serverIP;
 	}
+	
+	public NetAddress getServerAddress(){
+		return serverAddress;
+	}
 
 	public ShipState getShipState() {
 		return shipState;

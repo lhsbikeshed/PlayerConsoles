@@ -1,5 +1,6 @@
 package engineer;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import netP5.NetAddress;
@@ -30,14 +31,8 @@ public class EngineerConsole extends PlayerConsole {
 	ArrayList<Highlighter> highlightList = new ArrayList(0);
 
 	// Peripheral things
-	Serial serialPort;
-	String serialBuffer = "";
-
-	String lastSerial = "";
-	Serial panelPort;
-	String panelBuffer = "";
-
-	String lastPanelSerial = "";
+	UpperPanelHardware upperPanel;
+	LowerPanelHardware lowerPanel;
 
 	boolean globalBlinker = false;
 
@@ -51,86 +46,7 @@ public class EngineerConsole extends PlayerConsole {
 		highlightList.add(h);
 	}
 
-	void dealWithSerial(String vals) {
-
-		char p = vals.charAt(0);
-		if (p == 'P') { // this is from new panel
-			if (vals.substring(0, 2).equals("PS")) { // PS10:1
-				// switch
-				vals = vals.substring(2);
-				String[] sw = vals.split(":");
-				consoleAudio.randomBeep();
-
-				String t = "NEWSWITCH:" + sw[0] + ":" + sw[1];
-
-				currentScreen.serialEvent(t);
-			} else if (vals.substring(0, 2).equals("PC")) {// probe complete,
-															// unmute audio for
-															// buttons
-				consoleAudio.muteBeeps = false;
-			} else {
-				// its a dial
-				String t = "NEWDIAL:" + vals.substring(1, 2) + ":"
-						+ vals.substring(3);
-
-				currentScreen.serialEvent(t);
-			}
-		} else {
-
-			if (p == 'A' || p == 'B') { // values from the jamming knobs
-				int v = Integer.parseInt(vals.substring(1, vals.length()));
-				String s = "JAM" + p + ":" + v;
-				currentScreen.serialEvent(s);
-			} else if (p == 'S') {
-				int v = Integer.parseInt(vals.substring(1, vals.length()));
-				// ConsoleLogger.log(this,(v);
-				if (v == 0) {
-					consoleAudio.playClipForce("codeFail");
-				} else if (v <= 5) {
-					consoleAudio.playClipForce("beepLow");
-				} else if (v <= 9) {
-					consoleAudio.playClipForce("beepHigh");
-				} else {
-					consoleAudio.playClipForce("reactorReady");
-				}
-				if (v > 0) {
-					OscMessage myMessage = new OscMessage(
-							"/system/reactor/switchState");
-
-					myMessage.add(v);
-					OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
-				} else {
-					OscMessage myMessage = new OscMessage(
-							"/system/reactor/setstate");
-					myMessage.add(0);
-					OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
-				}
-			} else if (p == 'R') {
-				OscMessage myMessage = new OscMessage(
-						"/system/reactor/setstate");
-				myMessage.add(1);
-				OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
-			} else if (p == 'p') {
-				int v = Integer.parseInt(vals.substring(1, vals.length())) + 1;
-				String s = "KEY:" + v;
-				consoleAudio.randomBeep();
-
-				currentScreen.serialEvent(s);
-			} else if (p == 'L') {
-
-				currentScreen.serialEvent("BUTTON:AIRLOCK");
-			} else if (p == 'F') { // fuel gauge stuff
-				char nextChar = vals.charAt(1);
-				if (nextChar == 'E') {
-					// we ran out of fuel
-					OscMessage myMessage = new OscMessage(
-							"/system/reactor/outOfFuel");
-
-					OscP5.flush(myMessage, new NetAddress(serverIP, 12000));
-				}
-			}
-		}
-	}
+	
 
 	@Override
 	public void drawConsole() {
@@ -141,30 +57,7 @@ public class EngineerConsole extends PlayerConsole {
 
 		noSmooth();
 		background(0, 0, 0);
-		// serial read
-		if (serialEnabled) {
-			while (serialPort.available() > 0) {
-				char val = serialPort.readChar();
-				if (val == ',') {
-					// get first char
-					dealWithSerial(serialBuffer);
-					serialBuffer = "";
-				} else {
-					serialBuffer += val;
-				}
-			}
-
-			while (panelPort.available() > 0) {
-				char val = panelPort.readChar();
-				if (val == ',') {
-					// get first char
-					dealWithSerial(panelBuffer);
-					panelBuffer = "";
-				} else {
-					panelBuffer += val;
-				}
-			}
-		}
+		
 
 		if (shipState.areWeDead) {
 			drawDeadScreen();
@@ -210,27 +103,6 @@ public class EngineerConsole extends PlayerConsole {
 
 	}
 
-	@Override
-	public void keyPressed() {
-		consoleAudio.randomBeep();
-		
-		currentScreen.keyPressed(key);
-		if (key >= '0' && key <= '9') {
-			
-			currentScreen.serialEvent("KEY:" + key);
-		} else if (key == ' ') {
-			currentScreen.serialEvent("BUTTON:AIRLOCK");
-		} else if (key == ';') { // change me to something on keyboard
-			currentScreen.serialEvent("KEY:" + key);
-		} else if (key >= 'a' && key <= 't') {
-			currentScreen.serialEvent("KEY:" + key);
-		} else if (key == ' ') {
-			currentScreen.serialEvent("KEY:" + key);
-		}
-		if (key == '[') {
-			doSilliness();
-		}
-	}
 
 	private void doSilliness() {
 		if (shipState.sillinessLevel >= 0 && shipState.poweredOn
@@ -274,18 +146,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 	}
 
-	@Override
-	public void keyReleased() {
-		currentScreen.keyReleased(key);
-	}
 
-	@Override
-	public void mouseClicked() {
-		// ConsoleLogger.log(this,(mouseX + ":" + mouseY);
-		if (currentScreen == powerDisplay) {
-			((PowerDisplay) currentScreen).mouseClick(mouseX, mouseY);
-		}
-	}
 
 	@Override
 	protected void oscEvent(OscMessage theOscMessage) {
@@ -323,19 +184,11 @@ public class EngineerConsole extends PlayerConsole {
 			if (state) {
 				ConsoleLogger.log(this, "fuel leak started");
 				shipState.fuelLeaking = true;
-				if (serialEnabled) {
-
-					panelPort.write('F');
-					char c = 50;
-					panelPort.write(c);
-				}
+				lowerPanel.setFuelRate(50);
 			} else {
 				ConsoleLogger.log(this, "fuel leak stopped");
 				shipState.fuelLeaking = false;
-				if (serialEnabled) {
-
-					panelPort.write('X');
-				}
+				lowerPanel.setFuelRate(0);
 			}
 
 			/*
@@ -361,7 +214,7 @@ public class EngineerConsole extends PlayerConsole {
 	void probeEngPanel() {
 		if (serialEnabled) {
 			ConsoleLogger.log(this, "Probing engineer panel for state...");
-			panelPort.write('P');
+			lowerPanel.probePanel();
 			// mute the random beeps in console audio and only unmute when
 			// reeiving a probe complete message
 			consoleAudio.muteBeeps = true;
@@ -370,10 +223,7 @@ public class EngineerConsole extends PlayerConsole {
 
 	// send a reset to all attached devices
 	void resetDevices() {
-		if (!serialEnabled) {
-			return;
-		}
-		serialPort.write('r');
+		lowerPanel.reset();
 	}
 
 	// ---------------- main method
@@ -390,11 +240,6 @@ public class EngineerConsole extends PlayerConsole {
 			serialEnabled = true;
 			serverIP = "10.0.0.100";
 			shipState.poweredOn = false;
-		}
-
-		if (serialEnabled) {
-			serialPort = new Serial(this, "COM11", 9600);
-			panelPort = new Serial(this, "COM12", 115200);
 		}
 
 		oscP5 = new OscP5(this, 12001);
@@ -416,6 +261,11 @@ public class EngineerConsole extends PlayerConsole {
 		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim, 1.0f);
 
+		upperPanel = new UpperPanelHardware("upperpanel", "COM11", 9600, this);
+		lowerPanel = new LowerPanelHardware("lowerpanel", "COM12", 115200, this);
+		hardwareControllers.add(upperPanel);
+		hardwareControllers.add(lowerPanel);
+		
 
 		// set initial screen, probably gets overwritten from game shortly
 		changeDisplay(displayMap.get("power"));
@@ -436,10 +286,10 @@ public class EngineerConsole extends PlayerConsole {
 	@Override
 	protected void gameReset() {
 		// reset the entire game
-		if (serialEnabled) {
-			serialPort.write('r');
-			panelPort.write('R');
-		}
+		lowerPanel.reset();
+		upperPanel.reset();
+		
+		
 		changeDisplay(displayMap.get("power"));	
 		powerDisplay.reset();
 		shipState.poweredOn = false;
@@ -456,9 +306,8 @@ public class EngineerConsole extends PlayerConsole {
 		ConsoleLogger.log(this, "Ship exploded");
 		shipState.fuelLeaking = false;
 		deathTime = millis();
-		if (serialEnabled) {
-			serialPort.write('k');
-		}
+		upperPanel.kill();
+		
 	}
 
 	@Override
@@ -475,8 +324,14 @@ public class EngineerConsole extends PlayerConsole {
 
 	@Override
 	public void hardwareEvent(HardwareEvent h) {
-		// TODO Auto-generated method stub
+
+		if(h.event.equals("KEY")){
+			if(h.value == KeyEvent.VK_OPEN_BRACKET){
+				doSilliness();
+			} 
+		}
 		
+		currentScreen.serialEvent(h);
 	}
 
 }

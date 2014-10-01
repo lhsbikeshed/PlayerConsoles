@@ -3,10 +3,10 @@ package common.displays;
 import oscP5.OscMessage;
 import processing.core.PApplet;
 import processing.core.PImage;
-
 import common.BannerOverlay;
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class BootDisplay extends Display {
@@ -105,7 +105,7 @@ public class BootDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
+	public void serialEvent(HardwareEvent evt) {
 	}
 
 	public void setDisks(int[] in) {

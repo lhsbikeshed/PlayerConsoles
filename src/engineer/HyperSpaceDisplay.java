@@ -6,8 +6,8 @@ import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class HyperSpaceDisplay extends Display {
@@ -228,11 +228,10 @@ public class HyperSpaceDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
-		String[] va = evt.split(":");
-		if (va[0].equals("KEY")) {
-
-			char c2 = va[1].charAt(0);
+	public void serialEvent(HardwareEvent evt) {
+		
+		if (evt.event.equals("KEY")) {
+			char c2 = (char)evt.value;
 			if (c2 >= 'a' && c2 <= 't') {
 				for (Emitter e : emitters) {
 					if (e.keyChar == c2) {

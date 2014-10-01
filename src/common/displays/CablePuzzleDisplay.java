@@ -2,8 +2,8 @@ package common.displays;
 
 import oscP5.OscMessage;
 import processing.core.PImage;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 /* display for the large cable puzzle 
@@ -56,7 +56,7 @@ public class CablePuzzleDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
+	public void serialEvent(HardwareEvent evt) {
 	}
 
 	@Override

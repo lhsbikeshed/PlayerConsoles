@@ -7,6 +7,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.UsefulShit;
 
@@ -227,12 +228,7 @@ public class DropDisplay extends Display {
 		}
 	}
 
-	public void keyPressed(int key) {
-	}
-
-	public void keyReleased(int key) {
-		serialEvent("" + key);
-	}
+	
 
 	@Override
 	public void oscMessage(OscMessage theOscMessage) {
@@ -262,29 +258,15 @@ public class DropDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
+	public void serialEvent(HardwareEvent evt) {
 		
-		if (state == STATE_PATCHING) {
-			if (evt.equals("connectok")) {
-				// we received an ok from the panel hardware
-				// tell the main game that the test passed
-				// OscMessage myMessage = new
-				// OscMessage("/scene/droppanelrepaired");
-				// myMessage.add(1);
-				// p5.flush(myMessage, new NetAddress(serverIP, 12000));
-				state = STATE_AUTH;
-			}
-		} else if (state == STATE_AUTH) {
-			String[] parts = evt.split(":");
-			if (parts.length < 2) {
-				return;
-			}
-			ConsoleLogger.log(this, "received serial event " + parts[1]);
-			if (parts[0].equals("KEY")) {
+		if (state == STATE_AUTH) {
+			char c = (char)evt.value;
+			if (evt.event.equals("KEY")) {
 				if (authCode.length() < 4) {
-					authCode += parts[1].charAt(0);
+					authCode += c;
 				} else {
-					authCode += parts[1].charAt(0);
+					authCode +=c;
 					if (authCode.equals(currentAuthCode)) {
 						authResult = true;
 						parent.getConsoleAudio().playClip("codeOk");

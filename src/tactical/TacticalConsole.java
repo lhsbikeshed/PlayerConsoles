@@ -27,94 +27,27 @@ public class TacticalConsole extends PlayerConsole {
 	// disables serial port access
 	// and sets server to localhost
 	
-	boolean serialEnabled = false;
 
 	DropDisplay dropDisplay; // display for the drop scene
 	WarpDisplay warpDisplay; // warp scene
 
 	WeaponsConsole weaponsDisplay; // tactical weapons display
 
-	// is the decoy blinker on?
-	boolean decoyBlinker = false;
-
 	// power for something, not sure what
 	int systemPower = -1;
-	// serial stuff
-	Serial serialPort;
+	
+	//hardware
+	TacticalHardwareController mainPanelHardware;
+	FanLightHardwareController fanController;
 
-	Serial charlesPort;
-	String serialBuffer = "";
 
-	String lastSerial = "";
-
-	boolean decoyLightState = false;
-
-	/*
-	 * expected vals: 0-9 from keypad ' ' = scan key 'F' = any of the beam bank
-	 * buttons 'm' = decoy button 'X' = conduit puzzle failed 'P' = conduit
-	 * puzzle complete 'CX' = cable X connected correctly
-	 */
-	void dealWithSerial(String vals) {
-		// ConsoleLogger.log(this, (vals);
-
-		char c = vals.charAt(0);
-		if (c >= '0' && c <= '9') {
-			String v = "KEY:" + c;
-			consoleAudio.randomBeep();
-			currentScreen.serialEvent(v);
-		}
-		if (c == ' ') {
-			currentScreen.serialEvent("KEY:SCAN");
-		}
-		if (c == 'F') {
-			currentScreen.serialEvent("KEY:FIRELASER");
-		}
-		if (c == 'm') {
-			currentScreen.serialEvent("KEY:DECOY");
-		}
-
-		if (c == 'C') {
-
-			currentScreen.serialEvent("CONDUITCONNECT:" + vals.charAt(1));
-		}
-		if (c == 'c') {
-
-			currentScreen.serialEvent("CONDUITDISCONNECT:" + vals.charAt(1));
-		}
-	}
-
-	void decoyLightState(boolean s) {
-		if (serialEnabled == false) {
-			return;
-		}
-		;
-		if (s && decoyLightState == false) {
-			// ConsoleLogger.log(this, ("poo");
-			decoyLightState = true;
-			serialPort.write("D,");
-		} else if (!s && decoyLightState == true) {
-			serialPort.write("d,");
-			decoyLightState = false;
-		}
-	}
+	
 
 	@Override
 	public void drawConsole() {
 
 		noSmooth();
-		if (serialEnabled) {
-			while (serialPort.available() > 0) {
-				char val = serialPort.readChar();
-				// ConsoleLogger.log(this, (val);
-				if (val == ',') {
-					// get first char
-					dealWithSerial(serialBuffer);
-					serialBuffer = "";
-				} else {
-					serialBuffer += val;
-				}
-			}
-		}
+		
 
 		background(0, 0, 0);
 
@@ -153,21 +86,7 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	public void keyPressed() {
 		
-		if (key >= '0' && key <= '9') {
-			consoleAudio.randomBeep();
-			
-			currentScreen.serialEvent("KEY:" + key);
-		} else if (key == ' ') {
-			currentScreen.serialEvent("KEY:SCAN");
-		} else if (key == 'm') {
-			currentScreen.serialEvent("KEY:FIRELASER");
-		} else if (key == 'f') {
-			currentScreen.serialEvent("KEY:DECOY");
-		} else if (key == 'g') {
-			currentScreen.serialEvent("KEY:GRAPPLEFIRE");
-		} else if (key == 'h') {
-			currentScreen.serialEvent("KEY:GRAPPLERELEASE");
-		}
+		
 	}
 
 	@Override
@@ -182,15 +101,10 @@ public class TacticalConsole extends PlayerConsole {
 		if (theOscMessage.checkAddrPattern("/scene/warzone/weaponState") == true) {
 			int msg = theOscMessage.get(0).intValue();
 			if (msg == 1) {
-				if (serialEnabled) {
-					serialPort.write("P,");
-				}
+				mainPanelHardware.setPowerState(true);
 			} else {
-				if (serialEnabled) {
-
-					serialPort.write("p,");
-					decoyBlinker = false;
-				}
+				mainPanelHardware.setPowerState(false);
+				
 			}
 
 			currentScreen.oscMessage(theOscMessage);
@@ -209,19 +123,14 @@ public class TacticalConsole extends PlayerConsole {
 				OscMessage myMessage = new OscMessage(
 						"/game/Hello/TacticalStation");
 				oscP5.send(myMessage, new NetAddress(serverIP, 12000));
-				if (serialEnabled) {
-
-					serialPort.write("P,");
-					charlesPort.write("R1,");
-				}
+				mainPanelHardware.setPowerState(true);
+				fanController.setPowerState(true);
+				
 			} else {
 				shipState.poweredOn = false;
 				shipState.poweringOn = false;
-				if (serialEnabled) {
-
-					serialPort.write("p,");
-					charlesPort.write("R0,");
-				}
+				mainPanelHardware.setPowerState(false);
+				fanController.setPowerState(false);
 			}
 	
 
@@ -232,13 +141,10 @@ public class TacticalConsole extends PlayerConsole {
 			int sensorPower = theOscMessage.get(2).intValue() - 1;
 			int internalPower = theOscMessage.get(1).intValue() - 1;
 
-			if (serialEnabled) {
-				serialPort.write("L" + beamPower + ",");
-				charlesPort.write("P" + (propPower + 1));
-				charlesPort.write("W" + (beamPower + 1));
-				charlesPort.write("S" + (sensorPower + 1));
-				charlesPort.write("I" + (internalPower + 1));
-			}
+			mainPanelHardware.setChargeRate(beamPower);
+			fanController.setPowerLevels(propPower, beamPower, sensorPower,internalPower);
+			
+			
 			currentScreen.oscMessage(theOscMessage);
 		
 		} else if (theOscMessage
@@ -257,16 +163,9 @@ public class TacticalConsole extends PlayerConsole {
 			}
 		
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/openFlap")) {
-			ConsoleLogger.log(this, "popping panel..");
-			if (serialEnabled) {
-				serialPort.write("T,");
-				serialPort.write("F,");
-			}
+			mainPanelHardware.popFlap();
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/flapStrobe")) {
-			ConsoleLogger.log(this, "strobe..");
-			if (serialEnabled) {
-				serialPort.write("F,");
-			}
+			mainPanelHardware.strobe();
 		
 		} else {
 			if (currentScreen != null) {
@@ -276,28 +175,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	}
 
-	public void probeCableState() {
-		if (serialEnabled) {
-			serialPort.write("C,");
-		} else {
-			ConsoleLogger.log(this, "probed cable puzzle state");
-		}
-	}
-
-	void setDecoyBlinkerState(boolean state) {
-		if (!serialEnabled) {
-			return;
-		}
-		if (state != decoyBlinker) {
-			if (state) {
-				decoyBlinker = true;
-				serialPort.write("D,");
-			} else {
-				decoyBlinker = false;
-				serialPort.write("d,");
-			}
-		}
-	}
+	
 
 	// ---------------- main method
 
@@ -308,16 +186,12 @@ public class TacticalConsole extends PlayerConsole {
 
 		if (testMode) {
 			ConsoleLogger.log(this, "running test mode tactical");
-			serialEnabled = false;
 			serverIP = "127.0.0.1";
 			shipState.poweredOn = true;
 		} else {
 			ConsoleLogger.log(this, "running LIVE mode tactical");
-			serialEnabled = true;
 			serverIP = "10.0.0.100";
 			frame.setLocation(1024, 0);
-			serialPort = new Serial(this, "COM7", 9600);
-			charlesPort = new Serial(this, "COM5", 9600);
 			hideCursor();
 		}
 
@@ -338,11 +212,15 @@ public class TacticalConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 
+		
+		mainPanelHardware = new TacticalHardwareController("mainPanel", "COM7", 9600, this);
+		hardwareControllers.add(mainPanelHardware);
+		mainPanelHardware.setPowerState(false);
 
-		/* power down the tac console panel */
-		if (serialEnabled) {
-			serialPort.write("p,");
-		}
+		fanController = new FanLightHardwareController("fanController", "COM5", 9600, this);
+		fanController.setPowerState(false);
+
+		
 		
 		shipState.smartBombsLeft = 6;
 		
@@ -363,11 +241,8 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	protected void shipDamaged(float amount) {
 		//flash the lights attached to this console
-		if (serialEnabled) {
-			serialPort.write("S,");
-			charlesPort.write("D1,");
-			
-		}
+		mainPanelHardware.shipDamage();
+		fanController.shipDamage();
 
 	}
 
@@ -378,56 +253,38 @@ public class TacticalConsole extends PlayerConsole {
 		shipState.areWeDead = false;
 		shipState.poweredOn = false;
 		shipState.poweringOn = false;
-		if (serialEnabled) {
-			serialPort.write("p,");
-		}
+		mainPanelHardware.setPowerState(false);
 		shipState.smartBombsLeft = 6;
 	}
 
 	@Override
 	protected void shipDead() {
 		ConsoleLogger.log(this, "Ship exploded");
-		if (serialEnabled) {
-			serialPort.write("p,");
-			charlesPort.write("R0,");
-		}
+		mainPanelHardware.setPowerState(false);
+		fanController.setPowerState(false);
 	}
 
 	@Override
 	protected void reactorStarted() {
 		ConsoleLogger.log(this, "Reactor started");
-		if (serialEnabled) {
-			serialPort.write("P,");
-			charlesPort.write("R1,");
-		}
+		mainPanelHardware.setPowerState(true);
+		fanController.setPowerState(true);
+
+		
 	}
 
 	@Override
 	protected void reactorStopped() {
 		ConsoleLogger.log(this, "Reactor stopped");
-		if (serialEnabled) {
-			serialPort.write("p,");
-			decoyBlinker = false;
-			charlesPort.write("R0,");
-		}
+		mainPanelHardware.setPowerState(false);
+		fanController.setPowerState(false);
+
 		
 	}
 
 	@Override
 	public void hardwareEvent(HardwareEvent h) {
-		int keyPressed = (int)h.data; //data contains keycode value
-		ConsoleLogger.log(this, "keyp: " + keyPressed);
-		if (keyPressed >= KeyEvent.VK_0 && keyPressed <= KeyEvent.VK_9) {
-			consoleAudio.randomBeep();
-			
-			currentScreen.serialEvent("KEY:" + keyPressed);
-		} else if (keyPressed == KeyEvent.VK_SPACE) {
-			currentScreen.serialEvent("KEY:SCAN");
-		} else if (keyPressed == KeyEvent.VK_M) {
-			currentScreen.serialEvent("KEY:FIRELASER");
-		} else if (keyPressed == KeyEvent.VK_F) {
-			currentScreen.serialEvent("KEY:DECOY");
-		} 
+		currentScreen.serialEvent(h);
 		
 	}
 

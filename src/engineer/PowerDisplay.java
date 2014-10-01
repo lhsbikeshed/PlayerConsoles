@@ -13,6 +13,7 @@ import processing.core.PImage;
 import processing.core.PVector;
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.UsefulShit;
 import engineer.powersystems.CoilSubSystem;
@@ -509,41 +510,24 @@ public class PowerDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
-		String[] p = evt.split(":");
-		if (p[0].equals("KEY")) {
-			char c = p[1].charAt(0);
-			switch (c) {
-			case '1':
-				changePower(0);
-				break;
-			case '2':
-				changePower(1);
-				break;
-			case '3':
-				changePower(2);
-				break;
-			case '4':
-				changePower(3);
-				break;
-			}
-		} else if (p[0].equals("NEWDIAL")) {
-
-			String lookup = p[0] + ":" + p[1];// HRRNNNNNGGGGGGGGGGGGGG
-			ConsoleLogger.log(this, lookup);
+	public void serialEvent(HardwareEvent evt) {
+		if (evt.event.equals("POWERBUTTON")) {
+			changePower(evt.id);
+			
+		} else if (evt.event.equals("NEWDIAL")) {
+			String lookup = "NEWDIAL:" + evt.id;
 
 			SubSystem s = switchToSystemMap.get(lookup);
 			if (s != null) {
-				s.setState(Integer.parseInt(p[2]));
+				s.setState(evt.value);
 			}
-		} else if (p[0].equals("NEWSWITCH")) {
+		} else if (evt.event.equals("NEWSWITCH")) {
 
-			String lookup = p[0] + ":" + p[1];// HRRNNNNNGGGGGGGGGGGGGG
-			ConsoleLogger.log(this, lookup);
+			String lookup = "NEWSWITCH:" + evt.id;
 
 			SubSystem s = switchToSystemMap.get(lookup);
 			if (s != null) {
-				s.setState(Integer.parseInt(p[2]));
+				s.setState(evt.value);
 				// make a beep if the system isnt currently broken
 				if (!s.isBroken()) {
 					parent.getConsoleAudio().randomBeep();

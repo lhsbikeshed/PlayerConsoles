@@ -1,0 +1,109 @@
+package engineer;
+
+import oscP5.OscMessage;
+import common.ConsoleLogger;
+import common.HardwareController;
+import common.HardwareEvent;
+import common.PlayerConsole;
+
+public class LowerPanelHardware extends HardwareController {
+
+	public LowerPanelHardware(String interfaceName, String port, int rate,
+			PlayerConsole parent) {
+		super(interfaceName, port, rate, parent);
+		ConsoleLogger.log(this,"Starting lower panel hardware on " + port);
+		
+	}
+	
+	public void bufferComplete(){
+		char p = serialBuffer[0];
+		if (p == 'F') { 		// fuel gauge stuff
+			processFuelGuage();
+		} else if (p == 'P') { // this switch from new panel
+			String vals = new String(serialBuffer);
+			if (vals.substring(0, 2).equals("PS")) { // PS10:1
+				// chop off first two chars, split on the : character
+				vals = vals.substring(2);
+				String[] sw = vals.split(":");
+
+				HardwareEvent h = new HardwareEvent();
+				h.event = "NEWSWITCH";
+				h.id = Integer.parseInt(sw[0]);
+				h.value = Integer.parseInt(sw[1]);
+				parent.hardwareEvent(h);
+				parent.getConsoleAudio().randomBeep();
+				
+			} else if (vals.substring(0, 2).equals("PC")) {// probe complete,
+															// unmute audio for
+															// buttons
+				parent.getConsoleAudio().muteBeeps = false;
+			} else {
+				// its a dial
+				
+				int switchNum = Integer.parseInt(vals.substring(1,2));
+				int value = Integer.parseInt(vals.substring(3));
+				HardwareEvent h = new HardwareEvent();
+				h.event = "NEWDIAL";
+				h.id = switchNum;
+				h.value = value;
+				parent.hardwareEvent(h);
+
+			}
+		} 
+	}
+	
+	
+	private void processFuelGuage() {
+		char nextChar = serialBuffer[1];
+		if (nextChar == 'E') {
+			// we ran out of fuel
+			OscMessage myMessage = new OscMessage(
+					"/system/reactor/outOfFuel");
+
+			parent.getOscClient().send(myMessage, parent.getServerAddress());
+		}
+		
+	}
+
+	public void reset() {
+		ConsoleLogger.log(this, "resetting..");
+
+		if(parent.testMode){
+			return;
+		} 
+		serialPort.write('R');
+		
+	}
+
+	public void setFuelRate(int i) {
+		ConsoleLogger.log(this, "Setting fuel leak rate to " + i);
+
+		if(parent.testMode){
+			return;
+		} 
+		if(i == 0){
+			serialPort.write('X');
+
+		} else {
+
+			serialPort.write('F');
+			char c = (char) i;
+			serialPort.write(c);
+		}
+				
+	}
+
+	public void probePanel() {
+		ConsoleLogger.log(this, "probing panel for state");
+
+		if(parent.testMode){
+			return;
+		} 
+
+		serialPort.write('P');
+	
+		
+	}
+
+
+}

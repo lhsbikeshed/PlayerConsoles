@@ -30,16 +30,12 @@ public class PilotConsole extends PlayerConsole {
 	PImage autopilotOverlay;
 
 	// serial stuff
-	Serial serialPort;
-	String serialBuffer = "";
+	//Serial serialPort;
+	//String serialBuffer = "";
 
 	String lastSerial = "";
 
-	// mappings from physical buttons to OSC messages
-	String[] messageMapping = { "/system/undercarriage/state",
-			"/scene/launchland/dockingCompState", "/system/misc/blastShield",
-			"/system/propulsion/state", "/system/jump/state",
-			"/system/jump/doJump" };
+	
 	// -----displays-----
 	DropDisplay dropDisplay;
 	WarpDisplay warpDisplay;
@@ -51,50 +47,8 @@ public class PilotConsole extends PlayerConsole {
 	int systemPower = 2;
 
 	float lastOscTime = 0;
-
-	void dealWithSerial(String vals) {
-
-		char p = vals.charAt(0);
-
-		if (p == 't') {
-			int th = Integer.parseInt(vals.substring(1));
-			float t = map(th, 0f, 255f, 0f, 1.0f);
-			if (t < 0.1) {
-				t = 0;
-			}
-			// map throttle to 0-1 float, set throttle
-			joy.throttle = t;
-		} else if (p == 'C' || p == 'c') { // cable connection event
-			// C:<plug>:<socket>
-			OscMessage msg;
-			if (p == 'C') {
-				msg = new OscMessage("/system/cablePuzzle/connect");
-			} else {
-				msg = new OscMessage("/system/cablePuzzle/disconnect");
-			}
-			String[] parts = vals.split(":");
-			int pl = Integer.parseInt(parts[1]);
-			int s = Integer.parseInt(parts[2]);
-			msg.add(pl);
-			msg.add(s);
-			oscP5.send(msg, serverAddress);
-		} else {
-
-			int sw = Integer.parseInt("" + p);
-			int val = Integer.parseInt("" + vals.charAt(1));
-			println("sw : " + sw + "  " + val);
-			if (shipState.poweredOn == false) {
-				return;
-			}
-			OscMessage myMessage = new OscMessage(messageMapping[sw]);
-			if (sw == 4) {
-				// jump switch is now inverted
-				val = 1 - val;
-			}
-			myMessage.add(val);
-			oscP5.send(myMessage, serverAddress);
-		}
-	}
+	
+	PilotHardwareController pilotHardware;
 
 	@Override
 	public void drawConsole() {
@@ -103,18 +57,7 @@ public class PilotConsole extends PlayerConsole {
 		float s = shipState.shipVel.mag();
 		shipState.shipVelocity = lerp(shipState.lastShipVel, s,
 				(millis() - shipState.lastTransformUpdate) / 250.0f);
-		if (!testMode) {
-			while (serialPort.available() > 0) {
-				char val = serialPort.readChar();
-				if (val == ',') {
-					// get first char
-					dealWithSerial(serialBuffer);
-					serialBuffer = "";
-				} else {
-					serialBuffer += val;
-				}
-			}
-		}
+		
 
 		background(0, 0, 0);
 
@@ -169,20 +112,20 @@ public class PilotConsole extends PlayerConsole {
 		lastOscTime = millis();
 		// println(theOscMessage);
 		if (theOscMessage.checkAddrPattern("/scene/change") == true) {
-			setJumpLightState(false);
+			pilotHardware.setJumpLightState(false);
 				
 		} else if (theOscMessage.checkAddrPattern("/ship/jumpStatus") == true) {
 			int v = theOscMessage.get(0).intValue();
 			if (v == 0) {
-				setJumpLightState(false);
+				pilotHardware.setJumpLightState(false);
 			} else if (v == 1) {
-				setJumpLightState(true);
+				pilotHardware.setJumpLightState(true);
 			}
 		} else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
 			systemPower = theOscMessage.get(1).intValue() + 1;
 			// displayList[currentDisplay].oscMessage(theOscMessage);
 			currentScreen.oscMessage(theOscMessage);
-			setJumpLightState(false);
+			pilotHardware.setJumpLightState(false);
 		} else if (theOscMessage
 				.checkAddrPattern("/system/control/controlState") == true) {
 			boolean state = theOscMessage.get(0).intValue() == 0 ? true : false;
@@ -205,7 +148,7 @@ public class PilotConsole extends PlayerConsole {
 			} else {
 				shipState.poweredOn = false;
 				shipState.poweringOn = false;
-				setJumpLightState(false);
+				pilotHardware.setJumpLightState(false);
 			}
 
 		
@@ -240,15 +183,7 @@ public class PilotConsole extends PlayerConsole {
 		}
 	}
 
-	void setJumpLightState(boolean state) {
-		if (state == true && shipState.jumpState == false) {
-			serialPort.write('B');
-			shipState.jumpState = true;
-		} else if (state == false && shipState.jumpState == true) {
-			serialPort.write('b');
-			shipState.jumpState = false;
-		}
-	}
+	
 
 	// ---------------- main method
 
@@ -266,7 +201,7 @@ public class PilotConsole extends PlayerConsole {
 			joystickTestMode = false;
 			shipState.poweredOn = false;
 			frame.setLocation(0, 0);
-			serialPort = new Serial(this, "COM8", 115200);
+			
 		}
 
 		oscP5 = new OscP5(this, 12002);
@@ -288,10 +223,12 @@ public class PilotConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 
-		
+		//configure the pilot console hardware stuff
+		pilotHardware = new PilotHardwareController("mainconsole", "COM8", 115200, this);
+		hardwareControllers.add(pilotHardware);
 
 		// damage stuff
-		setJumpLightState(false);
+		pilotHardware.setJumpLightState(false);
 
 		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim, -1.0f);
@@ -323,7 +260,7 @@ public class PilotConsole extends PlayerConsole {
 		currentScreen = launchDisplay;
 		currentScreen.start();
 		shipState.areWeDead = false;
-		setJumpLightState(false);
+		pilotHardware.setJumpLightState(false);
 		shipState.poweredOn = false;
 		shipState.poweringOn = false;
 	}
@@ -348,7 +285,7 @@ public class PilotConsole extends PlayerConsole {
 
 	@Override
 	public void hardwareEvent(HardwareEvent h) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 }

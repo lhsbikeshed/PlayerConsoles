@@ -6,9 +6,9 @@ import oscP5.OscMessage;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
-
 import common.BannerOverlay;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class WarpDisplay extends Display {
@@ -227,7 +227,7 @@ public class WarpDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
+	public void serialEvent(HardwareEvent evt) {
 	}
 
 	@Override

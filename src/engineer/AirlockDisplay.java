@@ -1,12 +1,14 @@
-package engineer;
+	package engineer;
+
+import java.awt.event.KeyEvent;
 
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PImage;
-
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class AirlockDisplay extends Display {
@@ -159,22 +161,19 @@ public class AirlockDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
-		String[] evtData = evt.split(":");
-		
-		if (evtData[0].equals("KEY")) {
-			if (evtData[1].length() == 1) {
-				char c = evtData[1].charAt(0);
+	public void serialEvent(HardwareEvent evt) {		
+		if (evt.event.equals("KEY")) {		
 				
-				if (c >= '0' && c <= '9') {
-					
-					keyEntered(c);
-				}
-			}
+			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9) {		
+				char c = (char)(evt.value - 48); //VK_0 - 9 starts at 48, VK_KEYPAD_0 starts at 96. 
+												//casting keypad values to char doesnt produce number chars
+										
+				keyEntered(c);
+			}		
 		}
 
-		if (evtData[0].equals("BUTTON")) {
-			if (evtData[1].equals("AIRLOCK") && locked == false) {
+		if (evt.event.equals("BUTTON")) {
+			if (evt.value == UpperPanelHardware.BT_AIRLOCK && locked == false) {
 				greatSuccess = true;
 				successTime = parent.millis();
 				if (!doneSuccessMessage) {

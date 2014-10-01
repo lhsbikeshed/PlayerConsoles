@@ -15,7 +15,7 @@ public class HardwareController {
 
 	protected PlayerConsole parent;
 
-	protected char[] serialBuffer = new char[20];
+	protected char[] serialBuffer = new char[50];
 	protected int bufPtr = 0;
 
 	public HardwareController(String interfaceName, String port, int rate,
@@ -52,7 +52,7 @@ public class HardwareController {
 		if (isKeyboard) {
 			HardwareEvent h = new HardwareEvent();
 			h.event = "KEY";
-			h.data = "" + serialBuffer[0];
+			h.value = serialBuffer[0];
 			h.fromDevice = interfaceName;
 			parent.hardwareEvent(h);
 		}
@@ -62,7 +62,7 @@ public class HardwareController {
 		if (isKeyboard) {
 			HardwareEvent h = new HardwareEvent();
 			h.event = "KEY";
-			h.data = ke.getKeyCode();
+			h.value = ke.getKeyCode();
 			h.fromDevice = interfaceName;
 			parent.hardwareEvent(h);
 		}

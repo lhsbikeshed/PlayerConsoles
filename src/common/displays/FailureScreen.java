@@ -3,8 +3,8 @@ package common.displays;
 import oscP5.OscMessage;
 import processing.core.PApplet;
 import processing.core.PImage;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class FailureScreen extends Display {
@@ -64,7 +64,7 @@ public class FailureScreen extends Display {
 	}
 
 	@Override
-	public void serialEvent(String content) {
+	public void serialEvent(HardwareEvent content) {
 	}
 
 	@Override

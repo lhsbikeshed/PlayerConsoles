@@ -1,12 +1,14 @@
 package engineer;
 
+import java.awt.event.KeyEvent;
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class JamDisplay extends Display {
@@ -287,38 +289,34 @@ public class JamDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
-		if (evt.equals("boobs")) {
-			jamAttempt = true;
-			jamTimer = 120;
-			jamSuccess = true;
-		}
-		String[] v = evt.split(":");
-		if (v.length < 2) {
-			return;
-		}
+	public void serialEvent(HardwareEvent evt) {
+		
+		
 
 		// when the jam dials change and they change to the correct ones add a
 		// little time to the
 		// jamfrequency change timout, makes it a little easier
-		if (v[0].equals("JAMA")) {
-			dialA = Integer.parseInt(v[1]);
-			if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
-				lastChangeTime += 800; // give em an extra 800ms to whack the
-										// button
+		if(evt.event.equals("JAMDIAL")){
+			if (evt.id == 0) {
+				dialA = evt.value;
+				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
+					lastChangeTime += 800; // give em an extra 800ms to whack the
+											// button
+				}
+			} else if (evt.id == 1) {
+				dialB = evt.value;
+				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
+					lastChangeTime += 800; // give em an extra 800ms to whack the
+											// button
+				}
 			}
-		} else if (v[0].equals("JAMB")) {
-			dialB = Integer.parseInt(v[1]);
-			if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
-				lastChangeTime += 800; // give em an extra 800ms to whack the
-										// button
-			}
-		} else if (v[0].equals("KEY")) {
-			if (v[1].equals(";")) {
+		
+		} else if (evt.event.equals("KEY")) {
+			if (evt.value == KeyEvent.VK_SEMICOLON) {
 				jamAttempt();
 			}
-		} else if (evt.equals("NEWSWITCH:11:1")) {
-			jamAttempt();
+		} else if (evt.event.equals("NEWSWITCH")) {
+			if(evt.id == 11 && evt.value == 1) jamAttempt();
 		}
 	}
 

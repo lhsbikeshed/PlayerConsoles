@@ -32,7 +32,7 @@ public abstract class Display {
 	public abstract void oscMessage(OscMessage theOscMessage);
 
 	/* received a serialEvent from the hardware connected to machine */
-	public abstract void serialEvent(String content);
+	public abstract void serialEvent(HardwareEvent evt);
 
 	/* called when display is shown */
 	public abstract void start();

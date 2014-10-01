@@ -1,5 +1,6 @@
 package tactical;
 
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,15 +10,17 @@ import java.util.List;
 
  */
 
+
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
-
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class WeaponsConsole extends Display {
@@ -615,54 +618,87 @@ public class WeaponsConsole extends Display {
 	}
 
 	@Override
-	public void serialEvent(String contents) {
-		String action = contents.split(":")[1];
-		if (action.equals("FIRELASER")) {
-			OscMessage myMessage = new OscMessage(
-					"/system/targetting/fireAtTarget");
-			osc.send(myMessage, new NetAddress(serverIP, 12000));
-			if (currentTarget != null && currentTarget.pos.mag() < maxBeamRange) {
-				parent.getConsoleAudio().playClip("firing");
-			} else {
-				parent.getConsoleAudio().playClip("outOfRange");
+	public void serialEvent(HardwareEvent evt) {
+		if(evt.event.equals("KEYPAD")){
+
+			int action = evt.id;
+			if (action == TacticalHardwareController.KP_LASER) {
+				fireLaser();
 			}
-
-			ConsoleLogger.log(this, "Fire at target");
-			return;
-		}
-
-		if (action.equals("DECOY")) {
-			if (parent.getShipState().smartBombsLeft > 0) {
-				if (smartBombFireTime + 1000 < parent.millis()) {
-
-					OscMessage myMessage = new OscMessage(
-							"/system/targetting/fireFlare");
-					osc.send(myMessage, new NetAddress(serverIP, 12000));
-
-					
-				}
-			} else {
-				// warn we have no flares left
+	
+			if (action == TacticalHardwareController.KP_DECOY) {
+				fireSmartBomb();
+				
+				return;
 			}
-			return;
+	
+			if (action == TacticalHardwareController.KP_SCAN) {
+				scanTarget();
+			} else {
+				//keypad only types 0-9
+				keyTyped(evt.value);
+			
+			}
+		} else if (evt.event.equals("KEY")){
+			if(evt.value == KeyEvent.VK_F){
+				fireLaser();
+			} else if (evt.value == KeyEvent.VK_M){
+				fireSmartBomb();
+			} else if (evt.value == KeyEvent.VK_SPACE){
+				scanTarget();
+			}
+			//KEY events are keycodes
+			int code = evt.value - 48;
+			
+			keyTyped(code);
 		}
+	}
 
-		if (action.equals("SCAN")) {
-			scanTarget();
+	private void fireLaser() {
+		OscMessage myMessage = new OscMessage(
+				"/system/targetting/fireAtTarget");
+		osc.send(myMessage, new NetAddress(serverIP, 12000));
+		if (currentTarget != null && currentTarget.pos.mag() < maxBeamRange) {
+			parent.getConsoleAudio().playClip("firing");
 		} else {
+			parent.getConsoleAudio().playClip("outOfRange");
+		}
 
-			if (action.charAt(0) >= '0' && action.charAt(0) <= '9') {
-				if (scanningState != SCAN_TYPING) {
-					scanString = "";
-				}
-				scanString = scanString + action;
+		ConsoleLogger.log(this, "Fire at target");
+		return;
+		
+	}
 
-				scanningState = SCAN_TYPING;
-				if (scanString.length() >= 4) {
-					scanTarget();
-				}
+	private void fireSmartBomb() {
+		if (parent.getShipState().smartBombsLeft > 0) {
+			if (smartBombFireTime + 1000 < parent.millis()) {
+
+				OscMessage myMessage = new OscMessage(
+						"/system/targetting/fireFlare");
+				osc.send(myMessage, new NetAddress(serverIP, 12000));
+
+				
+			}
+		} else {
+			// warn we have no flares left
+		}
+		
+	}
+
+	//value should be 0-9
+	private void keyTyped(int value) {
+		if (value >= 0 && value <= 9) {
+			if (scanningState != SCAN_TYPING) {
+				scanString = "";
+			}
+			scanString = scanString + value;
+
+			scanningState = SCAN_TYPING;
+			if (scanString.length() >= 4) {
+				scanTarget();
 			}
 		}
+		
 	}
 
 	@Override

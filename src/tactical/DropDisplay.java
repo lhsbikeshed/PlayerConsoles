@@ -5,8 +5,8 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 /**
@@ -103,29 +103,22 @@ public class DropDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
-		String[] evtData = evt.split(":");
+	public void serialEvent(HardwareEvent evt) {
+		//String[] evtData = evt.split(":");
 
-		if (evtData[0].equals("CONDUITCONNECT")) {
-
-			char c = evtData[1].charAt(0);
-			if (c >= '0' && c < '9') {
-				OscMessage myMessage = new OscMessage(
-						"/scene/drop/conduitConnect");
-				myMessage.add(Integer.parseInt(evtData[1]));
-				OscP5.flush(myMessage, new NetAddress(parent.getServerIP(),
-						12000));
+		if (evt.event.equals("CONDUIT")) {
+			int cable = evt.id;
+			int state = evt.value;
+			
+			OscMessage msg;
+			if(state == 1){
+				msg = new OscMessage("/scene/drop/conduitConnect");
+				
+			} else {
+				msg = new OscMessage("/scene/drop/conduitDisconnect");
 			}
-		} else if (evtData[0].equals("CONDUITDISCONNECT")) {
-
-			char c = evtData[1].charAt(0);
-			if (c >= '0' && c < '9') {
-				OscMessage myMessage = new OscMessage(
-						"/scene/drop/conduitDisconnect");
-				myMessage.add(Integer.parseInt(evtData[1]));
-				OscP5.flush(myMessage, new NetAddress(parent.getServerIP(),
-						12000));
-			}
+			msg.add(cable);
+			parent.getOscClient().send(msg, parent.getServerAddress());
 		}
 
 	}
@@ -136,7 +129,7 @@ public class DropDisplay extends Display {
 		structFail = false;
 		jumpCharged = false;
 		// probe for current cable state
-		((TacticalConsole) parent).probeCableState();
+		TacticalHardwareController.instance.probeCableState();
 	}
 
 	@Override

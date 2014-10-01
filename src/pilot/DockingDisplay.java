@@ -5,8 +5,8 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
-
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class DockingDisplay extends Display {
@@ -252,7 +252,7 @@ public class DockingDisplay extends Display {
 	}
 
 	@Override
-	public void serialEvent(String evt) {
+	public void serialEvent(HardwareEvent evt) {
 	}
 
 	@Override
