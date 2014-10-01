@@ -3,7 +3,9 @@ package common;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import common.displays.BootDisplay;
@@ -109,13 +111,23 @@ public abstract class PlayerConsole extends PApplet {
 
 	protected Display currentScreen; // screen that is currently being displayed
 
+	//name of this console
 	protected String consoleName = "changeme";
 
+	//timer for heartbeat effects
 	protected long heartBeatTimer = -1;
-
+	
+	//time in ms since the start of the game at which the ship died
 	protected long deathTime = 0;
 
+	//common boot display to all consoles
 	protected BootDisplay bootDisplay;
+	
+	//list of all harware attached to this machine
+	protected ArrayList<HardwareController> hardwareControllers;
+	protected HardwareController keyboardController;
+	
+	
 
 	/* switch to a new display */
 	protected void changeDisplay(Display d) {
@@ -128,11 +140,18 @@ public abstract class PlayerConsole extends PApplet {
 
 	@Override
 	public void draw() {
-		// common draw things
+		// toggle the global blinker for animation purposes
 		if (blinkTime + 750 < millis()) {
 			blinkTime = millis();
 			globalBlinker = !globalBlinker;
 		}
+		
+		//update hardware
+		keyboardController.update();
+		for(HardwareController h : hardwareControllers){
+			h.update();
+		}
+		
 		// translate stuff
 		damageEffects.startTransform();
 
@@ -189,10 +208,7 @@ public abstract class PlayerConsole extends PApplet {
 		return shipState;
 	}
 
-	public void hardwareEvent(HardwareEvent h) {
-		// TODO Auto-generated method stub
-
-	}
+	public abstract void hardwareEvent(HardwareEvent h);
 
 	/* hide the cursor by substituting it for an empty icon */
 	protected void hideCursor() {
@@ -289,6 +305,20 @@ public abstract class PlayerConsole extends PApplet {
 		}
 	}
 
+	public void keyPressed(KeyEvent ke){
+		if(ke.getKeyCode() == KeyEvent.VK_ESCAPE){
+			ConsoleLogger.log(this, "Exitting..");
+			for(HardwareController h : hardwareControllers){
+				h.shutDown();
+			}
+			System.exit(0);
+		}
+		//pass this to the keyboard controller
+		//this will then pass it on to the current consoles "hardwareevent" method
+		//using the hardwareEvent container rather than just keypresses
+		keyboardController.keyPressed(ke);
+	}
+	
 	@Override
 	public void setup() {
 		// read config from the command line args
@@ -300,6 +330,12 @@ public abstract class PlayerConsole extends PApplet {
 		
 		// SOUND!
 		minim = new Minim(this);
+		
+		//serial stuff
+		hardwareControllers = new ArrayList<HardwareController>();
+		keyboardController = new HardwareController("Keyboard", "Keyboard", 0, this);
+		
+		
 		
 		
 		bannerSystem = new BannerOverlay(this);

@@ -8,6 +8,7 @@ import processing.serial.Serial;
 import common.ConsoleAudio;
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.Rot;
 import common.displays.BootDisplay;
@@ -342,6 +343,12 @@ public class PilotConsole extends PlayerConsole {
 	@Override
 	protected void reactorStopped() {
 		ConsoleLogger.log(this, "Reactor stopped");
+		
+	}
+
+	@Override
+	public void hardwareEvent(HardwareEvent h) {
+		// TODO Auto-generated method stub
 		
 	}
 }

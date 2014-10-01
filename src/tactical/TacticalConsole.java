@@ -1,13 +1,15 @@
 package tactical;
 
+import java.awt.event.KeyEvent;
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.serial.Serial;
-
 import common.ConsoleAudio;
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
@@ -15,7 +17,6 @@ import common.displays.DestructDisplay;
 import common.displays.FailureScreen;
 import common.displays.RestrictedAreaScreen;
 import common.displays.WarpDisplay;
-
 import ddf.minim.Minim;
 
 public class TacticalConsole extends PlayerConsole {
@@ -151,6 +152,7 @@ public class TacticalConsole extends PlayerConsole {
 	/* these are just for testing when serial devices arent available */
 	@Override
 	public void keyPressed() {
+		
 		if (key >= '0' && key <= '9') {
 			consoleAudio.randomBeep();
 			
@@ -408,6 +410,24 @@ public class TacticalConsole extends PlayerConsole {
 			decoyBlinker = false;
 			charlesPort.write("R0,");
 		}
+		
+	}
+
+	@Override
+	public void hardwareEvent(HardwareEvent h) {
+		int keyPressed = (int)h.data; //data contains keycode value
+		ConsoleLogger.log(this, "keyp: " + keyPressed);
+		if (keyPressed >= KeyEvent.VK_0 && keyPressed <= KeyEvent.VK_9) {
+			consoleAudio.randomBeep();
+			
+			currentScreen.serialEvent("KEY:" + keyPressed);
+		} else if (keyPressed == KeyEvent.VK_SPACE) {
+			currentScreen.serialEvent("KEY:SCAN");
+		} else if (keyPressed == KeyEvent.VK_M) {
+			currentScreen.serialEvent("KEY:FIRELASER");
+		} else if (keyPressed == KeyEvent.VK_F) {
+			currentScreen.serialEvent("KEY:DECOY");
+		} 
 		
 	}
 

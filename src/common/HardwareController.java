@@ -4,7 +4,9 @@ import java.awt.event.KeyEvent;
 
 import processing.serial.Serial;
 
-/* interface to hardware connected to machine */
+/* interface to hardware connected to machine 
+ * must override the bufferComplete method 
+ * */
 public class HardwareController {
 
 	protected Serial serialPort;
@@ -32,6 +34,14 @@ public class HardwareController {
 		this.parent = parent;
 
 	}
+	
+	public void shutDown(){
+		if(isKeyboard == false && parent.testMode == false){
+			serialPort.stop();
+			serialPort.dispose();
+			
+		}
+	}
 
 	/*
 	 * take contents of buffer and convert to hardwareevent This needs to be
@@ -52,7 +62,7 @@ public class HardwareController {
 		if (isKeyboard) {
 			HardwareEvent h = new HardwareEvent();
 			h.event = "KEY";
-			h.data = ke;
+			h.data = ke.getKeyCode();
 			h.fromDevice = interfaceName;
 			parent.hardwareEvent(h);
 		}

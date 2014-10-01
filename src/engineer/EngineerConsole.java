@@ -6,17 +6,16 @@ import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.serial.Serial;
-
 import common.ConsoleAudio;
 import common.ConsoleLogger;
 import common.Display;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
 import common.displays.DestructDisplay;
 import common.displays.FailureScreen;
 import common.displays.RestrictedAreaScreen;
-
 import ddf.minim.Minim;
 
 public class EngineerConsole extends PlayerConsole {
@@ -229,45 +228,50 @@ public class EngineerConsole extends PlayerConsole {
 			currentScreen.serialEvent("KEY:" + key);
 		}
 		if (key == '[') {
-			if (shipState.sillinessLevel >= 0 && shipState.poweredOn
-					&& shipState.sillinessInProgress == false) {
-				OscMessage msg = new OscMessage("/system/reactor/silliness");
-				sillinessStartTime = millis();
-				switch (shipState.sillinessLevel) {
-				case 0:
-					shipState.sillinessLevel = 1;
-					shipState.sillinessInProgress = true;
-					msg.add(0);
-					OscP5.flush(msg, new NetAddress(serverIP, 12000));
-					bannerSystem.setSize(700, 300);
-					bannerSystem.setTitle("!!WARNING!!");
-					bannerSystem
-							.setText("Please do not push that button again");
-					bannerSystem.displayFor(5000);
-					consoleAudio.playClip("warning1");
-					break;
-				case 1:
-					shipState.sillinessInProgress = true;
-					// shut down
-					shipState.sillinessLevel = 2;
-					consoleAudio.playClip("warning2");
-					msg.add(1);
-					OscP5.flush(msg, new NetAddress(serverIP, 12000));
-					break;
-				case 2:
-					shipState.sillinessInProgress = true;
-					shipState.sillinessLevel = -1;
-					consoleAudio.playClip("warning3");
-					msg.add(2);
-					OscP5.flush(msg, new NetAddress(serverIP, 12000));
-					bannerSystem.setSize(700, 300);
-					bannerSystem.setTitle("!!WARNING!!");
-					bannerSystem.setText("You Didnt listen, did you?");
-					bannerSystem.displayFor(5000);
-					break;
-				}
+			doSilliness();
+		}
+	}
+
+	private void doSilliness() {
+		if (shipState.sillinessLevel >= 0 && shipState.poweredOn
+				&& shipState.sillinessInProgress == false) {
+			OscMessage msg = new OscMessage("/system/reactor/silliness");
+			sillinessStartTime = millis();
+			switch (shipState.sillinessLevel) {
+			case 0:
+				shipState.sillinessLevel = 1;
+				shipState.sillinessInProgress = true;
+				msg.add(0);
+				OscP5.flush(msg, new NetAddress(serverIP, 12000));
+				bannerSystem.setSize(700, 300);
+				bannerSystem.setTitle("!!WARNING!!");
+				bannerSystem
+						.setText("Please do not push that button again");
+				bannerSystem.displayFor(5000);
+				consoleAudio.playClip("warning1");
+				break;
+			case 1:
+				shipState.sillinessInProgress = true;
+				// shut down
+				shipState.sillinessLevel = 2;
+				consoleAudio.playClip("warning2");
+				msg.add(1);
+				OscP5.flush(msg, new NetAddress(serverIP, 12000));
+				break;
+			case 2:
+				shipState.sillinessInProgress = true;
+				shipState.sillinessLevel = -1;
+				consoleAudio.playClip("warning3");
+				msg.add(2);
+				OscP5.flush(msg, new NetAddress(serverIP, 12000));
+				bannerSystem.setSize(700, 300);
+				bannerSystem.setTitle("!!WARNING!!");
+				bannerSystem.setText("You Didnt listen, did you?");
+				bannerSystem.displayFor(5000);
+				break;
 			}
 		}
+		
 	}
 
 	@Override
@@ -466,6 +470,12 @@ public class EngineerConsole extends PlayerConsole {
 	protected void reactorStopped() {
 		ConsoleLogger.log(this, "Reactor stopped, resetting devices..");
 		resetDevices();
+		
+	}
+
+	@Override
+	public void hardwareEvent(HardwareEvent h) {
+		// TODO Auto-generated method stub
 		
 	}
 
