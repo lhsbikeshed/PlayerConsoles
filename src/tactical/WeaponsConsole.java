@@ -472,6 +472,13 @@ public class WeaponsConsole extends Display {
 		return null;
 	}
 
+	private void fireDecoy(){
+		parent.getShipState().smartBombsLeft--;
+		smartBombFireTime = parent.millis();
+		
+	}
+	
+	
 	@Override
 	public void oscMessage(OscMessage theOscMessage) {
 
@@ -558,7 +565,11 @@ public class WeaponsConsole extends Display {
 					firingTime = parent.millis();
 				}
 			}
+		} else if (theOscMessage.checkAddrPattern("/system/targetting/smartBombOk")){
+			fireDecoy();
+			
 		}
+				
 	}
 
 	void scanTarget() {
@@ -628,8 +639,7 @@ public class WeaponsConsole extends Display {
 							"/system/targetting/fireFlare");
 					osc.send(myMessage, new NetAddress(serverIP, 12000));
 
-					parent.getShipState().smartBombsLeft--;
-					smartBombFireTime = parent.millis();
+					
 				}
 			} else {
 				// warn we have no flares left
