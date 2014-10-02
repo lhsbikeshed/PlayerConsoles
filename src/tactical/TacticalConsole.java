@@ -97,7 +97,9 @@ public class TacticalConsole extends PlayerConsole {
 
 	@Override
 	protected void oscEvent(OscMessage theOscMessage) {
+		try {
 		super.oscEvent(theOscMessage);
+		
 		if (theOscMessage.checkAddrPattern("/scene/warzone/weaponState") == true) {
 			int msg = theOscMessage.get(0).intValue();
 			if (msg == 1) {
@@ -172,6 +174,9 @@ public class TacticalConsole extends PlayerConsole {
 				currentScreen.oscMessage(theOscMessage);
 			}
 		}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 
 	}
 
@@ -196,7 +201,8 @@ public class TacticalConsole extends PlayerConsole {
 		}
 
 		oscP5 = new OscP5(this, 12004);
-
+		serverAddress = new NetAddress(serverIP, 12000);
+		
 		globalFont = loadFont("common/HanzelExtendedNormal-48.vlw");
 
 		dropDisplay = new DropDisplay(this);
@@ -241,7 +247,7 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	protected void shipDamaged(float amount) {
 		//flash the lights attached to this console
-		mainPanelHardware.shipDamage();
+		mainPanelHardware.shipDamage(amount);
 		fanController.shipDamage();
 
 	}

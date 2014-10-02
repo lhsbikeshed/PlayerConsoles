@@ -263,6 +263,7 @@ public class DropDisplay extends Display {
 		if (state == STATE_AUTH) {
 			char c = (char)evt.value;
 			if (evt.event.equals("KEY")) {
+				parent.getConsoleAudio().randomBeep();
 				if (authCode.length() < 4) {
 					authCode += c;
 				} else {

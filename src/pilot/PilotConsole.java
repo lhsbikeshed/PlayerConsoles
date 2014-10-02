@@ -285,7 +285,9 @@ public class PilotConsole extends PlayerConsole {
 
 	@Override
 	public void hardwareEvent(HardwareEvent h) {
-		
+		if(h.event.equals("THROTTLE")){
+			joy.setThrottle(h.value);
+		}
 		
 	}
 }

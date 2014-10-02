@@ -20,7 +20,7 @@ public class LowerPanelHardware extends HardwareController {
 		if (p == 'F') { 		// fuel gauge stuff
 			processFuelGuage();
 		} else if (p == 'P') { // this switch from new panel
-			String vals = new String(serialBuffer);
+			String vals = finalBufferContents;
 			if (vals.substring(0, 2).equals("PS")) { // PS10:1
 				// chop off first two chars, split on the : character
 				vals = vals.substring(2);

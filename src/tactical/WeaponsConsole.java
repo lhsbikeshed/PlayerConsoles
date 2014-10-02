@@ -643,7 +643,7 @@ public class WeaponsConsole extends Display {
 				scanTarget();
 			} else {
 				//keypad only types 0-9
-				keyTyped(evt.value);
+				keyTyped(evt.id);
 			
 			}
 		} else if (evt.event.equals("KEY")){

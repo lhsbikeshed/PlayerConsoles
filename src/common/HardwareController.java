@@ -16,6 +16,7 @@ public class HardwareController {
 	protected PlayerConsole parent;
 
 	protected char[] serialBuffer = new char[50];
+	protected String finalBufferContents;
 	protected int bufPtr = 0;
 
 	public HardwareController(String interfaceName, String port, int rate,
@@ -62,6 +63,7 @@ public class HardwareController {
 		if (isKeyboard) {
 			HardwareEvent h = new HardwareEvent();
 			h.event = "KEY";
+			h.id = ke.getKeyCode();
 			h.value = ke.getKeyCode();
 			h.fromDevice = interfaceName;
 			parent.hardwareEvent(h);
@@ -87,7 +89,10 @@ public class HardwareController {
 				char c = serialPort.readChar();
 
 				if (c == ',') {
+					finalBufferContents = (new String(serialBuffer)).substring(0, bufPtr);
+					
 					bufferComplete();
+					
 					bufPtr = 0;
 				} else {
 					serialBuffer[bufPtr] = c;

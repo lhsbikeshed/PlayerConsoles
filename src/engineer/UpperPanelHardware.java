@@ -71,7 +71,8 @@ public class UpperPanelHardware extends HardwareController {
 	private void controlSwitches() {
 		
 		//command format is "S<number>"
-		String vals = new String(serialBuffer);
+		String vals = finalBufferContents;
+		
 		int switchNumber = Integer.parseInt(vals.substring(1, vals.length()));
 		// ConsoleLogger.log(this,(v);
 		ConsoleAudio consoleAudio = parent.getConsoleAudio();
@@ -100,7 +101,7 @@ public class UpperPanelHardware extends HardwareController {
 	}
 
 	private void jammingDials(int index) {
-		String vals = new String(serialBuffer);
+		String vals = finalBufferContents;
 		int value = Integer.parseInt(vals.substring(1, vals.length()));
 		
 		HardwareEvent h = new HardwareEvent();

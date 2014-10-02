@@ -328,7 +328,8 @@ public class EngineerConsole extends PlayerConsole {
 		if(h.event.equals("KEY")){
 			if(h.value == KeyEvent.VK_OPEN_BRACKET){
 				doSilliness();
-			} 
+			}
+			
 		}
 		
 		currentScreen.serialEvent(h);

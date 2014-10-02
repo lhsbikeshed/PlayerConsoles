@@ -3,8 +3,8 @@ package pilot;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
+import processing.core.PApplet;
 import procontroll.*;
-
 import common.PlayerConsole;
 
 public class Joystick {
@@ -19,7 +19,7 @@ public class Joystick {
 	
 	long lastUpdateTime = 0;
 	long updateFreq = 100;
-	public float throttle = 0;
+	private float throttle = 0;
 	private boolean testMode = true;
 	boolean state = true;
 	OscP5 oscP5;
@@ -59,6 +59,15 @@ public class Joystick {
 			
 			afterburnerButton = device.getButton("Button 1");
 		}
+	}
+	
+	//take a 0-255 throttle value and scale to 0-1f
+	public void setThrottle(int th){
+		float t = PApplet.map(th, 0f, 255f, 0f, 1.0f);
+		if (t < 0.1) {
+			t = 0;
+		}
+		throttle = t;
 	}
 
 	public void setEnabled(boolean state) {

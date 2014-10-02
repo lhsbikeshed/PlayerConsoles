@@ -43,18 +43,15 @@ public class PilotHardwareController extends HardwareController {
 			HardwareEvent h = new HardwareEvent();
 			h.event = "THROTTLE";
 			h.id = SW_THROTTLE;
-			String buffer = new String(serialBuffer);
+			String buffer = finalBufferContents;
 			
 			int th = Integer.parseInt(buffer.substring(1));
-			float t = PApplet.map(th, 0f, 255f, 0f, 1.0f);
-			if (t < 0.1) {
-				t = 0;
-			}
+			
 			
 			h.value = th;
 			parent.hardwareEvent(h);
 			
-		} else if (commandChar == 'c'){
+		} else if (commandChar == 'c' || commandChar == 'C'){
 			// cable connection event 
 			// C:<plug>:<socket>
 			OscMessage msg;
@@ -63,7 +60,7 @@ public class PilotHardwareController extends HardwareController {
 			} else {
 				msg = new OscMessage("/system/cablePuzzle/disconnect");
 			}
-			String vals = new String(serialBuffer);
+			String vals = finalBufferContents;
 			String[] parts = vals.split(":");
 			int plugId = Integer.parseInt(parts[1]);
 			int socketId = Integer.parseInt(parts[2]);

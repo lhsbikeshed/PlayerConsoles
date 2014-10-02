@@ -6,6 +6,7 @@ import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
+import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
@@ -90,8 +91,8 @@ public class HyperSpaceDisplay extends Display {
 
 	PImage warningBanner;
 
-	char[] charMap = { 'a', 'f', 'k', 'p', 'b', 'q', 'c', 'r', 'd', 's', 'e',
-			'j', 'o', 't' };
+	char[] charMap = { 'A', 'F', 'K', 'P', 'B', 'Q', 'C', 'R', 'D', 'S', 'E',
+			'J', 'O', 'T' };
 
 	// text labels
 
@@ -231,8 +232,9 @@ public class HyperSpaceDisplay extends Display {
 	public void serialEvent(HardwareEvent evt) {
 		
 		if (evt.event.equals("KEY")) {
-			char c2 = (char)evt.value;
-			if (c2 >= 'a' && c2 <= 't') {
+			char c2 = (char)evt.id;
+			
+			if (c2 >= 'A' && c2 <= 'T') {
 				for (Emitter e : emitters) {
 					if (e.keyChar == c2) {
 						if (e.getState() == Emitter.STATE_FAIL) {

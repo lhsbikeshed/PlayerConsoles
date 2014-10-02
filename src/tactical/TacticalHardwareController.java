@@ -183,11 +183,13 @@ public class TacticalHardwareController extends HardwareController {
 		}
 	}
 
-	public void shipDamage() {
+	public void shipDamage(float amount) {
 		if(parent.testMode){
 			ConsoleLogger.log(this, "Damage effect");
 		} else {
-			serialPort.write("S,");
+			if(amount > 0.0f){
+				serialPort.write("S,");
+			}
 		}
 	}
 }

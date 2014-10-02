@@ -115,12 +115,13 @@ public class AirlockDisplay extends Display {
 		if (locked) {
 			if (codePtr < 4) {
 				if (failedCode == false) {
+					parent.getConsoleAudio().randomBeep();
 					codeAttempt[codePtr] = k - 48;
 					codePtr++;
 				}
 			} else {
 				if (failedCode == false) {
-
+					parent.getConsoleAudio().randomBeep();
 					codeAttempt[codePtr] = k - 48;
 					codePtr++;
 				}
@@ -149,13 +150,7 @@ public class AirlockDisplay extends Display {
 		}
 	}
 
-	public void keyPressed() {
-
-	}
-
-	public void keyReleased() {
-	}
-
+	
 	@Override
 	public void oscMessage(OscMessage theOscMessage) {
 	}
@@ -163,17 +158,16 @@ public class AirlockDisplay extends Display {
 	@Override
 	public void serialEvent(HardwareEvent evt) {		
 		if (evt.event.equals("KEY")) {		
-				
-			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9) {		
-				char c = (char)(evt.value - 48); //VK_0 - 9 starts at 48, VK_KEYPAD_0 starts at 96. 
-												//casting keypad values to char doesnt produce number chars
-										
+			
+			
+			if (evt.value >= KeyEvent.VK_0 && evt.value <= KeyEvent.VK_9) {
+				char c = (char)evt.value;
 				keyEntered(c);
-			}		
+			}
 		}
 
 		if (evt.event.equals("BUTTON")) {
-			if (evt.value == UpperPanelHardware.BT_AIRLOCK && locked == false) {
+			if (evt.id == UpperPanelHardware.BT_AIRLOCK && locked == false) {
 				greatSuccess = true;
 				successTime = parent.millis();
 				if (!doneSuccessMessage) {
