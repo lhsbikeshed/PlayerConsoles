@@ -571,6 +571,13 @@ public class WeaponsConsole extends Display {
 		} else if (theOscMessage.checkAddrPattern("/system/targetting/smartBombOk")){
 			fireDecoy();
 			
+		} else if (theOscMessage.checkAddrPattern("/system/targetting/weaponState")){
+			int state = theOscMessage.get(0).intValue();
+			if(state == 0){
+				parent.getConsoleAudio().playClip("weaponsRetracted");
+			} else {
+				parent.getConsoleAudio().playClip("weaponsDeployed");
+			}
 		}
 				
 	}
