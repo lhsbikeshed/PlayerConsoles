@@ -259,7 +259,8 @@ public class TacticalConsole extends PlayerConsole {
 		shipState.areWeDead = false;
 		shipState.poweredOn = false;
 		shipState.poweringOn = false;
-		mainPanelHardware.setPowerState(false);
+		mainPanelHardware.reset();
+		
 		shipState.smartBombsLeft = 6;
 	}
 

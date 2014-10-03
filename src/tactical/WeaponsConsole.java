@@ -12,6 +12,9 @@ import java.util.List;
 
 
 
+
+import javax.sound.sampled.TargetDataLine;
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -123,7 +126,7 @@ public class WeaponsConsole extends Display {
 	public boolean hookArmed = false;
 
 	// sensor power to range mapping
-	int[] sensorRanges = { 0, 600, 900, 1200 };
+	int[] sensorRanges = { 0, 580, 900, 1300 };
 	OscP5 osc;
 
 	String serverIP = "";
@@ -153,6 +156,10 @@ public class WeaponsConsole extends Display {
 
 	@Override
 	public void draw() {
+		sensorPower = 3;
+		
+		
+		
 		parent.background(0, 0, 0);
 		parent.noStroke();
 		if (mode == MODE_SCANNER) {
@@ -288,6 +295,9 @@ public class WeaponsConsole extends Display {
 		synchronized (targets) {
 			for (int i = targets.size() - 1; i >= 0; i--) {
 				TargetObject t = targets.get(i);
+				
+				float distanceToTarget = t.pos.mag();
+				float lastDistanceToTarget = t.lastPos.mag();
 				// update logic bits
 				// if no update received for 280ms then remove this target
 				if (parent.millis() - t.lastUpdateTime > 300) {
@@ -310,9 +320,9 @@ public class WeaponsConsole extends Display {
 				// float y = 426 + map(lerpY, -2000, 2000, -426, 426);
 				// 364,707
 				PVector p = PVector.fromAngle(t.randomAngle);
-				p.mult(75 + t.pos.mag() / 3.0f); // new pos
+				p.mult(75 + distanceToTarget / 3.0f); // new pos
 				PVector lp = PVector.fromAngle(t.randomAngle);
-				lp.mult(75 + t.lastPos.mag() / 3.0f);
+				lp.mult(75 + lastDistanceToTarget / 3.0f);
 
 				float x = 364 + PApplet.lerp(lp.x, p.x,
 						(parent.millis() - t.lastUpdateTime) / 250.0f);
@@ -322,15 +332,15 @@ public class WeaponsConsole extends Display {
 				;
 
 				// set target colour
-
-				if (t.pos.mag() > sensorRanges[sensorPower - 1]) {
+				float scaleFactor = 1.2f;
+				if (distanceToTarget > sensorRanges[sensorPower - 1] * scaleFactor) {
 					parent.fill(100, 100, 100);
 					x += parent.random(-5, 5);
 					y += parent.random(-5, 5);
-				} else if (t.pos.mag() < 200) {
+				} else if (distanceToTarget < 200) {
 
 					parent.fill(255, 0, 0);
-				} else if (t.pos.mag() < 500) {
+				} else if (distanceToTarget < 500) {
 					parent.fill(255, 255, 0);
 				} else {
 					parent.fill(0, 255, 0);
@@ -343,7 +353,7 @@ public class WeaponsConsole extends Display {
 				if (t.scanId < 1000) {
 					scanCode = "0" + scanCode;
 				}
-				if (t.pos.mag() < sensorRanges[sensorPower - 1]) { // grey it
+				if (distanceToTarget < sensorRanges[sensorPower - 1] * scaleFactor) { // grey it
 																	// out if
 																	// its
 																	// outside
@@ -351,11 +361,15 @@ public class WeaponsConsole extends Display {
 																	// range, if
 																	// not then
 																	// draw
-					parent.textFont(font, 12);
+					parent.textFont(font, 14);
 
 					String h = String.format("%.2f", t.stats[0] * 100);
-					parent.text(t.name + ": " + h + "%", x + 10, y + 15);
-					parent.text(scanCode, x + 10, y);
+					parent.text(t.name + ": " + h + "%", x + 30, y + 5);
+					parent.textFont(font, 20);
+					parent.text(scanCode, x + 30, y-10);
+					parent.stroke(255,255,0);
+					parent.line(x+30, y-15, x+20, y-15);
+					parent.line(x, y, x+20, y-15);
 					// are there any extended stats on this?
 					Float f = t.getStat("scanning");
 					if (f != null && f > 0.0f) {
@@ -422,8 +436,9 @@ public class WeaponsConsole extends Display {
 					parent.rect(-15 * scale, -15 * scale, 30 * scale,
 							30 * scale);
 					parent.popMatrix();
-
-					parent.text("scanning: " + t.scanCountDown, x + 10, y + 10);
+						
+					
+					//parent.text("scanning: " + t.scanCountDown, x + 10, y + 10);
 				}
 
 				if (t.targetted) {
@@ -431,12 +446,7 @@ public class WeaponsConsole extends Display {
 					parent.noFill();
 					// rect(x-10, y-10, 20, 20);
 
-					if (t.pos.mag() < maxBeamRange) {
-						parent.text("FIRE BEAMS", x + 10, y + 10);
-						fireEnabled = true;
-					} else {
-						parent.text("OUT OF RANGE", x + 10, y + 10);
-					}
+					
 
 					parent.pushMatrix();
 					parent.translate(x, y);
@@ -526,6 +536,7 @@ public class WeaponsConsole extends Display {
 				}
 				t.lastUpdateTime = parent.millis();
 				t.pos = new PVector(x, y, z);
+				
 				t.stats[0] = theOscMessage.get(7).floatValue();
 				// t.stats[1] = theOscMessage.get(8).floatValue();
 				t.statNames[0] = theOscMessage.get(8).stringValue();
@@ -712,6 +723,8 @@ public class WeaponsConsole extends Display {
 	public void start() {
 		offline = false;
 		targets = new ArrayList<TargetObject>();
+		OscMessage msg = new OscMessage("/system/ship/getPowerLevels");
+		OscP5.flush(msg, new NetAddress(serverIP, 12000));
 	}
 
 	@Override

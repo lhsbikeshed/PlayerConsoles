@@ -223,4 +223,10 @@ public class TacticalHardwareController extends HardwareController {
 			}
 		}
 	}
+
+	public void reset() {
+		setWeaponsArmedLight(false);
+		setPowerState(false);
+		
+	}
 }
