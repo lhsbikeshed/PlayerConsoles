@@ -1,5 +1,6 @@
 package tactical;
 
+import oscP5.OscMessage;
 import common.ConsoleLogger;
 import common.HardwareController;
 import common.HardwareEvent;
@@ -88,6 +89,18 @@ public class TacticalHardwareController extends HardwareController {
 			h.value = 0;
 			parent.hardwareEvent(h);
 			
+		}
+		if ( c == 'w'){
+			//toggle weapons off
+			OscMessage m = new OscMessage("/system/targetting/setWeaponState");
+			m.add(0);
+			parent.getOscClient().send(m, parent.getServerAddress());
+		}
+		if ( c == 'W'){
+			//toggle weapons
+			OscMessage m = new OscMessage("/system/targetting/setWeaponState");
+			m.add(1);
+			parent.getOscClient().send(m, parent.getServerAddress());
 		}
 	}
 	

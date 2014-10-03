@@ -46,6 +46,16 @@ public class LowerPanelHardware extends HardwareController {
 				h.event = "NEWDIAL";
 				h.id = switchNum;
 				h.value = value;
+				
+				if(switchNum == 9){	//9 is hardcoded to the jump system toggle
+									//send that message now but pass it on to rest of console in case something wants it
+					OscMessage m = new OscMessage("/system/jump/state");
+					m.add(h.value);
+					parent.getOscClient().send(m, parent.getServerAddress());
+					
+				}
+				
+				
 				parent.hardwareEvent(h);
 
 			}
