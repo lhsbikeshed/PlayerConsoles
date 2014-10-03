@@ -31,6 +31,8 @@ public class TacticalHardwareController extends HardwareController {
 	public static final int KP_LASER = 12;
 	
 	boolean decoyLightState = false;
+	boolean previousWeaponLightState = false;
+	boolean weaponLightState = false;
 
 	// is the decoy blinker on?
 	boolean decoyBlinker = false;
@@ -90,14 +92,15 @@ public class TacticalHardwareController extends HardwareController {
 			parent.hardwareEvent(h);
 			
 		}
+		/* weapons toggling commands */
 		if ( c == 'w'){
 			//toggle weapons off
 			OscMessage m = new OscMessage("/system/targetting/setWeaponState");
 			m.add(0);
 			parent.getOscClient().send(m, parent.getServerAddress());
-		}
-		if ( c == 'W'){
-			//toggle weapons
+			
+		} else if ( c == 'W'){
+			//toggle weapons on
 			OscMessage m = new OscMessage("/system/targetting/setWeaponState");
 			m.add(1);
 			parent.getOscClient().send(m, parent.getServerAddress());
@@ -116,7 +119,19 @@ public class TacticalHardwareController extends HardwareController {
 		parent.hardwareEvent(h);
 	}
 	
-	
+	void setWeaponsArmedLight(boolean state){
+		ConsoleLogger.log(this, "setting weapons armed light to " + state);
+		if(parent.testMode) return;
+		
+		if(state){
+			weaponLightState = true;
+			serialPort.write("A,");
+			
+		} else {
+			weaponLightState = false;
+			serialPort.write("a,");
+		}
+	}
 
 
 	void decoyLightState(boolean s) {
@@ -138,10 +153,13 @@ public class TacticalHardwareController extends HardwareController {
 		if(parent.testMode) return;
 		if(b){
 			/* power up the tac console panel */			
-			serialPort.write("P,");			
+			serialPort.write("P,");	
+			setWeaponsArmedLight(previousWeaponLightState);
 		} else {
 			serialPort.write("p,");
 			decoyBlinker = false;
+			previousWeaponLightState = weaponLightState;
+			setWeaponsArmedLight(false);
 		}
 		
 	}
