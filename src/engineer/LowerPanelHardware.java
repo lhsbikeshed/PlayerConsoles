@@ -33,6 +33,14 @@ public class LowerPanelHardware extends HardwareController {
 				parent.hardwareEvent(h);
 				parent.getConsoleAudio().randomBeep();
 				
+				if(h.id == 9){	//9 is hardcoded to the jump system toggle
+					//send that message now but pass it on to rest of console in case something wants it
+					OscMessage m = new OscMessage("/system/jump/state");
+					m.add(h.value);
+					parent.getOscClient().send(m, parent.getServerAddress());
+	
+				}
+				
 			} else if (vals.substring(0, 2).equals("PC")) {// probe complete,
 															// unmute audio for
 															// buttons
@@ -47,13 +55,7 @@ public class LowerPanelHardware extends HardwareController {
 				h.id = switchNum;
 				h.value = value;
 				
-				if(switchNum == 9){	//9 is hardcoded to the jump system toggle
-									//send that message now but pass it on to rest of console in case something wants it
-					OscMessage m = new OscMessage("/system/jump/state");
-					m.add(h.value);
-					parent.getOscClient().send(m, parent.getServerAddress());
-					
-				}
+				
 				
 				
 				parent.hardwareEvent(h);

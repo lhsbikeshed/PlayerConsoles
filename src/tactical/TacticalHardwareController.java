@@ -95,13 +95,13 @@ public class TacticalHardwareController extends HardwareController {
 		/* weapons toggling commands */
 		if ( c == 'w'){
 			//toggle weapons off
-			OscMessage m = new OscMessage("/system/targetting/setWeaponState");
+			OscMessage m = new OscMessage("/system/targetting/changeWeaponState");
 			m.add(0);
 			parent.getOscClient().send(m, parent.getServerAddress());
 			
 		} else if ( c == 'W'){
 			//toggle weapons on
-			OscMessage m = new OscMessage("/system/targetting/setWeaponState");
+			OscMessage m = new OscMessage("/system/targetting/changeWeaponState");
 			m.add(1);
 			parent.getOscClient().send(m, parent.getServerAddress());
 		}

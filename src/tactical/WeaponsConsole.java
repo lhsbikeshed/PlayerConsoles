@@ -156,9 +156,7 @@ public class WeaponsConsole extends Display {
 
 	@Override
 	public void draw() {
-		sensorPower = 3;
-		
-		
+	
 		
 		parent.background(0, 0, 0);
 		parent.noStroke();
