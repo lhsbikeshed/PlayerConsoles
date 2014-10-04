@@ -29,30 +29,43 @@ public class FailureScreen extends Display {
 	@Override
 	public void draw() {
 		parent.image(background, 0, 0, parent.width, parent.height);
-		animTime++;
+		animTime += 4;
 		leftIconPos -= 0.2f;
 		rightIconPos += 0.2f;
+		
+		int i;
+	    float rot, rad, dist;
+	    rot = PApplet.radians(animTime / 10.0f);
 
 		parent.pushMatrix();
 		parent.translate(leftIconPos + leftIcon.width, 328 + 328);
-		parent.rotate(PApplet.radians(-animTime / 10.0f));
-		parent.image(leftIcon, -leftIcon.width, -328);
+		parent.rotate(-rot);
+		parent.translate(0, -328);
+		for (i = 0; i < 5; i++) {
+			if (parent.random(10) <= 7 )
+				continue;
+			dist = parent.random(50);
+			parent.fill(255, 115 + dist * 2, 0);
+			rad = 100 - dist / 2;
+			parent.ellipse(-60 + dist, 50 + parent.random(-20, 20), rad, rad);
+		}
+		parent.image(leftIcon, -leftIcon.width, 0);
 		parent.popMatrix();
 
 		parent.pushMatrix();
 		parent.translate(rightIconPos + 10, 229 + 229);
-		parent.rotate(PApplet.radians(animTime / 10.0f));
-		parent.image(rightIcon, -10, -229);
-		parent.popMatrix();
-
-		for (int i = 0; i < 5; i++) {
-			if (parent.random(10) > 7) {
-				parent.fill(220 + parent.random(40), 204, 0);
-				float rad = 50 + parent.random(50);
-				parent.ellipse(435 + parent.random(40),
-						350 + parent.random(100), rad, rad);
-			}
+		parent.rotate(rot);
+		parent.translate(0, -229);
+		for (i = 0; i < 5; i++) {
+			if (parent.random(10) <= 7)
+				continue;
+			dist = parent.random(50);
+			parent.fill(255, 155 + dist * 2, 0);
+			rad = 100 - dist / 2;
+			parent.ellipse(40 + -dist, 180 + parent.random(-20, 20), rad, rad);
 		}
+		parent.image(rightIcon, -10, 0);
+		parent.popMatrix();
 
 		if (parent.globalBlinker) {
 			parent.image(warningImage, 44, 28);
