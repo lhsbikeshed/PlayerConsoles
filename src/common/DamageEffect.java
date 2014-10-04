@@ -6,6 +6,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
+import processing.opengl.PShader;
 
 public class DamageEffect {
 	private class CrackItem {
@@ -31,6 +32,7 @@ public class DamageEffect {
 	int maxCracks = 3;
 
 	PApplet parent;
+	PShader damageDistortion;
 	
 	Object lock = new Object();
 
@@ -45,6 +47,8 @@ public class DamageEffect {
 		}
 		noiseImage.updatePixels();
 		ConsoleLogger.log(this, "     ...done");
+		
+		damageDistortion = parent.loadShader("common/damageEffects/distort.glsl");
 
 		// window crack images
 		ConsoleLogger.log(this, "Loading crack images..");
@@ -84,7 +88,8 @@ public class DamageEffect {
 			if (damageTimer < parent.millis()) {
 				running = false;
 			} else {
-
+				damageDistortion.set("timer", parent.millis());
+				parent.filter(damageDistortion);
 				for (int x = 0; x < tileX; x++) {
 					for (int y = 0; y < tileY; y++) {
 						if (parent.random(100) < 25) {
