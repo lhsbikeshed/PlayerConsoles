@@ -285,6 +285,7 @@ public class EngineerConsole extends PlayerConsole {
 
 	@Override
 	protected void gameReset() {
+		super.gameReset();
 		// reset the entire game
 		lowerPanel.reset();
 		upperPanel.reset();

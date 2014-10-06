@@ -1,10 +1,9 @@
 package engineer.powersystems;
 
+import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
-
 import common.PlayerConsole;
-
 import engineer.EngineerConsole;
 import engineer.Highlighter;
 
@@ -23,10 +22,11 @@ public abstract class SubSystem {
 	protected long blinkStart = 0;
 	private PImage img;
 	// protected boolean isBroken = false;
-	protected int maxHealth = 100;
-	protected int health = maxHealth;
+	protected float maxHealth = 100;
+	protected float health = maxHealth;
 	protected int failedFor = 0;
 	protected int difficulty = 1;
+	protected boolean repairing = false;
 
 	protected boolean firstValueSet = true;
 	protected PlayerConsole parent;
@@ -42,23 +42,29 @@ public abstract class SubSystem {
 	public abstract void createFailure(); // make this system fail, pass in
 											// difficulty
 
-	public void doRepairs() {
+	public void doRepairs(float rate) {
 		// deal with repairs
 		if (health < maxHealth) {
-			health += parent.random(3);
+			health += rate;
+			repairing = true;
 			if (health >= maxHealth) {
 				health = maxHealth;
 				failedFor = 0;
+				repairing = false;
+				currentState = targetState;
 			}
 		}
 	}
 
 	public void draw() {
-
+		
 		if (isBroken()) {
 			parent.tint(100, 100, 100);
 			parent.image(getImg(), pos.x + parent.random(4) - 2,
-					pos.y + parent.random(4) - 2);
+			pos.y + parent.random(4) - 2);
+			parent.fill(255,255,0);
+			parent.rect(pos.x, pos.y+ getImg().height + 3, PApplet.map(health,  0, maxHealth, 0, getImg().width), 6);
+			
 		} else {
 
 			if (currentState != targetState) {
@@ -95,7 +101,7 @@ public abstract class SubSystem {
 	}
 
 	public boolean isBroken() {
-		return health <= 10;
+		return repairing;
 	}
 
 	public boolean isFailed() {

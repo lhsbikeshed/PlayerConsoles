@@ -9,6 +9,14 @@ import common.HardwareController;
 import common.HardwareEvent;
 import common.PlayerConsole;
 
+/* protocol :
+ * S<0-10> : startup sequence level
+ * R1 : Reactor start
+ * R0 : reactor off
+ * A<0-9>, B<0-9> : jamming dials
+ * pXXXX : power dial values X = 0-12 value 
+ * L  : airlock dump button
+ */
 public class UpperPanelHardware extends HardwareController {
 
 	public static final int BT_AIRLOCK = 0;
@@ -19,6 +27,7 @@ public class UpperPanelHardware extends HardwareController {
 		ConsoleLogger.log(this, "starting upper panel on " + port);
 	}
 
+	
 	public void bufferComplete(){
 		char p = serialBuffer[0];
 		
@@ -34,7 +43,7 @@ public class UpperPanelHardware extends HardwareController {
 			powerButtons();
 		} else if (p == 'L') {		//airlock button
 			airlockButton();
-		}
+		} 
 	}
 
 	
@@ -47,17 +56,29 @@ public class UpperPanelHardware extends HardwareController {
 		parent.hardwareEvent(h);
 	}
 		
-
+	/* h.id = dial id
+	 * h.value = value of dial
+	 */
 	private void powerButtons() {
+		//format is:
+		// pXXXX
+		// where X = power level from 0-12 + 65 (so its a printable char)
+		OscMessage msg = new OscMessage("/control/subsystemstate");
+		for(int i = 0; i < 4; i++){
+			HardwareEvent h = new HardwareEvent();
+			h.event = "POWERDIAL";
+			h.id = i;
+			
+			h.value = (int)(finalBufferContents.charAt(1 + i)) - 65;
+			parent.hardwareEvent(h);
+			msg.add(h.value);
+		}
 		
-		HardwareEvent h = new HardwareEvent();
-		h.event = "POWERBUTTON";
-		h.id = Integer.parseInt("" + serialBuffer[1]);
-		h.value = 1;
-		parent.hardwareEvent(h);
+		//now tell the game about this
+		parent.getOscClient().send(msg, parent.getServerAddress());
+		//these values then get pushed back to this console by the main game
 		
-		parent.getConsoleAudio().randomBeep();
-
+			
 		
 	}
 
@@ -110,6 +131,15 @@ public class UpperPanelHardware extends HardwareController {
 		h.value = value;
 		
 		parent.hardwareEvent(h);
+		
+	}
+	
+	public void syncPowerLevels(){
+		ConsoleLogger.log(this, "Syncing power dials..");
+		if(parent.testMode){
+			return;
+		}
+		
 		
 	}
 

@@ -224,6 +224,10 @@ public abstract class PlayerConsole extends PApplet {
 	}
 
 	protected void oscEvent(OscMessage theOscMessage) {
+		//pass to shipstate to parse common ship state messages
+		shipState.processOSCMessage(theOscMessage);
+		
+		
 		if (theOscMessage.checkAddrPattern("/ship/damage") == true) {
 			float damage = 0.0f;
 			if (theOscMessage.arguments().length > 0) {
@@ -322,6 +326,9 @@ public abstract class PlayerConsole extends PApplet {
 		//using the hardwareEvent container rather than just keypresses
 		keyboardController.keyPressed(ke);
 	}
+	public void mouseClicked(){
+		ConsoleLogger.log(this, "mx: " + mouseX + " y: " + mouseY);
+	}
 	
 	@Override
 	public void setup() {
@@ -364,7 +371,9 @@ public abstract class PlayerConsole extends PApplet {
 		}
 	}
 	
-	protected abstract void gameReset();
+	protected void gameReset(){
+		shipState.resetState();
+	}
 	protected abstract void shipDead();
 	protected abstract void reactorStarted();
 	protected abstract void reactorStopped();

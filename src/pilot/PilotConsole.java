@@ -44,7 +44,7 @@ public class PilotConsole extends PlayerConsole {
 	CablePuzzleDisplay cablePuzzleDisplay;
 
 	FailureScreen failureScreen;
-	int systemPower = 2;
+	
 
 	float lastOscTime = 0;
 	
@@ -122,7 +122,7 @@ public class PilotConsole extends PlayerConsole {
 				pilotHardware.setJumpLightState(true);
 			}
 		} else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
-			systemPower = theOscMessage.get(1).intValue() + 1;
+			
 			// displayList[currentDisplay].oscMessage(theOscMessage);
 			currentScreen.oscMessage(theOscMessage);
 			pilotHardware.setJumpLightState(false);
@@ -255,7 +255,7 @@ public class PilotConsole extends PlayerConsole {
 
 	@Override
 	protected void gameReset() {
-
+		super.gameReset();
 		currentScreen.stop();
 		currentScreen = launchDisplay;
 		currentScreen.start();

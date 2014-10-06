@@ -137,11 +137,11 @@ public class TacticalConsole extends PlayerConsole {
 	
 
 		} else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
-			int beamPower = theOscMessage.get(3).intValue() - 1; // write charge
+			int beamPower = theOscMessage.get(3).intValue()/4 - 1; // write charge
 																	// rate
-			int propPower = theOscMessage.get(0).intValue() - 1;
-			int sensorPower = theOscMessage.get(2).intValue() - 1;
-			int internalPower = theOscMessage.get(1).intValue() - 1;
+			int propPower = theOscMessage.get(0).intValue()/4 - 1;
+			int sensorPower = theOscMessage.get(2).intValue()/4 - 1;
+			int internalPower = theOscMessage.get(1).intValue()/4 - 1;
 
 			mainPanelHardware.setChargeRate(beamPower);
 			fanController.setPowerLevels(propPower, beamPower, sensorPower,internalPower);
@@ -254,6 +254,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	@Override
 	protected void gameReset() {
+		super.gameReset();
 		// reset the entire game
 		changeDisplay(weaponsDisplay);
 		shipState.areWeDead = false;

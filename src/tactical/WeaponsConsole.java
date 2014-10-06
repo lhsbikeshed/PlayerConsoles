@@ -13,6 +13,7 @@ import java.util.List;
 
 
 
+
 import javax.sound.sampled.TargetDataLine;
 
 import netP5.NetAddress;
@@ -25,6 +26,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 
 public class WeaponsConsole extends Display {
 
@@ -43,6 +45,8 @@ public class WeaponsConsole extends Display {
 		public float[] stats = new float[2];
 		public String[] statNames = new String[2];
 
+		
+		
 		public float randomAngle;
 		protected HashMap<String, Float> statMap = new HashMap<String, Float>();
 
@@ -94,6 +98,9 @@ public class WeaponsConsole extends Display {
 
 	TargetObject currentTarget;
 
+	int sensorPower = 0;
+	int beamPower = 0;
+	
 	long smartBombFireTime = 0;
 	long missileStartTime = 0;
 	float scannerAngle = 0;
@@ -106,9 +113,7 @@ public class WeaponsConsole extends Display {
 	float maxBeamRange = 1300;
 
 	int radarTicker = 175;
-	int beamPower = 2;
-
-	int sensorPower = 2;
+	
 	// states
 	boolean flareEnabled = false;
 	boolean offline = false;
@@ -126,7 +131,7 @@ public class WeaponsConsole extends Display {
 	public boolean hookArmed = false;
 
 	// sensor power to range mapping
-	int[] sensorRanges = { 0, 580, 900, 1300 };
+	//int[] sensorRanges = { 370, 580, 900, 1300 };
 	OscP5 osc;
 
 	String serverIP = "";
@@ -156,21 +161,26 @@ public class WeaponsConsole extends Display {
 
 	@Override
 	public void draw() {
-	
+	    sensorPower = parent.getShipState().powerStates[ShipState.POWER_SENSORS];
+	    beamPower = parent.getShipState().powerStates[ShipState.POWER_WEAPONS];
+	    int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300);
+	    maxBeamRange = (1000 + (beamPower - 1) * 300);
 		
 		parent.background(0, 0, 0);
 		parent.noStroke();
 		if (mode == MODE_SCANNER) {
 			parent.fill(0, 128, 0, 100);
-			int sensorSize = sensorRanges[sensorPower - 1];
+			int sensorSize = (int) parent.map(sensorPower, 0f, 12f, 270,1300) ;//sensorRanges[ sensorPower / 4];
 			parent.ellipse(364, 707, sensorSize, sensorSize);
 			radarTicker += 10;
-			parent.noFill();
-			parent.stroke(0, 255, 0);
-			parent.strokeWeight(3);
+			//parent.noFill();
+			parent.noStroke();
+			//parent.stroke(0, 255, 0);
+			int alpha = (int) PApplet.map(radarTicker, 0, sensorSize, 45f, 0f );
+			parent.fill(0,255,0, alpha);
 			parent.arc(364f, 707f, radarTicker, radarTicker, 4.2f, 5.23f);
-			if (radarTicker > sensorRanges[sensorPower - 1]) {
-				radarTicker = 175;
+			if (radarTicker > sensorRange) {
+				radarTicker = 15;
 			}
 
 			parent.image(bgImage, 0, 0);
@@ -188,12 +198,17 @@ public class WeaponsConsole extends Display {
 		parent.textFont(font, 56);
 		parent.text(parent.getShipState().smartBombsLeft, 212, 706);
 		// power gauges in bottom left
-		parent.fill(0, 255, 0);
-		parent.rect(47, 742, 25, beamPower * -20);
-		parent.rect(106, 742, 25, sensorPower * -20);
+		parent.noStroke();
+		int f = (int) PApplet.map(beamPower, 0f, 12f, 255f, 0f);
+		parent.fill(f, 255-f, 0);
+		parent.rect(47, 742, 25, PApplet.map(beamPower, 0f, 12f, 0f, -90));
+		f = (int) PApplet.map(sensorPower, 0f, 12f, 255f, 0f);
+		parent.fill(f, 255-f, 0);
+		parent.rect(106, 742, 25, PApplet.map(sensorPower, 0f, 12f, 0f, -90));
 
 		// the target list on the right hand side
 		parent.textFont(font, 14);
+		int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300); //sensorRanges[sensorPower / 4];
 		synchronized (targets) {
 			Collections.sort(targets); // sorted by distance from ship
 			int ypos = 144;
@@ -201,13 +216,13 @@ public class WeaponsConsole extends Display {
 				if (t.targetted) {
 					parent.fill(255, 0, 0);
 				} else {
-					if (t.pos.mag() < sensorRanges[sensorPower - 1]) {
+					if (t.pos.mag() < sensorRange) {
 						parent.fill(0, 255, 0);
 					} else {
 						parent.fill(100, 100, 100);
 					}
 				}
-				if (t.pos.mag() > sensorRanges[sensorPower - 1]) {
+				if (t.pos.mag() > sensorRange) {
 					parent.text("???", 710, ypos);
 				} else {
 					parent.text(t.scanId, 710, ypos);
@@ -219,7 +234,7 @@ public class WeaponsConsole extends Display {
 				if (name.length() > 12) {
 					name = name.substring(0, 12) + "..";
 				}
-				if (t.pos.mag() > sensorRanges[sensorPower - 1]) {
+				if (t.pos.mag() > sensorRange) {
 					name = "???";
 				}
 				parent.text(name, 855, ypos);
@@ -286,7 +301,7 @@ public class WeaponsConsole extends Display {
 	}
 
 	void drawTargets() {
-
+		int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300);
 		parent.textFont(font, 12);
 		fireEnabled = false;
 		parent.strokeWeight(1);
@@ -331,7 +346,7 @@ public class WeaponsConsole extends Display {
 
 				// set target colour
 				float scaleFactor = 1.2f;
-				if (distanceToTarget > sensorRanges[sensorPower - 1] * scaleFactor) {
+				if (distanceToTarget > sensorRange * scaleFactor) {
 					parent.fill(100, 100, 100);
 					x += parent.random(-5, 5);
 					y += parent.random(-5, 5);
@@ -345,13 +360,13 @@ public class WeaponsConsole extends Display {
 				}
 
 				// draw the target on the radar
-
+				parent.noStroke();
 				parent.ellipse(x, y, 10, 10);
 				String scanCode = "" + t.scanId;
 				if (t.scanId < 1000) {
 					scanCode = "0" + scanCode;
 				}
-				if (distanceToTarget < sensorRanges[sensorPower - 1] * scaleFactor) { // grey it
+				if (distanceToTarget < sensorRange * scaleFactor) { // grey it
 																	// out if
 																	// its
 																	// outside
@@ -493,11 +508,7 @@ public class WeaponsConsole extends Display {
 	@Override
 	public void oscMessage(OscMessage theOscMessage) {
 
-		if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
-			beamPower = theOscMessage.get(3).intValue() + 1;
-			sensorPower = theOscMessage.get(2).intValue() + 1;
-			maxBeamRange = (1000 + (beamPower - 1) * 300);
-		} else if (theOscMessage
+		if (theOscMessage
 				.checkAddrPattern("/tactical/weapons/targetUpdate")) {
 
 			int tgtHash = theOscMessage.get(0).intValue();
@@ -604,7 +615,7 @@ public class WeaponsConsole extends Display {
 			synchronized (targets) {
 				for (TargetObject t : targets) {
 					if (sId == t.scanId) {
-						t.scanCountDown = (5 - sensorPower) * 21;
+						t.scanCountDown = (13 - sensorPower) * 10;
 						targetFound = true;
 					} else {
 						if (t.targetted) {

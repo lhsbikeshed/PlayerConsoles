@@ -1,8 +1,14 @@
 package common;
 
+import oscP5.OscMessage;
 import processing.core.PVector;
 
 public class ShipState {
+	
+	public static final int POWER_PROPULSION = 0;
+	public static final int POWER_WEAPONS = 1;
+	public static final int POWER_SENSORS = 2;
+	public static final int POWER_DAMAGE = 3;
 
 	public boolean poweredOn = true;
 	public boolean poweringOn = false;
@@ -29,11 +35,27 @@ public class ShipState {
 	public int sillinessLevel;
 	
 	public boolean afterburnerCharging = true;
-	
+	public int[] powerStates = new int[4];
 
 	public ShipState() {
 	};
 
 	public void resetState() {
+		powerStates[0] = 6;
+		powerStates[1] = 6;
+		powerStates[2] = 6;
+		powerStates[3] = 6;
+		
+	}
+	
+	public void processOSCMessage(OscMessage msg){
+		if (msg.checkAddrPattern("/system/ship/powerLevels")){
+			powerStates[POWER_PROPULSION] = msg.get(0).intValue(); //engines
+			powerStates[POWER_DAMAGE] = msg.get(3).intValue(); //damage
+			powerStates[POWER_SENSORS] = msg.get(2).intValue();	//sensors
+			powerStates[POWER_WEAPONS] = msg.get(1).intValue(); //weapons
+			
+		
+		}
 	}
 }

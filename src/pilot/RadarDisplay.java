@@ -17,8 +17,7 @@ import common.UsefulShit;
 public class RadarDisplay extends Display {
 	Object lock = new Object();
 	PImage overlayImage, indicatorImage;
-	int sensorPower = 2;
-	int propulsionPower = 2;
+	
 	RadarObject targetted;
 	float zoomLevel = 0.1f;
 	float maxDist = 0.0f;
@@ -397,8 +396,8 @@ public class RadarDisplay extends Display {
 
 		parent.textFont(font, 18);
 		parent.fill(0, 255, 255);
-
-		parent.text("Prop: " + (propulsionPower * 33) + "%", 680, 630);
+		int power = (int) PApplet.map(shipState.powerStates[ShipState.POWER_PROPULSION], 0f, 12f, 0f, 100f);
+		parent.text("Prop: " + power + "%", 680, 630);
 
 		parent.text("speed: " + (int) shipState.shipVelocity, 680, 660);
 		
@@ -545,10 +544,7 @@ public class RadarDisplay extends Display {
 					radarList[rId].setStat(vals[0], Float.parseFloat(vals[1]));
 				}
 			}
-		} else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
-
-			sensorPower = theOscMessage.get(2).intValue();
-			propulsionPower = theOscMessage.get(0).intValue();
+		
 		} else if (theOscMessage.checkAddrPattern("/radar/wayPointReached")) {
 			parent.getConsoleAudio().playClip("waypointReached");
 		} 

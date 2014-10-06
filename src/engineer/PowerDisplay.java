@@ -34,7 +34,7 @@ public class PowerDisplay extends Display {
 	PImage bgImage, hullStateImage, reactorFailOverlay, fuelLeakImage;
 
 	// logic thingies
-	int[] power = new int[4];
+	//int[] power = new int[4];
 	int lastReducedIndex = -1;
 	float oxygenLevel = 100.0f;
 	float hullState = 100.0f;
@@ -85,10 +85,6 @@ public class PowerDisplay extends Display {
 		reactorFailOverlay = parent
 				.loadImage("engineerconsole/reactorFailOverlay.png");
 		fuelLeakImage = parent.loadImage("engineerconsole/leakIcon.png");
-
-		for (int i = 0; i < 4; i++) {
-			power[i] = 2;
-		}
 
 		// configure subsystems
 		subsystemList[0] = new FuelFlowRateSystem(parent, "Deuterium",
@@ -144,7 +140,7 @@ public class PowerDisplay extends Display {
 
 		// power dist
 		subsystemList[10] = new MultiValueSystem(parent, "Power Dist Route",
-				new PVector(553, 416),
+				new PVector(322, 617),
 				parent.loadImage("engineerconsole/icons/powerdist.png"), 3);
 		switchToSystemMap.put("NEWSWITCH:13", subsystemList[10]);
 
@@ -169,35 +165,7 @@ public class PowerDisplay extends Display {
 		}
 	}
 
-	public void changePower(int slot) {
-		if (slot >= 0 && slot < 5) {
-			// find the highest power and sub 1
-			int highestIndex = -1;
-			int highest = -1;
-			for (int i = 0; i < 4; i++) {
-				if (power[i] >= highest && i != slot && lastReducedIndex != i) {
-					highest = power[i];
-					highestIndex = i;
-				}
-			}
-			if (power[highestIndex] - 1 > 0 && power[slot] + 1 < 4) {
-				power[highestIndex]--;
-				lastReducedIndex = slot;
-
-				power[slot]++;
-				OscMessage msg = new OscMessage("/control/subsystemstate");
-				for (int i = 0; i < 4; i++) {
-					msg.add(power[i]);
-				}
-				p5.send(msg, new NetAddress(serverIP, 12000));
-			}
-		} else if (slot == 5) {
-			for (int i = 0; i < 4; i++) {
-				power[i] = 2;
-			}
-			lastReducedIndex = -1;
-		}
-	}
+	
 
 	private int countSystemFailures() {
 		int ct = 0;
@@ -263,6 +231,7 @@ public class PowerDisplay extends Display {
 
 	@Override
 	public void draw() {
+		
 		// check to see if we need to add a failure
 		if (lastFailureTime + nextFailureTime < parent.millis() && failureState) {
 			lastFailureTime = parent.millis();
@@ -343,24 +312,18 @@ public class PowerDisplay extends Display {
 		// draw hull damage
 		parent.tint((int) PApplet.map(hullState, 0, 100, 255, 0),
 				(int) PApplet.map(hullState, 0, 100, 0, 255), 0);
-		parent.image(hullStateImage, 259, 632);
+		parent.image(hullStateImage, 747,487);
 		parent.noTint();
 
-		// power assignment bars
-		parent.fill(0, 255, 0);
-		for (int i = 0; i < 4; i++) {
-			int w = power[i] * 33;
-			parent.fill(powerColours[power[i] - 1]);
-			parent.rect(884, 365 + i * 80, -w, 60);
-		}
+		
 
 		// bits o text
 		parent.textFont(font, 15);
-		parent.text((int) hullState + "%", 350, 741);
+		parent.text((int) hullState + "%", 916,655);
 		parent.textFont(font, 12);
 		parent.fill((int) PApplet.map(oxygenLevel, 0, 100, 255, 0),
 				(int) PApplet.map(oxygenLevel, 0, 100, 0, 255), 0);
-		parent.text((int) oxygenLevel + "%", 211, 652);
+		parent.text((int) oxygenLevel + "%", 793, 444);
 
 		if (parent.getShipState().fuelLeaking) {
 			if (parent.globalBlinker) {
@@ -368,7 +331,7 @@ public class PowerDisplay extends Display {
 			} else {
 				parent.noTint();
 			}
-			parent.image(fuelLeakImage, 390, 635);
+			parent.image(fuelLeakImage, 728,468);
 		}
 
 		// draw the subssystem icons
@@ -378,9 +341,11 @@ public class PowerDisplay extends Display {
 		for (SubSystem s : subsystemList) {
 			// whilst were at it lets repair the systems if the power to
 			// internal is on full
-			if (power[1] == 3) {
-				s.doRepairs();
-			}
+			float repairRate = parent.map(parent.getShipState().powerStates[1], 0f, 12f, 0.0025f, 0.9f);
+			
+			s.doRepairs(repairRate);
+			
+			
 			s.draw();
 			// if(s.isBroken()){
 			// noTint();
@@ -397,7 +362,7 @@ public class PowerDisplay extends Display {
 			}
 		}
 
-		if (power[1] == 3) {
+		if (parent.getShipState().powerStates[1] == 3) {
 			parent.fill(255, 255, 255);
 			parent.textFont(font, 15);
 			parent.text("Repairing..", 196, 757);
@@ -499,22 +464,12 @@ public class PowerDisplay extends Display {
 			} else {
 				reactorHealth = maxReactorHealth;
 			}
-		} else if (theOscMessage.checkAddrPattern("/system/ship/powerLevels")){
-			power[0] = theOscMessage.get(0).intValue(); //engines
-			power[1] = theOscMessage.get(3).intValue(); //damage
-			power[2] = theOscMessage.get(2).intValue();	//sensors
-			power[3] = theOscMessage.get(1).intValue(); //weapons
-			
-		
-		}
+		} 
 	}
 
 	@Override
 	public void serialEvent(HardwareEvent evt) {
-		if (evt.event.equals("POWERBUTTON")) {
-			changePower(evt.id);
-			
-		} else if (evt.event.equals("NEWDIAL")) {
+		if (evt.event.equals("NEWDIAL")) {
 			String lookup = "NEWDIAL:" + evt.id;
 
 			SubSystem s = switchToSystemMap.get(lookup);
@@ -549,9 +504,7 @@ public class PowerDisplay extends Display {
 	@Override
 	public void start() {
 		reset();
-		//request current power levels from ship
-		OscMessage msg = new OscMessage("/system/ship/getPowerLevels");
-		OscP5.flush(msg, new NetAddress(serverIP, 12000));
+		
 	}
 
 	public void reset(){
