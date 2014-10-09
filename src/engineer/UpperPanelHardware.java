@@ -149,7 +149,7 @@ public class UpperPanelHardware extends HardwareController {
 		if(parent.testMode){
 			return;
 		} 
-		serialPort.write('r');
+		serialPort.write("r,");
 	}
 
 	public void kill() {
@@ -159,7 +159,7 @@ public class UpperPanelHardware extends HardwareController {
 			return;
 		} 
 			
-		serialPort.write('k');
+		serialPort.write("k,");
 		
 		
 	}
