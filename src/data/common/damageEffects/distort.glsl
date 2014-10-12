@@ -77,12 +77,15 @@ void main() {
 
 	// Sine wave distortion
 	coords = vec2( desin( vertTexCoord.s, vertTexCoord.t), vertTexCoord.t );
+	
+	vec4 adjust = vertColor;
 
 	// Show "static" in image
 	if ( shouldFlicker() ) {
 		coords = calculateDistortion( coords );
+		adjust = vec4(3, 3, 3, 1);
 	}
 
 	// Write it to the screen
-	pixel = texture2D(texture, coords) * vertColor;
+	pixel = texture2D(texture, coords) * adjust;
 }
