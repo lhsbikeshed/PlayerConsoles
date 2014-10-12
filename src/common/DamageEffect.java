@@ -20,12 +20,10 @@ public class DamageEffect {
 	// time we last got damaged
 	long damageTimer = -1000;
 
-	PImage noiseImage; // static image that flashes
-
 	boolean running = false;
 	int tileX = 5;
-
 	int tileY = 5;
+	
 	ArrayList<CrackItem> crackList = new ArrayList<CrackItem>();
 	PImage[] crackImages;
 
@@ -38,16 +36,6 @@ public class DamageEffect {
 
 	public DamageEffect(PApplet parent) {
 		this.parent = parent;
-		ConsoleLogger.log(this, "generating damage images...");
-		noiseImage = parent.createImage(parent.width / tileX, parent.height
-				/ tileY, PConstants.RGB);
-		noiseImage.loadPixels();
-		for (int i = 0; i < noiseImage.width * noiseImage.height; i++) {
-			noiseImage.pixels[i] = parent.color(parent.random(255));
-		}
-		noiseImage.updatePixels();
-		ConsoleLogger.log(this, "     ...done");
-		
 		damageDistortion = parent.loadShader("common/damageEffects/distort.glsl");
 
 		// window crack images
@@ -81,23 +69,32 @@ public class DamageEffect {
 			crackList.clear();
 		}
 	}
+	
+	int lastDistort = 0;
 
 	public void draw() {
-		// image(noiseImage, 100,100);
 		if (running) {
-			if (damageTimer < parent.millis()) {
+			int now = parent.millis();
+			if (damageTimer < now) {
 				running = false;
 			} else {
-				damageDistortion.set("timer", parent.millis());
-				parent.filter(damageDistortion);
-				for (int x = 0; x < tileX; x++) {
-					for (int y = 0; y < tileY; y++) {
-						if (parent.random(100) < 25) {
-							parent.image(noiseImage, x * noiseImage.width, y
-									* noiseImage.height);
+				damageDistortion.set("timer", now);
+				int i, j, tx = 0, ty = 0;
+				int distortio = PApplet.round(now / 10);
+				if ( distortio > lastDistort) {
+					lastDistort = distortio;
+					for (i = 0; i < tileX; i++) {
+						for (j = 0; j < tileY; j++) {
+							if (parent.random(100) < 25) {
+								tx |= 1 << i;
+								ty |= 1 << j;
+							}
 						}
 					}
+					damageDistortion.set("tiles", tx, ty);
 				}
+
+				parent.filter(damageDistortion);
 			}
 		}
 
