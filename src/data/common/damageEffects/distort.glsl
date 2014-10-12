@@ -1,3 +1,5 @@
+#version 130
+
 #ifdef GL_ES
 precision mediump float;
 precision mediump int;
@@ -27,7 +29,7 @@ float rand(vec2 co){
 
 float desin(float val, float sinnable) {
 	sinnable *= 3.141569;
-	sinnable *= timer % 10;
+	sinnable *= mod( float(timer), 10);
 	return val + sin(sinnable) * 0.1;// ( ( 1 + sin(sinnable) ) / 2 );
 }
 
@@ -74,11 +76,10 @@ vec2 calculateDistortion( vec2 coords ) {
 
 void main() {
 	vec2 coords;
+	vec4 adjust = vertColor;
 
 	// Sine wave distortion
 	coords = vec2( desin( vertTexCoord.s, vertTexCoord.t), vertTexCoord.t );
-	
-	vec4 adjust = vertColor;
 
 	// Show "static" in image
 	if ( shouldFlicker() ) {
