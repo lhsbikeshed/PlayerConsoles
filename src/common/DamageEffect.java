@@ -36,7 +36,10 @@ public class DamageEffect {
 
 	public DamageEffect(PApplet parent) {
 		this.parent = parent;
+		
+		ConsoleLogger.log(this, "Loading damage shader..");
 		damageDistortion = parent.loadShader("common/damageEffects/distort.glsl");
+		ConsoleLogger.log(this, "     ...done");
 
 		// window crack images
 		ConsoleLogger.log(this, "Loading crack images..");
