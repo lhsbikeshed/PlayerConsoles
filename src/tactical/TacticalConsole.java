@@ -208,7 +208,7 @@ public class TacticalConsole extends PlayerConsole {
 		dropDisplay = new DropDisplay(this);
 		// radarDisplay = new RadarDisplay();
 		warpDisplay = new WarpDisplay(this);
-		weaponsDisplay = new WeaponsConsole(this);
+		weaponsDisplay = new WeaponConsoleNew(this);
 
 		displayMap.put("weapons", weaponsDisplay);
 		displayMap.put("drop", dropDisplay);

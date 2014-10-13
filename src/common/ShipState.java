@@ -37,6 +37,14 @@ public class ShipState {
 	public boolean afterburnerCharging = true;
 	public int[] powerStates = new int[4];
 
+	
+	public static final int WEAPON_STOWED = 0;
+	public static final int WEAPON_DEPLOYED = 1;
+	public static final int WEAPON_TRANSIT_OUT = 2;
+	public static final int WEAPON_TRANSIT_IN = 3;
+	public int weaponState = 0;
+	
+	
 	public ShipState() {
 	};
 
@@ -56,6 +64,8 @@ public class ShipState {
 			powerStates[POWER_WEAPONS] = msg.get(1).intValue(); //weapons
 			
 		
+		} else if (msg.checkAddrPattern("/ship/weaponState")){
+			weaponState = msg.get(0).intValue();
 		}
 	}
 }

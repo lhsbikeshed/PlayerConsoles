@@ -46,6 +46,13 @@ public class UpperPanelHardware extends HardwareController {
 		} 
 	}
 
+	public void damageShip(){
+		ConsoleLogger.log(this, "ship damage signal..");
+		if(!parent.testMode){
+			serialPort.write("d,");
+			
+		}
+	}
 	
 	private void airlockButton() {
 		

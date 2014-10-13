@@ -47,6 +47,7 @@ public class WeaponsConsole extends Display {
 
 		
 		
+		
 		public float randomAngle;
 		protected HashMap<String, Float> statMap = new HashMap<String, Float>();
 
@@ -78,7 +79,6 @@ public class WeaponsConsole extends Display {
 
 	public static final int MODE_SCANNER = 0;
 
-	public static final int MODE_LOCKED = 1;
 	// images etc
 	PImage[] banners = new PImage[3];
 	PImage bgImage;
@@ -100,6 +100,7 @@ public class WeaponsConsole extends Display {
 
 	int sensorPower = 0;
 	int beamPower = 0;
+	boolean weaponsDeployed = false;
 	
 	long smartBombFireTime = 0;
 	long missileStartTime = 0;
@@ -136,6 +137,7 @@ public class WeaponsConsole extends Display {
 
 	String serverIP = "";
 
+	
 	public WeaponsConsole(PlayerConsole parent) {
 		super(parent);
 		osc = parent.getOscClient();
@@ -157,6 +159,8 @@ public class WeaponsConsole extends Display {
 		grappleButtonD = parent.loadImage("tacticalconsole/grappleFireOff.png");
 		hullStateImage = parent
 				.loadImage("tacticalconsole/hulldamageoverlay.png");
+		
+	
 	}
 
 	@Override
@@ -170,7 +174,7 @@ public class WeaponsConsole extends Display {
 		parent.noStroke();
 		if (mode == MODE_SCANNER) {
 			parent.fill(0, 128, 0, 100);
-			int sensorSize = (int) parent.map(sensorPower, 0f, 12f, 270,1300) ;//sensorRanges[ sensorPower / 4];
+			int sensorSize = (int) parent.map(sensorPower, 0f, 12f, 270,1300) ;
 			parent.ellipse(364, 707, sensorSize, sensorSize);
 			radarTicker += 10;
 			//parent.noFill();
@@ -208,7 +212,7 @@ public class WeaponsConsole extends Display {
 
 		// the target list on the right hand side
 		parent.textFont(font, 14);
-		int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300); //sensorRanges[sensorPower / 4];
+		int sensorRange = (int) PApplet.map(sensorPower, 0f, 12f, 270,1300); //sensorRanges[sensorPower / 4];
 		synchronized (targets) {
 			Collections.sort(targets); // sorted by distance from ship
 			int ypos = 144;
@@ -289,7 +293,7 @@ public class WeaponsConsole extends Display {
 			parent.stroke(70, 70, 255);
 			parent.ellipse(364, 707, radius * 900, radius * 900);
 		}
-
+/*
 		// draw hull damage
 		parent.tint((int) PApplet.map(parent.getShipState().hullState, 0, 100,
 				255, 0), (int) PApplet.map(parent.getShipState().hullState, 0,
@@ -298,9 +302,10 @@ public class WeaponsConsole extends Display {
 		parent.textFont(font, 23);
 		parent.text((int) parent.getShipState().hullState + "%", 463, 646);
 		parent.noTint();
+		*/ 
 	}
 
-	void drawTargets() {
+	protected void drawTargets() {
 		int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300);
 		parent.textFont(font, 12);
 		fireEnabled = false;
@@ -487,9 +492,10 @@ public class WeaponsConsole extends Display {
 			}
 		}
 	}
+	
 
 	// find a target by hashcode
-	private TargetObject findTargetById(int id) {
+	protected TargetObject findTargetById(int id) {
 		for (TargetObject t : targets) {
 			if (t.hashCode == id) {
 				return t;
@@ -505,101 +511,121 @@ public class WeaponsConsole extends Display {
 	}
 	
 	
+	
 	@Override
 	public void oscMessage(OscMessage theOscMessage) {
 
 		if (theOscMessage
 				.checkAddrPattern("/tactical/weapons/targetUpdate")) {
 
-			int tgtHash = theOscMessage.get(0).intValue();
-			synchronized (targets) {
-				TargetObject t = findTargetById(tgtHash);
-				boolean newTarget = false;
-				if (t == null) {
-					ConsoleLogger.log(this, "new target: " + tgtHash);
-					t = new TargetObject();
-					t.hashCode = tgtHash;
-					newTarget = true;
-					targets.add(t);
-					parent.getConsoleAudio().playClip("newTarget");
-				}
-				t.scanId = theOscMessage.get(1).intValue();
-				t.trackingPlayer = theOscMessage.get(2).intValue() == 1 ? true
-						: false;
-				t.targetted = theOscMessage.get(3).intValue() == 1 ? true
-						: false;
-				float x = theOscMessage.get(4).floatValue();
-				float y = theOscMessage.get(5).floatValue();
-				float z = theOscMessage.get(6).floatValue();
-				if (newTarget) {
-					t.lastPos.x = x;
-					t.lastPos.y = y;
-					t.lastPos.z = z;
-					t.randomAngle = PApplet.map(parent.random(100), 0, 100,
-							4.2f, 5.23f);
-				} else {
-
-					t.lastPos.x = t.pos.x;
-					t.lastPos.y = t.pos.y;
-					t.lastPos.z = t.pos.z;
-				}
-				t.lastUpdateTime = parent.millis();
-				t.pos = new PVector(x, y, z);
-				
-				t.stats[0] = theOscMessage.get(7).floatValue();
-				// t.stats[1] = theOscMessage.get(8).floatValue();
-				t.statNames[0] = theOscMessage.get(8).stringValue();
-				// t.statNames[1] = theOscMessage.get(10).stringValue();
-				t.name = theOscMessage.get(9).stringValue();
-
-				// now unpack the stat string
-				String statString = theOscMessage.get(10).stringValue();
-				String[] pairs = statString.split(",");
-				for (String p : pairs) {
-					String[] vals = p.split(":");
-					t.setStat(vals[0], Float.parseFloat(vals[1]));
-				}
-			}
+			updateTarget(theOscMessage);
 		} else if (theOscMessage
 				.checkAddrPattern("/tactical/weapons/targetRemove")) {
-			synchronized (targets) {
-				int tgtHash = theOscMessage.get(0).intValue();
-				TargetObject t = findTargetById(tgtHash);
-				if (t != null) {
-					t.dead = true;
-					t.targetted = false;
-					ConsoleLogger.log(this, "target removed");
-					if (t.targetted) {
-						parent.getConsoleAudio().playClip("targetDestroyed");
-						scanningState = SCAN_TYPING;
-					}
-					if (t.scanCountDown >= 0) {
-						scanningState = SCAN_TYPING;
-					}
-				}
-			}
+			removeTarget(theOscMessage);
 		} else if (theOscMessage
 				.checkAddrPattern("/tactical/weapons/firingAtTarget")) {
-			synchronized (targets) {
-				int tgtHash = theOscMessage.get(0).intValue();
-				TargetObject t = findTargetById(tgtHash);
-				if (t != null) {
-					t.beingFiredAt = true;
-					firingTime = parent.millis();
-				}
-			}
+			firingAtTarget(theOscMessage);
 		} else if (theOscMessage.checkAddrPattern("/system/targetting/smartBombOk")){
 			fireDecoy();
 			
-		} else if (theOscMessage.checkAddrPattern("/system/targetting/weaponState")){
+		} else if (theOscMessage.checkAddrPattern("/ship/weaponState")){
 			int state = theOscMessage.get(0).intValue();
-			if(state == 0){
+			switch(state){
+			case ShipState.WEAPON_STOWED:
 				parent.getConsoleAudio().playClip("weaponsRetracted");
-			} else {
+				break;
+			case ShipState.WEAPON_DEPLOYED: 
 				parent.getConsoleAudio().playClip("weaponsDeployed");
+				break;
 			}
+			
 		}
 				
+	}
+
+	protected void firingAtTarget(OscMessage theOscMessage) {
+		synchronized (targets) {
+			int tgtHash = theOscMessage.get(0).intValue();
+			TargetObject t = findTargetById(tgtHash);
+			if (t != null) {
+				t.beingFiredAt = true;
+				firingTime = parent.millis();
+			}
+		}
+		
+	}
+
+	protected void removeTarget(OscMessage theOscMessage) {
+		synchronized (targets) {
+			int tgtHash = theOscMessage.get(0).intValue();
+			TargetObject t = findTargetById(tgtHash);
+			if (t != null) {
+				t.dead = true;
+				t.targetted = false;
+				ConsoleLogger.log(this, "target removed");
+				if (t.targetted) {
+					parent.getConsoleAudio().playClip("targetDestroyed");
+					scanningState = SCAN_TYPING;
+				}
+				if (t.scanCountDown >= 0) {
+					scanningState = SCAN_TYPING;
+				}
+			}
+		}
+		
+	}
+
+	protected void updateTarget(OscMessage theOscMessage) {
+		int tgtHash = theOscMessage.get(0).intValue();
+		synchronized (targets) {
+			TargetObject t = findTargetById(tgtHash);
+			boolean newTarget = false;
+			if (t == null) {
+				ConsoleLogger.log(this, "new target: " + tgtHash);
+				t = new TargetObject();
+				t.hashCode = tgtHash;
+				newTarget = true;
+				targets.add(t);
+				parent.getConsoleAudio().playClip("newTarget");
+			}
+			t.scanId = theOscMessage.get(1).intValue();
+			t.trackingPlayer = theOscMessage.get(2).intValue() == 1 ? true
+					: false;
+			t.targetted = theOscMessage.get(3).intValue() == 1 ? true
+					: false;
+			float x = theOscMessage.get(4).floatValue();
+			float y = theOscMessage.get(5).floatValue();
+			float z = theOscMessage.get(6).floatValue();
+			if (newTarget) {
+				t.lastPos.x = x;
+				t.lastPos.y = y;
+				t.lastPos.z = z;
+				t.randomAngle = PApplet.map(parent.random(100), 0, 100,
+						4.2f, 5.23f);
+			} else {
+
+				t.lastPos.x = t.pos.x;
+				t.lastPos.y = t.pos.y;
+				t.lastPos.z = t.pos.z;
+			}
+			t.lastUpdateTime = parent.millis();
+			t.pos = new PVector(x, y, z);
+			
+			t.stats[0] = theOscMessage.get(7).floatValue();
+			// t.stats[1] = theOscMessage.get(8).floatValue();
+			t.statNames[0] = theOscMessage.get(8).stringValue();
+			// t.statNames[1] = theOscMessage.get(10).stringValue();
+			t.name = theOscMessage.get(9).stringValue();
+
+			// now unpack the stat string
+			String statString = theOscMessage.get(10).stringValue();
+			String[] pairs = statString.split(",");
+			for (String p : pairs) {
+				String[] vals = p.split(":");
+				t.setStat(vals[0], Float.parseFloat(vals[1]));
+			}
+		}
+		
 	}
 
 	void scanTarget() {
