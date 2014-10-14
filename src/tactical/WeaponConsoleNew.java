@@ -222,30 +222,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 					parent.stroke(255,255,0);
 					parent.line(x+30, y-15, x+20, y-15);
 					parent.line(x, y, x+20, y-15);
-					// are there any extended stats on this?
-					Float f = t.getStat("scanning");
-					if (f != null && f > 0.0f) {
-						// draw a scanning effect around the target
-						int maxSize = 70;
-						int size = (int) PApplet.map(parent.millis() % 2000, 0,
-								2000, 0, maxSize);
-						parent.noFill();
-						parent.strokeWeight(2);
-						parent.stroke(0, 128, 255,
-								PApplet.map(size, 0, maxSize, 255, 0));
-						parent.ellipse(x, y, size, size);
-						size = (int) PApplet.map(
-								(parent.millis() + 1000) % 2000, 0, 2000, 0,
-								maxSize);
-						parent.stroke(0, 128, 255,
-								PApplet.map(size, 0, maxSize, 255, 0));
-						parent.ellipse(x, y, size, size);
-					}
-					f = t.getStat("chargingWeapons");
-					if (f != null && f > 0.0f) {
-						// warn the player that the target is charging its
-						// weapons
-					}
+					
 				} else {
 					parent.fill(128);
 					StringBuilder s = new StringBuilder(t.name);
