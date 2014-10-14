@@ -15,6 +15,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 import common.UsefulShit;
 import engineer.powersystems.CoilSubSystem;
 import engineer.powersystems.FuelFlowRateSystem;
@@ -341,7 +342,7 @@ public class PowerDisplay extends Display {
 		for (SubSystem s : subsystemList) {
 			// whilst were at it lets repair the systems if the power to
 			// internal is on full
-			float repairRate = parent.map(parent.getShipState().powerStates[1], 0f, 12f, 0.0025f, 0.9f);
+			float repairRate = PApplet.map(parent.getShipState().powerStates[ShipState.POWER_DAMAGE], 12f, 0f, 0.0025f, 0.9f);
 			
 			s.doRepairs(repairRate);
 			

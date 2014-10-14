@@ -158,9 +158,11 @@ public class EngineerConsole extends PlayerConsole {
 				shipState.poweredOn = true;
 				shipState.poweringOn = false;
 				bootDisplay.stop();
+				upperPanel.forcePowerMode(true);
 			} else {
 				shipState.poweredOn = false;
 				shipState.poweringOn = false;
+				upperPanel.forcePowerMode(false);
 			}
 		
 		} else if (theOscMessage

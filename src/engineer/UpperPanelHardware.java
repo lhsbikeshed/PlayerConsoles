@@ -71,12 +71,13 @@ public class UpperPanelHardware extends HardwareController {
 		// pXXXX
 		// where X = power level from 0-12 + 65 (so its a printable char)
 		OscMessage msg = new OscMessage("/control/subsystemstate");
-		for(int i = 0; i < 4; i++){
+		for(int i = 4; i > 0; i--){
 			HardwareEvent h = new HardwareEvent();
 			h.event = "POWERDIAL";
 			h.id = i;
 			
-			h.value = (int)(finalBufferContents.charAt(1 + i)) - 65;
+			h.value = (finalBufferContents.charAt(i) - 65);
+			ConsoleLogger.log(this, "received from dials: " + h.value);
 			parent.hardwareEvent(h);
 			msg.add(h.value);
 		}
@@ -150,6 +151,23 @@ public class UpperPanelHardware extends HardwareController {
 		
 	}
 
+
+	public void forcePowerMode(boolean on) {
+		ConsoleLogger.log(this, "forcing power mode.." + on);
+
+		if(parent.testMode){
+			return;
+		} 
+		if(on){
+			serialPort.write("P,");
+		} else {
+			serialPort.write("p,");
+		}
+	}
+
+	
+	
+	
 	public void reset() {
 		ConsoleLogger.log(this, "resetting..");
 

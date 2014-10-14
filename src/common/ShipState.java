@@ -59,9 +59,9 @@ public class ShipState {
 	public void processOSCMessage(OscMessage msg){
 		if (msg.checkAddrPattern("/system/ship/powerLevels")){
 			powerStates[POWER_PROPULSION] = msg.get(0).intValue(); //engines
-			powerStates[POWER_DAMAGE] = msg.get(3).intValue(); //damage
+			powerStates[POWER_DAMAGE] = msg.get(1).intValue(); //damage
 			powerStates[POWER_SENSORS] = msg.get(2).intValue();	//sensors
-			powerStates[POWER_WEAPONS] = msg.get(1).intValue(); //weapons
+			powerStates[POWER_WEAPONS] = msg.get(3).intValue(); //weapons
 			
 		
 		} else if (msg.checkAddrPattern("/ship/weaponState")){
