@@ -43,7 +43,7 @@ public class ShipState {
 	public static final int WEAPON_TRANSIT_OUT = 2;
 	public static final int WEAPON_TRANSIT_IN = 3;
 	public int weaponState = 0;
-	
+	public float[] weaponHealth = {1f, 1f,1f,1f, 1f};
 	
 	public ShipState() {
 	};
@@ -66,6 +66,11 @@ public class ShipState {
 		
 		} else if (msg.checkAddrPattern("/ship/weaponState")){
 			weaponState = msg.get(0).intValue();
+		} else if (msg.checkAddrPattern("/ship/weaponHealth")){
+			for(int i = 0; i < 5; i++){
+				weaponHealth[i] = msg.get(i).floatValue();
+			}
+			
 		}
 	}
 }

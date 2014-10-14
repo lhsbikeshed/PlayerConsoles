@@ -30,16 +30,16 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		weaponIcon = parent.loadImage("tacticalconsole/weaponsScreen/weaponIcon.png");
 		weaponStatusPanelImage = parent.loadImage("tacticalconsole/weaponStatusPanel.png");
 		
-		weaponIconPositions[0] = new PVector(533, 673);
+		weaponIconPositions[0] = new PVector(533, 689);
 		weaponIconRotations[0] = 0;
-		weaponIconPositions[1] = new PVector(617, 673);
+		weaponIconPositions[1] = new PVector(616, 710);
 		weaponIconRotations[1] = 180f;
-		weaponIconPositions[2] = new PVector(543, 666);
+		weaponIconPositions[2] = new PVector(545, 668);
 		weaponIconRotations[2] = 45f;
-		weaponIconPositions[3] = new PVector(590, 666);
-		weaponIconRotations[3] = -45f;
-		weaponIconPositions[4] = new PVector(585, 704);
-		weaponIconRotations[4] = 90f;
+		weaponIconPositions[3] = new PVector(622, 682);
+		weaponIconRotations[3] = 135f;
+		weaponIconPositions[4] = new PVector(565, 724);
+		weaponIconRotations[4] = -90f;
 	}
 	
 	protected void triggerDeploymentAnimation(int state){
@@ -56,9 +56,9 @@ public class WeaponConsoleNew extends WeaponsConsole {
 	
 	public void draw(){
 		sensorPower = parent.getShipState().powerStates[ShipState.POWER_SENSORS];
-	    sensorPower = 12;
+		
 		beamPower = parent.getShipState().powerStates[ShipState.POWER_WEAPONS];
-	    int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300);
+	    int sensorRange = (int) PApplet.map(sensorPower, 0f, 12f, 270,1300);
 	    maxBeamRange = (1000 + (beamPower - 1) * 300);
 		
 		parent.background(0, 0, 0);
@@ -66,17 +66,13 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		if (mode == MODE_SCANNER) {
 			parent.image(bgImage, 0, 0);
 			parent.fill(0, 128, 0, 100);
-			int sensorSize = (int) parent.map(sensorPower, 0f, 12f, 270,650) ;
-			//parent.ellipse(364, 707, sensorSize, sensorSize);
+			int sensorSize = (int) PApplet.map(sensorPower, 0f, 12f, 270,650) ;
 			parent.ellipse(351, 420, sensorSize, sensorSize);
 			radarTicker += 10;
-			//parent.noFill();
 			parent.noStroke();
-			//parent.stroke(0, 255, 0);
 			int alpha = (int) PApplet.map(radarTicker, 0, sensorSize, 45f, 0f );
 			parent.fill(0,255,0, alpha);
 			parent.ellipse(351, 420, radarTicker, radarTicker);
-			//parent.arc(364f, 707f, radarTicker, radarTicker, 4.2f, 5.23f);
 			if (radarTicker > sensorRange) {
 				radarTicker = 15;
 			}
@@ -94,18 +90,10 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		
 	}
 	
+	/* weapon status panel, shows deployment state and health of each*/
 	protected void drawWeaponStatus(){
 		parent.image(weaponStatusPanelImage, 451, 598);
-		weaponIconPositions[0] = new PVector(533, 689);
-		weaponIconRotations[0] = 0;
-		weaponIconPositions[1] = new PVector(616, 710);
-		weaponIconRotations[1] = 180f;
-		weaponIconPositions[2] = new PVector(545, 668);
-		weaponIconRotations[2] = 45f;
-		weaponIconPositions[3] = new PVector(622, 682);
-		weaponIconRotations[3] = 135f;
-		weaponIconPositions[4] = new PVector(565, 724);
-		weaponIconRotations[4] = -90f;
+		
 		
 		//draw the weapon icons
 		
@@ -130,18 +118,32 @@ public class WeaponConsoleNew extends WeaponsConsole {
 			}
 			parent.image(weaponIcon, xOffset, 0);
 			
+//			if(parent.getShipState().weaponState == ShipState.WEAPON_DEPLOYED){
+//				float health = parent.getShipState().weaponHealth[i];
+//				parent.noFill();
+//				parent.stroke(255);
+//				parent.strokeWeight(1);
+//				parent.rect(xOffset - 30f,  + 4f, 25f,  14f);
+//				parent.noStroke();
+//				parent.fill(255 - (health * 255), health * 255, 0);
+//				parent.rect(xOffset - 5f,  + 4f, -PApplet.map(health, 0f, 1.0f, 0f, 25f),  14f);
+//			}
+			
 			parent.popMatrix();
 			
 		}
 		
 		parent.image(shipIcon, 532, 643);
-		;
+		
+		
+		
 	}
 	
 	
 	
 	protected void drawTargets(){
-		int sensorRange = (int) parent.map(sensorPower, 0f, 12f, 270,1300);
+		
+		int sensorRange = (int) PApplet.map(sensorPower, 0f, 12f, 270,1300);
 		parent.textFont(font, 12);
 		fireEnabled = false;
 		parent.strokeWeight(1);
@@ -175,9 +177,11 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				PVector lp = PVector.fromAngle(t.randomAngle);
 				lp.mult(75 + lastDistanceToTarget / 3.0f);
 
-				float x = 351 + lerpX;
+				float screenSpaceScaleFactor = 0.18f;
+				
+				float x = 351 + lerpX * screenSpaceScaleFactor;
 				;
-				float y = 420 + lerpY;
+				float y = 420 + lerpY * screenSpaceScaleFactor;
 
 				// set target colour
 				float scaleFactor = 1.2f;
@@ -351,8 +355,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				t.lastPos.x = x;
 				t.lastPos.y = y;
 				t.lastPos.z = z;
-				t.randomAngle = PApplet.map(parent.random(100), 0, 100,
-						4.2f, 5.23f);
+				
 			} else {
 
 				t.lastPos.x = t.pos.x;
@@ -360,7 +363,9 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				t.lastPos.z = t.pos.z;
 			}
 			t.lastUpdateTime = parent.millis();
+			
 			t.pos = new PVector(x, y, z);
+			
 			
 			t.stats[0] = theOscMessage.get(7).floatValue();
 			// t.stats[1] = theOscMessage.get(8).floatValue();

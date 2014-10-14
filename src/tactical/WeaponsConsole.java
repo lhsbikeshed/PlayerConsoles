@@ -205,10 +205,10 @@ public class WeaponsConsole extends Display {
 		parent.noStroke();
 		int f = (int) PApplet.map(beamPower, 0f, 12f, 255f, 0f);
 		parent.fill(f, 255-f, 0);
-		parent.rect(47, 742, 25, PApplet.map(beamPower, 0f, 12f, 0f, -90));
+		parent.rect(106, 742, 25, PApplet.map(beamPower, 0f, 12f, 0f, -90));
 		f = (int) PApplet.map(sensorPower, 0f, 12f, 255f, 0f);
 		parent.fill(f, 255-f, 0);
-		parent.rect(106, 742, 25, PApplet.map(sensorPower, 0f, 12f, 0f, -90));
+		parent.rect(47, 742, 25, PApplet.map(sensorPower, 0f, 12f, 0f, -90));
 
 		// the target list on the right hand side
 		parent.textFont(font, 14);
@@ -289,9 +289,9 @@ public class WeaponsConsole extends Display {
 		if (smartBombFireTime + 1000 > parent.millis()) {
 			float radius = (parent.millis() - smartBombFireTime) / 1000.0f;
 			parent.noFill();
-			parent.strokeWeight(3);
+			parent.strokeWeight(5);
 			parent.stroke(70, 70, 255);
-			parent.ellipse(364, 707, radius * 900, radius * 900);
+			parent.ellipse(351, 420, radius * 900, radius * 900);
 		}
 /*
 		// draw hull damage
