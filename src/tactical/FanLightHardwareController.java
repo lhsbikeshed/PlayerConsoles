@@ -35,10 +35,10 @@ public class FanLightHardwareController extends HardwareController {
 			ConsoleLogger.log(this, "changing power levels");
 		} else {
 		
-			serialPort.write("P" + (propPower + 1));
-			serialPort.write("W" + (beamPower + 1));
-			serialPort.write("S" + (sensorPower + 1));
-			serialPort.write("I" + (internalPower + 1));
+			serialPort.write("P" + (propPower / 4));
+			serialPort.write("W" + (beamPower / 4));
+			serialPort.write("S" + (sensorPower / 4));
+			serialPort.write("I" + (internalPower / 4));
 		}		
 	}
 
