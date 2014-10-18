@@ -54,6 +54,7 @@ public class ShipState {
 	public float[] weaponHealth = {1f, 1f,1f,1f, 1f};
 	
 	public int currentScene = 0;
+	public boolean thrustReverser = false;
 	
 	public ShipState() {
 	};
@@ -83,6 +84,8 @@ public class ShipState {
 			
 		} else if(msg.checkAddrPattern("/scene/change")){
 			currentScene = msg.get(0).intValue();
+		} else if(msg.checkAddrPattern("/system/propulsion/setThrustReverser")){
+			thrustReverser  = msg.get(0).intValue() == 1 ? true : false;
 		}
 	}
 }

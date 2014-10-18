@@ -48,8 +48,13 @@ public class PlottingDisplay extends Display {
 		
 		//current route
 		int yOffset = 0;
-		for(MapNode s : currentRoute){
-			parent.text("> " + s.id, 39, 246+ yOffset);
+		for(int i = 0; i < currentRoute.size(); i++){
+			MapNode s = currentRoute.get(i);
+			String t = "> " + s.id;
+			if(i == currentRoute.size() -1){
+				t += " - OK";
+			}
+			parent.text(t, 39, 246 + yOffset);
 			yOffset += 40;
 		}
 		//post-list text
@@ -138,7 +143,7 @@ public class PlottingDisplay extends Display {
 	private void codeFailed(String reason){
 		currentCode = "";
 		failReason = reason;
-		
+		parent.getConsoleAudio().playClip("outOfRange");
 		
 	}
 
@@ -190,7 +195,7 @@ public class PlottingDisplay extends Display {
 				return;
 			}
 			m.visited = true;
-			
+			parent.getConsoleAudio().playClip("codeOk");
 			currentRoute.add(m);
 			currentCode = "";
 			
@@ -216,8 +221,10 @@ public class PlottingDisplay extends Display {
 		}
 	}
 
+	//a key was typed
 	private void keyTyped(int value) {
 		lastKeyTime = 50;
+		parent.getConsoleAudio().randomBeep();
 		if(currentCode.length() < 4){
 			currentCode += (char)value;
 			failReason = "";
@@ -225,7 +232,8 @@ public class PlottingDisplay extends Display {
 			currentCode = "" + (char)value;
 		}
 	}
-
+	
+	/* clear the current route, set the start and end nodes based on where we are */
 	@Override
 	public void start() {
 		// TODO Auto-generated method stub

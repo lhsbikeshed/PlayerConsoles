@@ -59,6 +59,11 @@ public class RadarDisplay extends Display {
 		parent.background(0, 0, 0);
 		zoomLevel = 0.5f; // map(mouseY, 0, height, 0.01f, 1.0f);
 		drawRadar();
+		if(parent.getShipState().thrustReverser && parent.globalBlinker){
+			parent.textFont(font, 25);
+			parent.fill(255);
+			parent.text("**REVERSE THRUST**", 310, 500);
+		}
 	}
 
 	public void drawAxis(int highlight) {
