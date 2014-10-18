@@ -9,6 +9,14 @@ public class ShipState {
 	public static final int POWER_WEAPONS = 1;
 	public static final int POWER_SENSORS = 2;
 	public static final int POWER_DAMAGE = 3;
+	
+	public static final int SCENE_LAUNCH = 0;
+	public static final int SCENE_HYPERSPACE = 1;
+	public static final int SCENE_MARSDROP = 2;
+	public static final int SCENE_WARZONE = 3;
+	public static final int SCENE_LANDING = 4;
+	public static final int SCENE_DEAD = 5;
+	public static final int SCENE_COMET = 6;
 
 	public boolean poweredOn = true;
 	public boolean poweringOn = false;
@@ -45,6 +53,8 @@ public class ShipState {
 	public int weaponState = 0;
 	public float[] weaponHealth = {1f, 1f,1f,1f, 1f};
 	
+	public int currentScene = 0;
+	
 	public ShipState() {
 	};
 
@@ -71,6 +81,8 @@ public class ShipState {
 				weaponHealth[i] = msg.get(i).floatValue();
 			}
 			
+		} else if(msg.checkAddrPattern("/scene/change")){
+			currentScene = msg.get(0).intValue();
 		}
 	}
 }

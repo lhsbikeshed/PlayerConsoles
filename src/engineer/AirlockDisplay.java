@@ -163,25 +163,32 @@ public class AirlockDisplay extends Display {
 			if (evt.value >= KeyEvent.VK_0 && evt.value <= KeyEvent.VK_9) {
 				char c = (char)evt.value;
 				keyEntered(c);
+			} else if (evt.value == KeyEvent.VK_L){
+				dumpAirlock();
 			}
 		}
 
 		if (evt.event.equals("BUTTON")) {
 			if (evt.id == UpperPanelHardware.BT_AIRLOCK && locked == false) {
-				greatSuccess = true;
-				successTime = parent.millis();
-				if (!doneSuccessMessage) {
-
-					OscMessage msg = new OscMessage(
-							"/system/transporter/beamAttemptResult");
-					msg.add(3);
-					p5.send(msg, myRemoteLocation);
-					parent.getConsoleAudio().playClip("airlockDump", -1.0f);
-
-				}
+				dumpAirlock();
 			}
 		}
 
+	}
+
+	private void dumpAirlock() {
+		greatSuccess = true;
+		successTime = parent.millis();
+		if (!doneSuccessMessage) {
+
+			OscMessage msg = new OscMessage(
+					"/system/transporter/beamAttemptResult");
+			msg.add(3);
+			p5.send(msg, myRemoteLocation);
+			parent.getConsoleAudio().playClip("airlockDump", -1.0f);
+
+		}
+		
 	}
 
 	void setAirlockLightState(boolean state) {

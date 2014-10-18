@@ -32,6 +32,7 @@ public class TacticalConsole extends PlayerConsole {
 	WarpDisplay warpDisplay; // warp scene
 
 	WeaponsConsole weaponsDisplay; // tactical weapons display
+	PlottingDisplay plottingDisplay;
 
 	// power for something, not sure what
 	int systemPower = -1;
@@ -217,6 +218,8 @@ public class TacticalConsole extends PlayerConsole {
 		displayMap.put("cablepuzzle", new CablePuzzleDisplay(this));
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
+		displayMap.put("plottingDisplay", new PlottingDisplay(this));
+		
 
 		
 		mainPanelHardware = new TacticalHardwareController("mainPanel", "COM7", 9600, this);
@@ -236,7 +239,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("weapons"));
+		changeDisplay(displayMap.get("plottingDisplay"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");
