@@ -6,9 +6,10 @@ import processing.core.PVector;
 public class ShipState {
 	
 	public static final int POWER_PROPULSION = 0;
-	public static final int POWER_WEAPONS = 1;
+	public static final int POWER_DAMAGE = 1;
 	public static final int POWER_SENSORS = 2;
-	public static final int POWER_DAMAGE = 3;
+	public static final int POWER_WEAPONS = 3;
+
 
 	public boolean poweredOn = true;
 	public boolean poweringOn = false;

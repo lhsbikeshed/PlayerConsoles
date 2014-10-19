@@ -342,7 +342,7 @@ public class PowerDisplay extends Display {
 		for (SubSystem s : subsystemList) {
 			// whilst were at it lets repair the systems if the power to
 			// internal is on full
-			float repairRate = PApplet.map(parent.getShipState().powerStates[ShipState.POWER_DAMAGE], 12f, 0f, 0.0025f, 0.9f);
+			float repairRate = PApplet.map(parent.getShipState().powerStates[ShipState.POWER_DAMAGE], 0f, 12f, 0.0025f, 0.5f);
 			
 			s.doRepairs(repairRate);
 			
