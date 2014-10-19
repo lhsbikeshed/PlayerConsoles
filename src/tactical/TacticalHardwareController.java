@@ -29,6 +29,11 @@ public class TacticalHardwareController extends HardwareController {
 	public static final int KP_SCAN = 10;
 	public static final int KP_DECOY = 11;
 	public static final int KP_LASER = 12;
+	public static final int KP_SCREENCHANGE = 13;
+	
+	String[] screenNames = {"weapons", "plottingDisplay"};
+	int screenIndex = 1;
+	
 	
 	boolean decoyLightState = false;
 	boolean previousWeaponLightState = false;
@@ -103,6 +108,14 @@ public class TacticalHardwareController extends HardwareController {
 			//toggle weapons on
 			OscMessage m = new OscMessage("/system/targetting/changeWeaponState");
 			m.add(1);
+			parent.getOscClient().send(m, parent.getServerAddress());
+		} else if (c == 'S'){
+			screenIndex ++;
+			screenIndex %= screenNames.length;
+			
+			OscMessage m = new OscMessage("/control/screenSelection");
+			m.add("TacticalStation");
+			m.add(screenNames[screenIndex]);
 			parent.getOscClient().send(m, parent.getServerAddress());
 		}
 	}

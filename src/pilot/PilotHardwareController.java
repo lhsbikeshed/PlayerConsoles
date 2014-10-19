@@ -21,7 +21,7 @@ public class PilotHardwareController extends HardwareController {
 	// mappings from physical buttons to OSC messages
 	String[] messageMapping = { "/system/undercarriage/state",
 			"/scene/launchland/dockingCompState", "/system/misc/blastShield",
-			"/system/propulsion/state", "/system/nothing/nothing",
+			"/system/propulsion/state", "/system/propulsion/setThrustReverser",
 			"/system/jump/doJump" };
 
 	public PilotHardwareController(String interfaceName, String port, int rate,
