@@ -363,11 +363,6 @@ public class PowerDisplay extends Display {
 			}
 		}
 
-		if (parent.getShipState().powerStates[1] == 3) {
-			parent.fill(255, 255, 255);
-			parent.textFont(font, 15);
-			parent.text("Repairing..", 196, 757);
-		}
 
 		if (reactorFailWarn && parent.globalBlinker) {
 			parent.image(reactorFailOverlay, 207, 631);

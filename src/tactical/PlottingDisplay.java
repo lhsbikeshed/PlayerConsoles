@@ -238,14 +238,23 @@ public class PlottingDisplay extends Display {
 	public void start() {
 		// TODO Auto-generated method stub
 		currentRoute = new ArrayList<MapNode>();
-		if(parent.getShipState().currentScene == ShipState.SCENE_LAUNCH){
+		int curScene = parent.getShipState().currentScene;
+		if(curScene == ShipState.SCENE_LAUNCH || curScene == ShipState.SCENE_LANDING){
 			startNode = findNodeById("STATION 13");
 			destNode = findNodeById("TRAINING AREA");					
 			currentRoute.add(startNode);
 			
-		} else if (parent.getShipState().currentScene == ShipState.SCENE_WARZONE){
+		} else if (curScene == ShipState.SCENE_WARZONE){
 			destNode = findNodeById("STATION 13");
 			startNode = findNodeById("TRAINING AREA");					
+			currentRoute.add(startNode);
+		} else {
+			startNode = new MapNode();
+			startNode.pos = new PVector (1000,1000);
+			startNode.id = "HAHAHA";
+			destNode = new MapNode();
+			destNode.pos = new PVector (-1000,-1000);
+			destNode.id = "HAHAHA";
 			currentRoute.add(startNode);
 		}
 		for(MapNode m : mapNodes){

@@ -17,6 +17,8 @@ import common.UsefulShit;
 public class RadarDisplay extends Display {
 	Object lock = new Object();
 	PImage overlayImage, indicatorImage;
+	PImage radarBaseImage;
+	
 	
 	RadarObject targetted;
 	float zoomLevel = 0.1f;
@@ -39,6 +41,8 @@ public class RadarDisplay extends Display {
 	Rot backgroundRotation = Rot.IDENTITY;
 	ShipState shipState;
 	
+	boolean bleeper = false;
+	
 
 
 	public RadarDisplay(PlayerConsole parent) {
@@ -46,6 +50,7 @@ public class RadarDisplay extends Display {
 		shipState = parent.getShipState();
 		overlayImage = parent.loadImage("pilotconsole/overlayImage.png");
 		indicatorImage = parent.loadImage("pilotconsole/indicator.png");
+		radarBaseImage = parent.loadImage("pilotconsole/radarBase.png");
 		for (int i = 0; i < 100; i++) {
 			radarList[i] = new RadarObject();
 			radarList[i].active = false;
@@ -59,15 +64,25 @@ public class RadarDisplay extends Display {
 		parent.background(0, 0, 0);
 		zoomLevel = 0.5f; // map(mouseY, 0, height, 0.01f, 1.0f);
 		drawRadar();
-		if(parent.getShipState().thrustReverser && parent.globalBlinker){
-			parent.textFont(font, 25);
-			parent.fill(255);
-			parent.text("**REVERSE THRUST**", 310, 500);
+		if(parent.getShipState().thrustReverser ){
+			if(parent.globalBlinker){
+		
+				parent.textFont(font, 25);
+				parent.fill(255);
+				parent.text("**REVERSE THRUST**", 310, 500);
+			}
+			if(bleeper != parent.globalBlinker){
+				bleeper = parent.globalBlinker;
+				if(bleeper) parent.getConsoleAudio().playClip("blip");
+			}
+			
 		}
 	}
 
 	public void drawAxis(int highlight) {
 
+		
+		
 		// x axis
 		parent.stroke(128, 0, 0);
 		parent.strokeWeight(1);
@@ -79,11 +94,14 @@ public class RadarDisplay extends Display {
 		parent.noFill();
 		parent.strokeWeight(1);
 		drawRadarCircle(5, 200, highlight);
+
 		parent.popMatrix();
 
 		// z axis
-		parent.stroke(0, 0, 128);
-		parent.line(0, 0, -1000, 0, 0, 1000);
+		parent.stroke(0, 0, 200);
+		parent.strokeWeight(2);
+		parent.line(0, 0, 0, 0, 0, 1000);
+		
 		parent.line(-10, 0, 1000, 10, 0, 1000);
 
 		parent.stroke(0, 128, 0);
@@ -159,6 +177,7 @@ public class RadarDisplay extends Display {
 
 	public void drawRadar() {
 
+
 		parent.pushMatrix();
 
 		parent.lights();
@@ -166,13 +185,14 @@ public class RadarDisplay extends Display {
 		parent.noTint();
 		// move the camera --------------------------------------
 		parent.translate(parent.width / 2, parent.height / 2);
-		parent.rotateX(PApplet.radians(345)); // 326
+		parent.rotateX(PApplet.radians(325)); // 326
 		parent.rotateY(PApplet.radians(180));
 
 		drawAxis((int) ((parent.millis() % 1750.0f) / 200));
 
 		// draw the background cube ------------------------------
-		parent.box(10);
+		parent.box(20);
+
 		parent.pushMatrix();
 		Rot newRot = Rot.slerp(shipState.lastShipRot,
 				shipState.shipRot,
@@ -275,10 +295,10 @@ public class RadarDisplay extends Display {
 					// sphere(10);
 					if (newPos.y >= 0) {
 
-						parent.image(indicatorImage, -16, -16, 32, 32);
+						parent.image(indicatorImage, -8, -8, 16, 16);
 					} else {
 						parent.scale(1, -1);
-						parent.image(indicatorImage, -16, -16, 32, 32);
+						parent.image(indicatorImage, -8, -8, 16, 16);
 					}
 					parent.popMatrix();
 
@@ -311,11 +331,11 @@ public class RadarDisplay extends Display {
 						}
 
 						parent.fill(40);
-						parent.text(s.toString(), rItem.screenPos.x + 5,
+						parent.text(s.toString(), rItem.screenPos.x + 15,
 								rItem.screenPos.y + 10);
 					} else {
 						parent.fill(rItem.displayColor);
-						parent.text(rItem.name, rItem.screenPos.x + 5,
+						parent.text(rItem.name, rItem.screenPos.x + 15,
 								rItem.screenPos.y + 10);
 					}
 					// textFont(font, 10);
@@ -436,21 +456,25 @@ public class RadarDisplay extends Display {
 		drawGuides();
 		
 		
+
 		
 	}
 
 	void drawRadarCircle(int num, int sizing, int highlight) {
+		//parent.hint(PConstants.DISABLE_DEPTH_TEST);
 		int radius = sizing;
 		for (int i = 0; i < num; i++) {
 			if (i == highlight) {
-				parent.stroke(0, 30, 0);
+				parent.stroke(0, 120, 0);
 			} else {
-				parent.stroke(0, 30, 0);
+				parent.stroke(0, 90, 0);
 			}
 			parent.ellipse(0, 0, radius, radius);
 			radius += sizing;
 		}
 		parent.stroke(0, 255, 0);
+		//parent.hint(PConstants.ENABLE_DEPTH_TEST);
+		
 	}
 
 	public int findRadarItemById(int id) {
