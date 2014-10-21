@@ -93,14 +93,14 @@ public class RadarDisplay extends Display {
 		parent.rotateX(PApplet.radians(-90));
 		parent.noFill();
 		parent.strokeWeight(1);
-		drawRadarCircle(5, 200, highlight);
+		drawRadarCircle(10, 200, highlight);
 
 		parent.popMatrix();
 
 		// z axis
 		parent.stroke(0, 0, 200);
 		parent.strokeWeight(2);
-		parent.line(0, 0, 0, 0, 0, 1000);
+		parent.line(0, 0, -1000, 0, 0, 1000);
 		
 		parent.line(-10, 0, 1000, 10, 0, 1000);
 
@@ -222,11 +222,12 @@ public class RadarDisplay extends Display {
 		parent.fill(255, 255, 0, 255);
 		parent.sphere(1);
 		parent.fill(0, 0, 255);
-		zoomLevel = PApplet.map(maxDist, 0f, 5000f, 1.8f, 0.2f);
+		zoomLevel = 1.5f; //PApplet.map(maxDist, 0f, 1000f, 1.9f, 0.1f);
+		//zoomLevel = zoomLevel > 1000.0f ? 1000.0f : zoomLevel;
 		parent.scale(zoomLevel);
 		// println(zoomLevel);
 		maxDist = 0;
-		float distanceToShip = 0;
+		
 		synchronized (lock) {
 			for (int i = 0; i < 100; i++) {
 
@@ -267,15 +268,16 @@ public class RadarDisplay extends Display {
 					// -r.position.y, r.position.z);
 					parent.line(-newPos.x, 0, newPos.z, -newPos.x, -newPos.y,
 							newPos.z);
-					// circle at base
+					// rect at base
 					parent.pushMatrix();
 					parent.translate(-newPos.x, 0, newPos.z);
 					parent.rotateX(PApplet.radians(-90));
-					parent.fill(0, 50, 0);
+					float fill = PApplet.map(Math.abs(newPos.z), 0f, 100.f, 0f, 255f);
+					parent.fill(0, 255, 0, fill);
 					parent.strokeWeight(1);
-
+					parent.noStroke();
 					// ellipse(0, 0, 20, 20);
-					parent.rect(-10, 10, 20, 20);
+					parent.rect(-6, -6, 12, 12);
 					parent.popMatrix();
 
 					// sphere and text
@@ -335,8 +337,11 @@ public class RadarDisplay extends Display {
 								rItem.screenPos.y + 10);
 					} else {
 						parent.fill(rItem.displayColor);
+						String dist = String.format("%.2f", rItem.distance);
 						parent.text(rItem.name, rItem.screenPos.x + 15,
 								rItem.screenPos.y + 10);
+						parent.textFont(font, 10);
+						parent.text(dist, rItem.screenPos.x + 15, rItem.screenPos.y + 20);
 					}
 					// textFont(font, 10);
 					// text(r.statusText,r.screenPos.x + 5, r.screenPos.y + 20);
@@ -421,10 +426,28 @@ public class RadarDisplay extends Display {
 
 		parent.textFont(font, 18);
 		parent.fill(0, 255, 255);
-		int power = (int) PApplet.map(shipState.powerStates[ShipState.POWER_PROPULSION], 0f, 12f, 0f, 100f);
-		parent.text("Prop: " + power + "%", 680, 630);
-
+		int engPower = shipState.powerStates[ShipState.POWER_PROPULSION];
+		int power = (int) PApplet.map(engPower, 0f, 12f, 0f, 180f);
+		float engColor = PApplet.map(engPower, 0, 12, 0, 255);
+		parent.text("Engine power" , 680, 600);
+		parent.noFill();
+		parent.stroke(255);
+		parent.rect(680, 605, 180, 20);
+		parent.fill(255 - engColor, engColor,0);
+		parent.rect(680, 605, power, 20);
+		if(engPower == 0){
+			parent.textFont(font, 13);
+			if(parent.globalBlinker){
+				parent.fill(255,0,0);
+			} else {
+				parent.fill(255);
+			}
+			parent.text("NO POWER", 714, 619);
+		}
+		parent.textFont(font,18);
+		parent.fill(255);
 		parent.text("speed: " + (int) shipState.shipVelocity, 680, 660);
+
 		
 		
 		parent.text("Afterburner: ", 690, 742);
@@ -465,9 +488,9 @@ public class RadarDisplay extends Display {
 		int radius = sizing;
 		for (int i = 0; i < num; i++) {
 			if (i == highlight) {
-				parent.stroke(0, 120, 0);
+				parent.stroke(0, 150, 0);
 			} else {
-				parent.stroke(0, 90, 0);
+				parent.stroke(0, 120 - i * 4, 0);
 			}
 			parent.ellipse(0, 0, radius, radius);
 			radius += sizing;
