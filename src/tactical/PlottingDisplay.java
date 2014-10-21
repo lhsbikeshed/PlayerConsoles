@@ -119,6 +119,12 @@ public class PlottingDisplay extends Display {
 			} else if (evt.value == KeyEvent.VK_SPACE){
 				codeEntered();
 			}
+		} else if (evt.event.equals("KEYPAD")){
+			if(evt.id >= 0 && evt.id <= 9){
+				keyTyped((char)(48+ evt.id));
+			} else if (evt.id == TacticalHardwareController.KP_SCAN){
+				codeEntered();
+			}
 		}
 	}
 			
