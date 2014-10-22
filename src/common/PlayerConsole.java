@@ -373,6 +373,8 @@ public abstract class PlayerConsole extends PApplet {
 	
 	protected void gameReset(){
 		shipState.resetState();
+		damageEffects.clearCracks();
+		
 	}
 	protected abstract void shipDead();
 	protected abstract void reactorStarted();
