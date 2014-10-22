@@ -44,6 +44,7 @@ public class WeaponsConsole extends Display {
 		public String name = "missile";
 		public float[] stats = new float[2];
 		public String[] statNames = new String[2];
+		public PVector screenSpacePos = new PVector(0,0);
 
 		
 		
@@ -286,13 +287,7 @@ public class WeaponsConsole extends Display {
 			parent.image(beamButton, 714, 431);
 		}
 
-		if (smartBombFireTime + 1000 > parent.millis()) {
-			float radius = (parent.millis() - smartBombFireTime) / 1000.0f;
-			parent.noFill();
-			parent.strokeWeight(5);
-			parent.stroke(70, 70, 255);
-			parent.ellipse(351, 420, radius * 900, radius * 900);
-		}
+		
 /*
 		// draw hull damage
 		parent.tint((int) PApplet.map(parent.getShipState().hullState, 0, 100,

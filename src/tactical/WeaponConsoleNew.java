@@ -3,6 +3,8 @@ package tactical;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import processing.core.PApplet;
+import processing.core.PConstants;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 import tactical.WeaponsConsole.TargetObject;
@@ -22,6 +24,8 @@ public class WeaponConsoleNew extends WeaponsConsole {
 	PVector[] weaponIconPositions = new PVector[5];
 	float[] weaponIconRotations = new float[5];
 	
+	PGraphics radarGraphics;
+	
 
 	public WeaponConsoleNew(PlayerConsole parent) {
 		super(parent);
@@ -40,6 +44,8 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		weaponIconRotations[3] = 135f;
 		weaponIconPositions[4] = new PVector(565, 724);
 		weaponIconRotations[4] = -90f;
+		
+		radarGraphics = parent.createGraphics(680, 700, PConstants.P3D);
 	}
 	
 	protected void triggerDeploymentAnimation(int state){
@@ -63,24 +69,57 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		
 		parent.background(0, 0, 0);
 		parent.noStroke();
-		if (mode == MODE_SCANNER) {
-			parent.image(bgImage, 0, 0);
-			parent.fill(0, 128, 0, 100);
-			int sensorSize = (int) PApplet.map(sensorPower, 0f, 12f, 270,650) ;
-			parent.ellipse(351, 420, sensorSize, sensorSize);
-			radarTicker += 10;
-			parent.noStroke();
-			int alpha = (int) PApplet.map(radarTicker, 0, sensorSize, 45f, 0f );
-			parent.fill(0,255,0, alpha);
-			parent.ellipse(351, 420, radarTicker, radarTicker);
-			if (radarTicker > sensorRange) {
-				radarTicker = 15;
-			}
+		
 
-			
-			
-			drawTargets();
+		
+		//start of 3d section ----------------------
+		radarGraphics.beginDraw();
+		radarGraphics.background(0);
+		radarGraphics.hint(PApplet.DISABLE_DEPTH_TEST);
+		radarGraphics.pushMatrix();
+		radarGraphics.translate(340, 92, -800);
+		radarGraphics.rotateX(parent.radians(41));
+		
+		//parent.image(bgImage, 0, 0);
+		radarGraphics.fill(0, 128, 0, 100);
+		radarGraphics.stroke(509);
+		int sensorSize = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450) ;
+		radarGraphics.ellipse(0, 0, 1450, 1450);
+		radarGraphics.stroke(128);
+		radarGraphics.ellipse(0, 0, sensorSize, sensorSize);
+		
+		
+		radarTicker += 20;
+		radarGraphics.noStroke();
+		int alpha = (int) PApplet.map(radarTicker, 0, sensorSize, 45f, 0f );
+		radarGraphics.fill(0,255,0, alpha);
+		radarGraphics.ellipse(0, 0, radarTicker, radarTicker);
+		
+		if (radarTicker > sensorRange) {
+			radarTicker = 15;
 		}
+
+		
+		
+		drawTargets2();
+		
+		if (smartBombFireTime + 1000 > parent.millis()) {
+			float radius = (parent.millis() - smartBombFireTime) / 1000.0f;
+			radarGraphics.noFill();
+			radarGraphics.strokeWeight(5);
+			radarGraphics.stroke(70, 70, 255);
+			radarGraphics.ellipse(0, 0, radius * 900, radius * 900);
+			radarGraphics.strokeWeight(1);
+		}
+		
+		radarGraphics.popMatrix();	
+		
+		drawScreenSpaceTargets();
+		
+		radarGraphics.endDraw();
+		//----------end of 3d section-------------
+		parent.image(radarGraphics, 10, 80);
+		
 		drawSideBar();
 		
 		drawWeaponStatus();
@@ -90,6 +129,50 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		
 	}
 	
+	private void drawScreenSpaceTargets() {
+		int sensorRange = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450);
+		synchronized (targets) {
+			for (int i = targets.size() - 1; i >= 0; i--) {
+				TargetObject t = targets.get(i);
+				float distanceToTarget = t.pos.mag();
+				String scanCode = "" + t.scanId;
+				
+				if (t.scanId < 1000) {
+					scanCode = "0" + scanCode;
+				}
+				
+				radarGraphics.pushMatrix();
+				radarGraphics.translate(t.screenSpacePos.x, t.screenSpacePos.y);
+				if (distanceToTarget < sensorRange * 0.6f) { 
+					radarGraphics.textFont(font, 13);
+					radarGraphics.fill(255,255,0);
+					
+					//radarGraphics.rotateX(-0.8f);;
+					String h = String.format("%.2f", t.stats[0] * 100);
+					radarGraphics.text(t.name + ": " + h + "%", 30, 25);
+					radarGraphics.textFont(font, 18);
+					radarGraphics.text(scanCode, 30, 5);
+					radarGraphics.stroke(255,255,0);
+					radarGraphics.line(30, 15, 20, 15);
+					radarGraphics.line(0, 0, 20, 15);
+					
+					
+				} else {
+					radarGraphics.fill(128);
+					StringBuilder s = new StringBuilder(t.name);
+					for (int c = 0; c < (int) parent.random(3, s.length()); c++) {
+						s.setCharAt((int) parent.random(0, s.length()),
+								(char) parent.random(0, 255));
+					}
+					radarGraphics.text(s.toString(), 10, 0);
+				}
+				radarGraphics.popMatrix();
+			}
+		}
+		
+		
+	}
+
 	/* weapon status panel, shows deployment state and health of each*/
 	protected void drawWeaponStatus(){
 		parent.image(weaponStatusPanelImage, 451, 598);
@@ -179,7 +262,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 
 				float screenSpaceScaleFactor = 0.18f;
 				
-				float x = 351 + lerpX * screenSpaceScaleFactor;
+				float x =  lerpX * screenSpaceScaleFactor;
 				;
 				float y = 420 + lerpY * screenSpaceScaleFactor;
 
@@ -213,7 +296,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 																	// range, if
 																	// not then
 																	// draw
-					parent.textFont(font, 14);
+					parent.textFont(font, 24);
 
 					String h = String.format("%.2f", t.stats[0] * 100);
 					parent.text(t.name + ": " + h + "%", x + 30, y + 5);
@@ -288,22 +371,159 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				}
 
 				// draw a beam out to the target if we are firing
-				if (t.beingFiredAt && firingTime + 400 > parent.millis()) {
+				if (!t.beingFiredAt && firingTime + 400 < parent.millis()) {
 					parent.stroke(255, 255, 0);
 					parent.strokeWeight(2);
-					parent.line(364, 707, x, y);
+					parent.line(0, 0, x, y);
 				}
-				// draw a beam to the ship if the target is firing at us
-				Float f = t.getStat("firing");
-				if (f != null && f > 0.0f) {
-					parent.stroke(255, 0, 0);
-					parent.strokeWeight(4);
-					parent.line(x, y, 364, 707);
-				}
+				
 			}
 		}
 	}
 	
+	
+
+	protected void drawTargets2(){
+		
+		int sensorRange = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450);
+		parent.textFont(font, 12);
+		fireEnabled = false;
+		parent.strokeWeight(1);
+		synchronized (targets) {
+			for (int i = targets.size() - 1; i >= 0; i--) {
+				TargetObject t = targets.get(i);
+				
+				float distanceToTarget = t.pos.mag();
+
+				// update logic bits
+				// if no update received for 280ms then remove this target
+				if (parent.millis() - t.lastUpdateTime > 300) {
+					if (t.targetted) {
+						parent.getConsoleAudio().playClip("targetDestroyed");
+						scanningState = SCAN_TYPING;
+						scanString = "";
+					}
+					targets.remove(i);
+				}
+
+				float lerpX = PApplet.lerp(t.lastPos.x, t.pos.x,
+						(parent.millis() - t.lastUpdateTime) / 250.0f);
+				float lerpY = PApplet.lerp(t.lastPos.z, t.pos.z,
+						(parent.millis() - t.lastUpdateTime) / 250.0f);
+				float lerpZ = PApplet.lerp(t.lastPos.y, t.pos.y,
+						(parent.millis() - t.lastUpdateTime) / 250.0f);
+
+				float screenSpaceScaleFactor = 0.001f;
+				
+				float x =  lerpX * screenSpaceScaleFactor;
+				float y =  lerpY * screenSpaceScaleFactor;
+				float z =  lerpZ * screenSpaceScaleFactor;
+
+				
+				t.screenSpacePos.x = radarGraphics.screenX(lerpX, lerpY, lerpZ);
+				t.screenSpacePos.y = radarGraphics.screenY(lerpX, lerpY, lerpZ);
+				
+				// set target colour
+				float scaleFactor = 0.6f;
+				if (distanceToTarget > sensorRange * scaleFactor) {
+					radarGraphics.fill(100, 100, 100);
+					x += parent.random(-5, 5);
+					y += parent.random(-5, 5);
+				} else if (distanceToTarget < 200) {
+
+					radarGraphics.fill(255, 0, 0);
+				} else if (distanceToTarget < 500) {
+					radarGraphics.fill(255, 255, 0);
+				} else {
+					radarGraphics.fill(0, 255, 0);
+				}
+
+				// draw the target on the radar
+				radarGraphics.pushMatrix();
+				radarGraphics.noStroke();
+				
+				radarGraphics.translate(lerpX, lerpY, lerpZ);
+				radarGraphics.sphereDetail(2);
+				radarGraphics.sphere(10);
+				radarGraphics.stroke(255);
+				radarGraphics.line(0, 0, 0, 0,0,-lerpZ);;
+				
+				
+
+				radarGraphics.popMatrix();
+				
+				if (t.dead) {
+					if (t == currentTarget) {
+						scanningState = SCAN_TYPING;
+					}
+					targets.remove(i);
+
+				}
+
+				// scanning stuff
+				if (t.scanCountDown > 0) {
+					if (t.scanCountDown - 1 > 0) {
+						t.scanCountDown--;
+					} else {
+						// target this motherfucker
+						t.scanCountDown--;
+						OscMessage myMessage = new OscMessage(
+								"/system/targetting/targetObject");
+						myMessage.add(t.hashCode);
+						osc.send(myMessage, new NetAddress(serverIP, 12000));
+						currentTarget = t;
+						parent.getConsoleAudio().playClip("targetLocked");
+						scanningState = SCAN_OK;
+					}
+					radarGraphics.pushMatrix();
+					radarGraphics.translate(lerpX, lerpY, lerpZ);
+					radarGraphics.rotate(PApplet.radians((parent.millis() / 10.0f) % 360));
+					radarGraphics.noFill();
+					radarGraphics.stroke(255, 255, 0);
+					float scale = PApplet.map(t.scanCountDown, 100, 0, 10, 1);
+					radarGraphics.rect(-15 * scale, -15 * scale, 30 * scale,
+							30 * scale);
+					radarGraphics.popMatrix();
+						
+					
+					//parent.text("scanning: " + t.scanCountDown, x + 10, y + 10);
+				}
+
+				if (t.targetted) {
+					radarGraphics.stroke(0, 255, 0);
+					radarGraphics.noFill();
+					// rect(x-10, y-10, 20, 20);
+
+					
+
+					radarGraphics.pushMatrix();
+					radarGraphics.translate(lerpX, lerpY, lerpZ);
+					radarGraphics.rotate(PApplet.radians((parent.millis() / 10.0f) % 360));
+					radarGraphics.noFill();
+					radarGraphics.stroke(255, 255, 0);
+					float scale = PApplet.map(t.scanCountDown, 100, 0, 10, 1);
+					radarGraphics.rect(-15, -15, 30, 30);
+					radarGraphics.popMatrix();
+				}
+
+				// draw a beam out to the target if we are firing
+				if (t.beingFiredAt && firingTime + 400 > parent.millis()) {
+					radarGraphics.stroke(255, 255, 0);
+					radarGraphics.strokeWeight(2);
+					radarGraphics.line(0, 0, 0, lerpX, lerpY, lerpZ);
+				}
+				// draw a beam to the ship if the target is firing at us
+				Float f = t.getStat("firing");
+				if (f != null && f > 0.0f) {
+					radarGraphics.stroke(255, 0, 0);
+					radarGraphics.strokeWeight(4);
+					radarGraphics.line(x, y, 364, 707);
+				}
+			}
+		}
+		
+	
+	}
 	
 	
 
