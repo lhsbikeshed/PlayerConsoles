@@ -79,6 +79,8 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		radarGraphics.pushMatrix();
 		radarGraphics.translate(340, 92, -800);
 		radarGraphics.rotateX(parent.radians(41));
+		radarGraphics.rotateZ(parent.radians(-45));
+
 		
 		//parent.image(bgImage, 0, 0);
 		radarGraphics.fill(0, 128, 0, 100);
@@ -86,9 +88,18 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		int sensorSize = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450) ;
 		radarGraphics.ellipse(0, 0, 1450, 1450);
 		radarGraphics.stroke(128);
+
 		radarGraphics.ellipse(0, 0, sensorSize, sensorSize);
+		radarGraphics.stroke(0,0,255);
+		radarGraphics.line(-1450,0,0,1450,0,0);
+		radarGraphics.stroke(255,0,0);
+		radarGraphics.line(0,-1450,0,0,1450,0);
 		
 		
+		
+		
+		
+		radarGraphics.box(30);
 		radarTicker += 20;
 		radarGraphics.noStroke();
 		int alpha = (int) PApplet.map(radarTicker, 0, sensorSize, 45f, 0f );
@@ -413,7 +424,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				float lerpZ = PApplet.lerp(t.lastPos.y, t.pos.y,
 						(parent.millis() - t.lastUpdateTime) / 250.0f);
 
-				float screenSpaceScaleFactor = 0.001f;
+				float screenSpaceScaleFactor = 0.0005f;
 				
 				float x =  lerpX * screenSpaceScaleFactor;
 				float y =  lerpY * screenSpaceScaleFactor;

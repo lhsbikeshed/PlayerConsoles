@@ -636,7 +636,7 @@ public class WeaponsConsole extends Display {
 			synchronized (targets) {
 				for (TargetObject t : targets) {
 					if (sId == t.scanId) {
-						t.scanCountDown = (13 - sensorPower) * 10;
+						t.scanCountDown = (13 - sensorPower) * 5;
 						targetFound = true;
 					} else {
 						if (t.targetted) {
