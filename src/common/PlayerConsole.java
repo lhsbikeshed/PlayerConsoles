@@ -327,7 +327,8 @@ public abstract class PlayerConsole extends PApplet {
 		keyboardController.keyPressed(ke);
 	}
 	public void mouseClicked(){
-		ConsoleLogger.log(this, "mx: " + mouseX + " y: " + mouseY);
+		
+		keyboardController.mouseClicked(mouseButton);
 	}
 	
 	@Override

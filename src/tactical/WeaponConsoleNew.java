@@ -9,6 +9,7 @@ import processing.core.PImage;
 import processing.core.PVector;
 import tactical.WeaponsConsole.TargetObject;
 import common.ConsoleLogger;
+import common.HardwareEvent;
 import common.PlayerConsole;
 import common.ShipState;
 
@@ -26,7 +27,8 @@ public class WeaponConsoleNew extends WeaponsConsole {
 	
 	PGraphics radarGraphics;
 	
-
+	float mouseRadius = 20f;
+	
 	public WeaponConsoleNew(PlayerConsole parent) {
 		super(parent);
 		bgImage = parent.loadImage("tacticalconsole/tacticalscreen2.png");
@@ -46,6 +48,8 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		weaponIconRotations[4] = -90f;
 		
 		radarGraphics = parent.createGraphics(680, 700, PConstants.P3D);
+		
+		
 	}
 	
 	protected void triggerDeploymentAnimation(int state){
@@ -79,7 +83,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		radarGraphics.pushMatrix();
 		radarGraphics.translate(340, 92, -800);
 		radarGraphics.rotateX(parent.radians(41));
-		radarGraphics.rotateZ(parent.radians(-45));
+		radarGraphics.rotateZ(parent.radians(parent.millis() / 200f));
 
 		
 		//parent.image(bgImage, 0, 0);
@@ -137,6 +141,17 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		parent.stroke(255);
 		parent.fill(255);
 		
+		//draw the mouse targetting cursor
+		PVector pos = ((TacticalConsole)parent).mousePosition;
+		parent.pushMatrix();
+		parent.translate(pos.x, pos.y);		
+		parent.rotate(parent.millis() / 1000f);
+		parent.noFill();
+		parent.ellipse(0, 0,  mouseRadius, mouseRadius);
+		parent.line(-20,0, 20,0);
+		parent.line(0, 20, 0, -20);
+		
+		parent.popMatrix();
 		
 	}
 	
@@ -456,8 +471,14 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				radarGraphics.translate(lerpX, lerpY, lerpZ);
 				radarGraphics.sphereDetail(2);
 				radarGraphics.sphere(10);
-				radarGraphics.stroke(255);
+				if(t == currentTarget){
+					radarGraphics.stroke(255);
+				} else {
+					radarGraphics.stroke(128);
+				}
 				radarGraphics.line(0, 0, 0, 0,0,-lerpZ);;
+				//radarGraphics.line(-lerpX, -lerpY, -lerpZ, 0,0,-lerpZ);;
+				
 				
 				
 
@@ -491,9 +512,14 @@ public class WeaponConsoleNew extends WeaponsConsole {
 					radarGraphics.rotate(PApplet.radians((parent.millis() / 10.0f) % 360));
 					radarGraphics.noFill();
 					radarGraphics.stroke(255, 255, 0);
-					float scale = PApplet.map(t.scanCountDown, 100, 0, 10, 1);
-					radarGraphics.rect(-15 * scale, -15 * scale, 30 * scale,
-							30 * scale);
+					float scale = PApplet.map(t.scanCountDown, 100, 0, 20, 1);
+					for(int i1 = 0; i1 < 4; i1++){
+						scale *= 0.7f;
+						radarGraphics.rect(-15 * scale, -15 * scale, 30 * scale,
+								30 * scale);
+					}
+					
+					
 					radarGraphics.popMatrix();
 						
 					
@@ -512,8 +538,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 					radarGraphics.rotate(PApplet.radians((parent.millis() / 10.0f) % 360));
 					radarGraphics.noFill();
 					radarGraphics.stroke(255, 255, 0);
-					float scale = PApplet.map(t.scanCountDown, 100, 0, 10, 1);
-					radarGraphics.rect(-15, -15, 30, 30);
+					radarGraphics.rect(-30, -30, 60, 60);
 					radarGraphics.popMatrix();
 				}
 
@@ -536,6 +561,38 @@ public class WeaponConsoleNew extends WeaponsConsole {
 	
 	}
 	
+	public void serialEvent(HardwareEvent h){
+		super.serialEvent(h);
+		if(h.event.equals("MOUSECLICK")){
+			
+			pickTarget();
+		}
+	}
+	
+	protected void pickTarget(){
+		mouseRadius = 30.0f;
+		for(TargetObject t : targets){
+			PVector m = ((TacticalConsole)parent).mousePosition;
+			
+			PVector s = new PVector(t.screenSpacePos.x+10, t.screenSpacePos.y+80);
+		
+			if(PVector.sub(m,s).mag() < mouseRadius && t.targetted == false){
+				//check the range
+				float scaleFactor = 0.6f;
+				float distanceToTarget = t.pos.mag();
+				int sensorRange = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450);
+
+				if (distanceToTarget < sensorRange * scaleFactor) {
+					ConsoleLogger.log(this, "picked target " + t.scanId);
+					scanString = "" + t.scanId;
+					scanTarget(scanString);
+					
+					break;
+				}
+			}
+		}
+		
+	}
 	
 
 	protected void updateTarget(OscMessage theOscMessage) {

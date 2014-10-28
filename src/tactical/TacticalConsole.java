@@ -1,10 +1,12 @@
 package tactical;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
+import processing.core.PVector;
 import processing.serial.Serial;
 import common.ConsoleAudio;
 import common.ConsoleLogger;
@@ -18,6 +20,9 @@ import common.displays.FailureScreen;
 import common.displays.RestrictedAreaScreen;
 import common.displays.WarpDisplay;
 import ddf.minim.Minim;
+
+import java.awt.Point;
+import java.awt.Robot;
 
 public class TacticalConsole extends PlayerConsole {
 
@@ -41,8 +46,9 @@ public class TacticalConsole extends PlayerConsole {
 	TacticalHardwareController mainPanelHardware;
 	FanLightHardwareController fanController;
 
-
-	
+	public PVector mousePosition = new PVector(0,0);
+	Robot mouseRobot;
+	private boolean ignoreMouse;
 
 	@Override
 	public void drawConsole() {
@@ -87,14 +93,9 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	public void keyPressed() {
 		
-		
 	}
 
-	@Override
-	public void mouseClicked() {
-		ConsoleLogger.log(this, "mx: " + mouseX + ", my: " + mouseY);
-		
-	}
+	
 
 	@Override
 	protected void oscEvent(OscMessage theOscMessage) {
@@ -245,8 +246,35 @@ public class TacticalConsole extends PlayerConsole {
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");
 		oscP5.send(myMessage, new NetAddress(serverIP, 12000));
 
+		try{
+			mouseRobot = new Robot();
+			mouseRobot.mouseMove(getLocationOnScreen().x+512, getLocationOnScreen().y + 384); 
+		} catch (Exception e){
+			ConsoleLogger.log(this, "there was a problem setting up the robot class. Game will fail");
+			
+		}
 	}
-
+	
+	public void mouseMoved(MouseEvent e) {
+		super.mouseMoved(e);
+		if(mouseRobot!= null && ignoreMouse == false){
+			mouseRobot.mouseMove(getLocationOnScreen().x+512, getLocationOnScreen().y + 384);  
+			mousePosition.x += e.getX() - 512;
+			mousePosition.y += e.getY() - 384;
+			if(mousePosition.x < 0){
+				mousePosition.x = 0;
+			} else if (mousePosition.x > 1024){
+				mousePosition.x = 1024;
+			}
+			if(mousePosition.y < 0){
+				mousePosition.y = 0;
+			} else if (mousePosition.y > 768){
+				mousePosition.y = 768;
+			}
+		}
+	}
+	
+	
 	@Override
 	protected void shipDamaged(float amount) {
 		//flash the lights attached to this console
@@ -296,6 +324,14 @@ public class TacticalConsole extends PlayerConsole {
 	@Override
 	public void hardwareEvent(HardwareEvent h) {
 		currentScreen.serialEvent(h);
+		
+		if(h.event.equals("KEY")){
+			if(h.value == 83){
+				ignoreMouse = !ignoreMouse;
+			}
+		} else if (h.event.equals("MOUSECLICK")){
+			ConsoleLogger.log(this, "mx: " + mousePosition.x + " y: " + mousePosition.y);
+		}
 		
 	}
 

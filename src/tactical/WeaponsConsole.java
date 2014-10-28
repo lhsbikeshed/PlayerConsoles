@@ -623,20 +623,20 @@ public class WeaponsConsole extends Display {
 		
 	}
 
-	void scanTarget() {
+	void scanTarget(String scanId) {
 
 		currentTarget = null;
 		ConsoleLogger.log(this, "scan start");
 
 		int sId = 0;
 		try {
-			sId = Integer.parseInt(scanString);
+			sId = Integer.parseInt(scanId);
 			// find what were scanning
 			boolean targetFound = false;
 			synchronized (targets) {
 				for (TargetObject t : targets) {
 					if (sId == t.scanId) {
-						t.scanCountDown = (13 - sensorPower) * 5;
+						t.scanCountDown = 25;//(13 - sensorPower) * 5;
 						targetFound = true;
 					} else {
 						if (t.targetted) {
@@ -681,7 +681,7 @@ public class WeaponsConsole extends Display {
 			}
 	
 			if (action == TacticalHardwareController.KP_SCAN) {
-				scanTarget();
+				scanTarget(scanString);
 			} else {
 				//keypad only types 0-9
 				keyTyped(evt.id);
@@ -693,7 +693,7 @@ public class WeaponsConsole extends Display {
 			} else if (evt.value == KeyEvent.VK_M){
 				fireSmartBomb();
 			} else if (evt.value == KeyEvent.VK_SPACE){
-				scanTarget();
+				scanTarget(scanString);
 			}
 			//KEY events are keycodes
 			int code = evt.value - 48;
@@ -743,7 +743,7 @@ public class WeaponsConsole extends Display {
 
 			scanningState = SCAN_TYPING;
 			if (scanString.length() >= 4) {
-				scanTarget();
+				scanTarget(scanString);
 			}
 		}
 		

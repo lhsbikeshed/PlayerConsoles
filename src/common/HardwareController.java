@@ -102,4 +102,13 @@ public class HardwareController {
 		}
 	}
 
+	public void mouseClicked(int button) {
+		HardwareEvent h = new HardwareEvent();
+		h.event = "MOUSECLICK";
+		h.id = button;
+		h.value = 1;
+		parent.hardwareEvent(h);
+		
+	}
+
 }
