@@ -12,6 +12,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.displays.AuthDisplay;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
 import common.displays.DestructDisplay;
@@ -259,6 +260,8 @@ public class EngineerConsole extends PlayerConsole {
 		displayMap.put("cablepuzzle", new CablePuzzleDisplay(this));
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
+		
+		displayMap.put("authdisplay", new AuthDisplay(this));
 
 		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim, 1.0f);

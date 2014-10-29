@@ -103,6 +103,7 @@ public class HardwareController {
 	}
 
 	public void mouseClicked(int button) {
+		ConsoleLogger.log(this, "mx: " + parent.mouseX + " my: " + parent.mouseY);
 		HardwareEvent h = new HardwareEvent();
 		h.event = "MOUSECLICK";
 		h.id = button;
