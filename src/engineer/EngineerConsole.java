@@ -160,6 +160,9 @@ public class EngineerConsole extends PlayerConsole {
 				shipState.poweringOn = false;
 				bootDisplay.stop();
 				upperPanel.forcePowerMode(true);
+				OscMessage myMessage = new OscMessage(
+						"/game/Hello/EngineerStation");
+				oscP5.send(myMessage, serverAddress);
 			} else {
 				shipState.poweredOn = false;
 				shipState.poweringOn = false;
