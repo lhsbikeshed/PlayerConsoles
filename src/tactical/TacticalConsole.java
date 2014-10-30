@@ -240,7 +240,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("weapons"));
+		changeDisplay(displayMap.get("plottingDisplay"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");
@@ -328,6 +328,11 @@ public class TacticalConsole extends PlayerConsole {
 		if(h.event.equals("KEY")){
 			if(h.value == 83){
 				ignoreMouse = !ignoreMouse;
+			} else if (h.value == KeyEvent.VK_P){
+				OscMessage m = new OscMessage("/control/screenSelection");
+				m.add("TacticalStation");
+				m.add("plottingDisplay");
+				getOscClient().send(m, getServerAddress());
 			}
 		} else if (h.event.equals("MOUSECLICK")){
 			ConsoleLogger.log(this, "mx: " + mousePosition.x + " y: " + mousePosition.y);

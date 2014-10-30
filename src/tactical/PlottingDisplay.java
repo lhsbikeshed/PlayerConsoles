@@ -215,15 +215,12 @@ public class PlottingDisplay extends Display {
 			dst = destNode.pos;
 			diff = PVector.sub(src, dst);
 			if (diff.mag() < 165) { // too far
-				int routeTag = 0;
-				//scan back through the route looking for the first >= 0 route tag
-				for(MapNode n : currentRoute){
-					if (n.routeTag >= 0){
-						routeTag = n.routeTag;
-						ConsoleLogger.log(this, "setting route tag " + routeTag);
-						break;
-					}
-				}
+				
+				//look at the last entered waypoint and send the route tag it has
+				int routeTag = currentRoute.get(currentRoute.size() - 1).routeTag;
+				
+				ConsoleLogger.log(this, "setting route tag " + routeTag);
+						
 				// tell the main game which route we're using
 				OscMessage msg = new OscMessage("/system/jump/setRoute");
 				msg.add(routeTag);
