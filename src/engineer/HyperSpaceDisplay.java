@@ -80,7 +80,7 @@ public class HyperSpaceDisplay extends Display {
 	long failDelay = 0;
 	float timeRemaining = 0; // how long until exit
 
-	int failsRemaining = 5;
+	
 	long nextFailTime = 5000;
 	long lastFailTime = 0;
 
@@ -157,11 +157,7 @@ public class HyperSpaceDisplay extends Display {
 			} else {
 				parent.text("EXITING HYPERSPACE", 294, 700);
 			}
-			int h = (failsRemaining * 20);
-			if (h < 0) {
-				h = 0;
-			}
-			parent.text("Hyperspace Tunnel Health: " + h + "%", 149, 740);
+			
 
 			if (lastFailTime + nextFailTime < parent.millis()) {
 				lastFailTime = parent.millis();
@@ -207,7 +203,7 @@ public class HyperSpaceDisplay extends Display {
 
 		if (theOscMessage.checkAddrPattern("/scene/warp/updatestats") == true) {
 			timeRemaining = (int) theOscMessage.get(1).floatValue();
-			failsRemaining = (int) theOscMessage.get(0).floatValue();
+			
 		} else if (theOscMessage.checkAddrPattern("/scene/warp/failjump") == true) {
 			haveFailed = true;
 			failStart = parent.millis();
@@ -261,7 +257,7 @@ public class HyperSpaceDisplay extends Display {
 	@Override
 	public void start() {
 		haveFailed = false;
-		failsRemaining = 5;
+	
 		for (Emitter e : emitters) {
 			e.state = Emitter.STATE_OFF;
 		}

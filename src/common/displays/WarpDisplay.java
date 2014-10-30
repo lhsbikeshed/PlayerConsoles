@@ -17,6 +17,7 @@ public class WarpDisplay extends Display {
 	PImage overlayImage;
 	PImage shipIcon;
 	PImage planetImage;
+	PImage cometImage;
 
 	// 22
 
@@ -30,6 +31,7 @@ public class WarpDisplay extends Display {
 	float lastTimeRemaining = 30;
 	long lastUpdate = 0;
 	boolean thisIsFail = false;
+	private int jumpDestination = 0;
 
 	int gridWidth = 20;
 	int gridHeight = 20;
@@ -51,6 +53,7 @@ public class WarpDisplay extends Display {
 
 	int screenFlashTimer = 0;
 	BannerOverlay bannerSystem;
+	
 
 	public WarpDisplay(PlayerConsole parent) {
 		super(parent);
@@ -60,6 +63,7 @@ public class WarpDisplay extends Display {
 				.loadImage("common/warpScreen/hyperfailoverlay.png");
 		shipIcon = parent.loadImage("common/warpScreen/hyperShipIcon.png");
 		planetImage = parent.loadImage("common/warpScreen/hyperPlanet.png");
+		cometImage = parent.loadImage("common/warpScreen/cometIcon.png");
 		// setup grid points
 		int cellW = (2 * parent.width) / gridWidth;
 		int cellH = 400 / gridHeight;
@@ -96,15 +100,14 @@ public class WarpDisplay extends Display {
 
 		drawGrid();
 
-		if (thisIsFail) {
-			int pW = (int) (planetImage.width * planetScale);
-			int pH = (int) (planetImage.height * planetScale);
-
-			planetX = (int) PApplet.lerp(parent.width, 637,
-					(parent.millis() - sceneStart) / 20000.0f);
-			planetScale = PApplet.lerp(0.6f, 1.0f,
-					(parent.millis() - sceneStart) / 20000.0f);
-			parent.image(planetImage, planetX + pW / 2, 485 - pH / 2, pW, pH);
+		switch (jumpDestination){
+			case 2:
+				drawFailPlanet();
+				break;
+			case 7:
+				drawFailComet();
+				break;
+				
 		}
 
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
@@ -132,6 +135,45 @@ public class WarpDisplay extends Display {
 			parent.rect(0, 0, parent.width, parent.height);
 
 		}
+	}
+
+	private void drawFailComet() {
+		
+		
+
+		int cometY = (int) PApplet.lerp(parent.height + 800, 452,
+				(parent.millis() - sceneStart) / 20000.0f);
+		if (cometY < 452) cometY = 452;
+		float cometScale = PApplet.lerp(0.3f, 0.6f,
+				(parent.millis() - sceneStart) / 20000.0f);
+		if (cometY > 0.6f) cometScale = 0.6f;
+		
+		int pW = (int) (cometImage.width * cometScale);
+		int pH = (int) (cometImage.height * cometScale);
+		
+		parent.image(cometImage, 300 + pW / 2, cometY - pH / 2, pW, pH);
+		
+		parent.textFont(font, 20);
+		if(parent.globalBlinker){
+			parent.fill(255,255,255);
+		} else {
+			parent.fill(255,0,0);
+		}
+		parent.text("COMET GX-M56", 300, cometY - 100);
+		parent.stroke(255,255,0);
+		parent.line(540, cometY - 105, 540 + pW/2  , cometY -205 + pH / 2);
+	}
+
+	private void drawFailPlanet() {
+		int pW = (int) (planetImage.width * planetScale);
+		int pH = (int) (planetImage.height * planetScale);
+
+		planetX = (int) PApplet.lerp(parent.width, 637,
+				(parent.millis() - sceneStart) / 20000.0f);
+		planetScale = PApplet.lerp(0.6f, 1.0f,
+				(parent.millis() - sceneStart) / 20000.0f);
+		parent.image(planetImage, planetX + pW / 2, 485 - pH / 2, pW, pH);
+		
 	}
 
 	void drawGrid() {
@@ -214,14 +256,24 @@ public class WarpDisplay extends Display {
 			timeRemaining = theOscMessage.get(1).floatValue();
 			thisIsFail = theOscMessage.get(2).intValue() == 1 ? true : false;
 			lastUpdate = parent.millis();
+			jumpDestination = theOscMessage.get(3).intValue();
 		} else if (theOscMessage.checkAddrPattern("/scene/warp/failjump") == true) {
 			haveFailed = true;
 			failStart = parent.millis();
 			failDelay = theOscMessage.get(0).intValue() * 1000;
 			bannerSystem.setSize(700, 300);
 			bannerSystem.setTitle("WARNING");
-			bannerSystem
-					.setText("GRAVITATIONAL BODY DETECTED, TUNNEL COLLAPSING, PREPARE FOR UNPLANNED REENTRY");
+			switch (jumpDestination){
+			case 2:
+				bannerSystem
+				.setText("GRAVITATIONAL BODY DETECTED, TUNNEL COLLAPSING, PREPARE FOR UNPLANNED REENTRY");
+				break;
+			case 7:
+				bannerSystem
+				.setText("GRAVITATIONAL BODY DETECTED, DISENGAGING JUMP DRIVE");
+				break;
+			}
+			
 			bannerSystem.displayFor(5000);
 		}
 	}
@@ -241,6 +293,7 @@ public class WarpDisplay extends Display {
 		thisIsFail = false;
 		planetScale = 0.6f;
 		exitStartTime = -1;
+		jumpDestination= 0;
 
 	}
 
@@ -251,4 +304,6 @@ public class WarpDisplay extends Display {
 		warpingIn = false;
 
 	}
+	
+	
 }

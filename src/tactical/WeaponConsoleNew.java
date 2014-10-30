@@ -88,16 +88,29 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		
 		//parent.image(bgImage, 0, 0);
 		radarGraphics.fill(0, 128, 0, 100);
-		radarGraphics.stroke(509);
+		radarGraphics.noStroke();
 		int sensorSize = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450) ;
 		radarGraphics.ellipse(0, 0, 1450, 1450);
 		radarGraphics.stroke(128);
+		
+		radarGraphics.pushMatrix();
+		
+		for(int i=0; i < 24; i++){
+			radarGraphics.rotate((float)((Math.PI * 2f) / 24));
+			if((i + 1 ) % 3 == 0){
+				radarGraphics.line(0, 700, 0, 850);
+			} else {
+				radarGraphics.line(0, 700, 0, 750);
+			
+			}
+		}
+		radarGraphics.popMatrix();
 
 		radarGraphics.ellipse(0, 0, sensorSize, sensorSize);
 		radarGraphics.stroke(0,0,255);
-		radarGraphics.line(-1450,0,0,1450,0,0);
+		radarGraphics.line(-725,0,0,725,0,0);
 		radarGraphics.stroke(255,0,0);
-		radarGraphics.line(0,-1450,0,0,1450,0);
+		radarGraphics.line(0,-725,0,0,725,0);
 		
 		
 		
