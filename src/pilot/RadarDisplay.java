@@ -306,12 +306,7 @@ public class RadarDisplay extends Display {
 
 					// workout what needs cleaning
 
-					if (rItem.lastUpdateTime < parent.millis() - 500.0f) {
-						// its dead jim
-						// removeList.add(new Integer(i));
-						ConsoleLogger.log(this, "removing id: " + rItem.id);
-						rItem.active = false;
-					}
+					clearDeadItems(rItem);
 				}
 			}
 			parent.popMatrix();
@@ -480,6 +475,16 @@ public class RadarDisplay extends Display {
 		
 		
 
+		
+	}
+
+	protected void clearDeadItems(RadarObject rItem) {
+		if (rItem.lastUpdateTime < parent.millis() - 500.0f) {
+			// its dead jim
+			// removeList.add(new Integer(i));
+			ConsoleLogger.log(this, "removing id: " + rItem.id);
+			rItem.active = false;
+		}
 		
 	}
 

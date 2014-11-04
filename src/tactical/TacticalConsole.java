@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
+import pilot.CollisionRadarDisplay;
 import processing.core.PVector;
 import processing.serial.Serial;
 import common.ConsoleAudio;
@@ -221,6 +222,7 @@ public class TacticalConsole extends PlayerConsole {
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 		displayMap.put("plottingDisplay", new PlottingDisplay(this));
 		
+		
 
 		
 		mainPanelHardware = new TacticalHardwareController("mainPanel", "COM7", 9600, this);
@@ -240,7 +242,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("hyperspace"));
+		changeDisplay(displayMap.get("weapons"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");

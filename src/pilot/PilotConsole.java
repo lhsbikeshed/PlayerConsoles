@@ -222,7 +222,8 @@ public class PilotConsole extends PlayerConsole {
 		displayMap.put("cablepuzzle", new CablePuzzleDisplay(this));
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
-
+		displayMap.put("collisionradar", new CollisionRadarDisplay(this));
+		
 		//configure the pilot console hardware stuff
 		pilotHardware = new PilotHardwareController("mainconsole", "COM8", 115200, this);
 		hardwareControllers.add(pilotHardware);
