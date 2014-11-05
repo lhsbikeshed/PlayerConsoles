@@ -523,18 +523,7 @@ public class WeaponsConsole extends Display {
 		} else if (theOscMessage.checkAddrPattern("/system/targetting/smartBombOk")){
 			fireDecoy();
 			
-		} else if (theOscMessage.checkAddrPattern("/ship/weaponState")){
-			int state = theOscMessage.get(0).intValue();
-			switch(state){
-			case ShipState.WEAPON_STOWED:
-				parent.getConsoleAudio().playClip("weaponsRetracted");
-				break;
-			case ShipState.WEAPON_DEPLOYED: 
-				parent.getConsoleAudio().playClip("weaponsDeployed");
-				break;
-			}
-			
-		}
+		} 
 				
 	}
 
@@ -671,7 +660,8 @@ public class WeaponsConsole extends Display {
 
 			int action = evt.id;
 			if (action == TacticalHardwareController.KP_LASER) {
-				fireLaser();
+				int bank = evt.value;
+				fireLaser(bank);
 			}
 	
 			if (action == TacticalHardwareController.KP_DECOY) {
@@ -689,7 +679,7 @@ public class WeaponsConsole extends Display {
 			}
 		} else if (evt.event.equals("KEY")){
 			if(evt.value == KeyEvent.VK_F){
-				fireLaser();
+				fireLaser(0);
 			} else if (evt.value == KeyEvent.VK_M){
 				fireSmartBomb();
 			} else if (evt.value == KeyEvent.VK_SPACE){
@@ -702,12 +692,14 @@ public class WeaponsConsole extends Display {
 		}
 	}
 
-	private void fireLaser() {
+	private void fireLaser(int bank) {
 		OscMessage myMessage = new OscMessage(
 				"/system/targetting/fireAtTarget");
 		osc.send(myMessage, new NetAddress(serverIP, 12000));
 		if (currentTarget != null && currentTarget.pos.mag() < maxBeamRange) {
 			parent.getConsoleAudio().playClip("firing");
+			//clear the power level on that bank
+			TacticalHardwareController.instance.setPowerLevel(bank, 0);
 		} else {
 			parent.getConsoleAudio().playClip("outOfRange");
 		}
@@ -725,6 +717,7 @@ public class WeaponsConsole extends Display {
 						"/system/targetting/fireFlare");
 				osc.send(myMessage, new NetAddress(serverIP, 12000));
 
+				TacticalHardwareController.instance.setPowerLevel(3, 80); //force power levels to always be charged
 				
 			}
 		} else {

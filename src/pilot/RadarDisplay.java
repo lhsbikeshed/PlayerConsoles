@@ -484,6 +484,7 @@ public class RadarDisplay extends Display {
 			// removeList.add(new Integer(i));
 			ConsoleLogger.log(this, "removing id: " + rItem.id);
 			rItem.active = false;
+			rItem.id = 100000;
 		}
 		
 	}

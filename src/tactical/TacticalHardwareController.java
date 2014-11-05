@@ -34,6 +34,8 @@ public class TacticalHardwareController extends HardwareController {
 	String[] screenNames = {"weapons", "plottingDisplay"};
 	int screenIndex = 1;
 	
+	String[] weaponNames = {"LASER", "LASER", "LASER", "EMP"};
+	
 	
 	boolean decoyLightState = false;
 	boolean previousWeaponLightState = false;
@@ -41,6 +43,7 @@ public class TacticalHardwareController extends HardwareController {
 
 	// is the decoy blinker on?
 	boolean decoyBlinker = false;
+	private boolean weaponPanelState;
 
 	//there should only ever be one of these per console
 	public static TacticalHardwareController instance;
@@ -51,6 +54,27 @@ public class TacticalHardwareController extends HardwareController {
 		super(interfaceName, port, rate, parent);
 		ConsoleLogger.log(this, "Starting Tactical panel controller on " + port);
 		instance = this;
+		
+		setBankName(0, weaponNames[0]);
+		setBankName(1, weaponNames[1]);
+		setBankName(2, weaponNames[2]);
+		setBankName(3, weaponNames[3]);
+		setPowerLevel(3, 80);	//emp is always charged for now, we limit the number they can fire instead
+		
+		
+		
+	}
+
+	private void setBankName(int bank, String name) {
+		ConsoleLogger.log(this, "Setting bank name " + bank + " to " + name);
+
+		if(parent.testMode){
+			return;
+		}
+		
+		name = "n" + bank + name + ",";
+		serialPort.write(name);		
+		
 	}
 
 	public void bufferComplete(){
@@ -68,18 +92,17 @@ public class TacticalHardwareController extends HardwareController {
 		}
 		if (c == 'F') {
 			HardwareEvent h = new HardwareEvent();
+			int bank = serialBuffer[1] - '0';
+			if(bank >= 0 && bank < 3){		//banks 0,1,2 are lasers
+				h.id = KP_LASER;
+			} else if (bank == 3){
+				h.id = KP_DECOY;
+			}
 			h.event = "KEYPAD";
-			h.id = KP_LASER;
-			h.value = 1;
+			h.value = bank;
 			parent.hardwareEvent(h);
 		}
-		if (c == 'm') {
-			HardwareEvent h = new HardwareEvent();
-			h.event = "KEYPAD";
-			h.id = KP_DECOY;
-			h.value = 1;
-			parent.hardwareEvent(h);
-		}
+		
 
 		if (c == 'C') {
 			HardwareEvent h = new HardwareEvent();
@@ -99,17 +122,27 @@ public class TacticalHardwareController extends HardwareController {
 		}
 		/* weapons toggling commands */
 		if ( c == 'w'){
-			//toggle weapons off
-			OscMessage m = new OscMessage("/system/targetting/changeWeaponState");
-			m.add(0);
-			parent.getOscClient().send(m, parent.getServerAddress());
+			sendWeaponChange(false);
 			
 		} else if ( c == 'W'){
-			//toggle weapons on
-			OscMessage m = new OscMessage("/system/targetting/changeWeaponState");
-			m.add(1);
-			parent.getOscClient().send(m, parent.getServerAddress());
+			sendWeaponChange(true);
 		} else if (c == 'S'){
+			cycleScreen();
+		}
+	}
+
+	protected void sendWeaponChange(boolean b) {
+		//toggle weapons on
+		if(parent.getShipState().poweredOn == true){
+			OscMessage m = new OscMessage("/system/targetting/changeWeaponState");
+			m.add(b == true ? 1 : 0);
+			parent.getOscClient().send(m, parent.getServerAddress());
+		}
+	}
+
+	protected void cycleScreen() {
+		if(parent.getShipState().poweredOn == true){
+
 			screenIndex ++;
 			screenIndex %= screenNames.length;
 			
@@ -161,15 +194,34 @@ public class TacticalHardwareController extends HardwareController {
 			decoyLightState = false;
 		}
 	}
+	
+	public void setWeaponPanelState(boolean powerOn){
+		ConsoleLogger.log(this, "setting weapon panel state to " + powerOn);
+		if(parent.testMode) return;
+		
+		if(powerOn){
+			serialPort.write("W,");
+			weaponPanelState = true;
+		} else {
+			serialPort.write("w,");
+			weaponPanelState = false;
+		}
+	}
 
 	public void setPowerState(boolean b) {
 		if(parent.testMode) return;
 		if(b){
 			/* power up the tac console panel */			
 			serialPort.write("P,");	
+			if(weaponPanelState){
+				serialPort.write("W,");	//restore weapon panel state
+			} else {
+				serialPort.write("w,");
+			}
 			setWeaponsArmedLight(previousWeaponLightState);
 		} else {
 			serialPort.write("p,");
+			serialPort.write("w,"); //turn off weapon Panel without affecting our state
 			decoyBlinker = false;
 			previousWeaponLightState = weaponLightState;
 			setWeaponsArmedLight(false);
@@ -178,9 +230,17 @@ public class TacticalHardwareController extends HardwareController {
 	}
 
 	public void setChargeRate(int beamPower) {
-		if(parent.testMode) return;
 		
-		serialPort.write("L" + beamPower + ",");
+		if(parent.testMode) return;
+		//charge rates are set from char '0' upwards, setting emp charge rate has no effect as the charge level is
+		//permanently held at full, it should always flash "READY FIRE"
+		for(int i = 0; i < 4; i++){
+			int c = '0' + beamPower;
+			serialPort.write("L" + i + c + ",");
+			
+		}
+		
+		
 
 		
 	}
@@ -240,6 +300,15 @@ public class TacticalHardwareController extends HardwareController {
 	public void reset() {
 		setWeaponsArmedLight(false);
 		setPowerState(false);
+		
+	}
+
+	public void setPowerLevel(int bank, int i) {
+		ConsoleLogger.log(this, "setting charge level of bank " + bank + "to " + i);
+		if(parent.testMode) return;
+		
+		String msg = "x" + bank + ",";
+		serialPort.write(msg);
 		
 	}
 }

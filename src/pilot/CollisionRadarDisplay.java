@@ -15,14 +15,16 @@ import common.UsefulShit;
 public class CollisionRadarDisplay extends RadarDisplay {
 
 	PImage overlayImage;
-	PImage rockIcon;
+	PImage[] rockIcon = new PImage[3];
 	
 	PGraphics pg;
 	
 	public CollisionRadarDisplay(PlayerConsole parent) {
 		super(parent);
 		overlayImage = parent.loadImage("pilotconsole/collisionOverlay.png");
-		rockIcon = parent.loadImage("pilotconsole/rockIcon1.png");
+		for(int i = 1; i < 4; i++){
+			rockIcon[i-1] = parent.loadImage("pilotconsole/rockIcon" + i + ".png");
+		}
 		pg = parent.createGraphics(1024, 768, PApplet.P3D);
 	}
 
@@ -82,7 +84,13 @@ public class CollisionRadarDisplay extends RadarDisplay {
 						pg.pushMatrix();
 						pg.rotate((rItem.hashCode() + parent.millis() + 100000) * 0.001f);
 						pg.scale(0.5f);
-						pg.image(rockIcon, -rockIcon.width/2, -rockIcon.height/2);
+						if(newPos.mag() < 4.0f){
+							pg.tint(255,0,0);
+						} else {
+							pg.noTint();
+						}
+						PImage rock = rockIcon[Math.abs(rItem.id / 10) % 3];
+						pg.image(rock, -rock.width/2, -rock.height/2);
 						pg.popMatrix();
 						pg.fill(255);
 						pg.text(newPos.mag(), 28, 70);

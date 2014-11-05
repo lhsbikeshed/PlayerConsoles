@@ -11,6 +11,7 @@ import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
 import common.Rot;
+import common.ShipState;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
 import common.displays.DestructDisplay;
@@ -174,7 +175,7 @@ public class PilotConsole extends PlayerConsole {
 		} else if (theOscMessage.checkAddrPattern("/system/propulsion/afterburnerCharging")){
 			shipState.afterburnerCharging = true;
 		
-			
+		
 			
 		} else {
 			if (currentScreen != null) {

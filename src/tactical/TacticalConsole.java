@@ -14,6 +14,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
 import common.displays.DestructDisplay;
@@ -171,7 +172,19 @@ public class TacticalConsole extends PlayerConsole {
 			mainPanelHardware.popFlap();
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/flapStrobe")) {
 			mainPanelHardware.strobe();
-		
+		}else if (theOscMessage.checkAddrPattern("/ship/weaponState")){
+				int state = theOscMessage.get(0).intValue();
+				switch(state){
+				case ShipState.WEAPON_STOWED:
+					getConsoleAudio().playClip("weaponsRetracted");
+					mainPanelHardware.setWeaponPanelState(false);
+					break;
+				case ShipState.WEAPON_DEPLOYED: 
+					getConsoleAudio().playClip("weaponsDeployed");
+					mainPanelHardware.setWeaponPanelState(true);
+
+					break;
+				}
 		} else {
 			if (currentScreen != null) {
 				currentScreen.oscMessage(theOscMessage);
