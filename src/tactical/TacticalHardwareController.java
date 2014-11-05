@@ -26,10 +26,18 @@ public class TacticalHardwareController extends HardwareController {
 	public static final int KP_8 = 8;
 	public static final int KP_9 = 9;
 	
-	public static final int KP_SCAN = 10;
+	public static final int KP_SCAN = 35;		//move the scan key to the # key for now
 	public static final int KP_DECOY = 11;
 	public static final int KP_LASER = 12;
 	public static final int KP_SCREENCHANGE = 13;
+	public static final int KP_HASH = 35;
+	public static final int KP_STAR = 42;
+	public static final int KP_A = 65;
+	public static final int KP_B = 66;
+	public static final int KP_C = 67;
+	public static final int KP_D = 68;
+	
+	
 	
 	String[] screenNames = {"weapons", "plottingDisplay"};
 	int screenIndex = 1;
@@ -79,8 +87,10 @@ public class TacticalHardwareController extends HardwareController {
 
 	public void bufferComplete(){
 		char c = serialBuffer[0];
-		if (c >= '0' && c <= '9') {
-			keypadKey();
+		if(c == 'K'){		//keypad key	
+			char val = serialBuffer[1];
+			keypadKey(val);
+				
 			
 		}
 		if (c == ' ') {
@@ -129,6 +139,17 @@ public class TacticalHardwareController extends HardwareController {
 		} else if (c == 'S'){
 			cycleScreen();
 		}
+		
+		//trackball buttons
+		if(c == 'B'){
+			if(serialBuffer[0] == '0'){
+				HardwareEvent h = new HardwareEvent();
+				h.event = "MOUSECLICK";
+				h.id = 0;
+				h.value = 1;
+				parent.hardwareEvent(h);
+			}
+		}
 	}
 
 	protected void sendWeaponChange(boolean b) {
@@ -155,10 +176,18 @@ public class TacticalHardwareController extends HardwareController {
 	
 	//decode the buffer as a keypad key
 	//these are 0-9 so just parse as Ints for the id part
-	void keypadKey(){
+	//other keys just pass out the character value, can be compared with the constants define
+	//at the top of this file
+	void keypadKey(char val){
 		HardwareEvent h = new HardwareEvent();
 		h.event = "KEYPAD";
-		h.id = Integer.parseInt("" + serialBuffer[0]);
+		if(val >= '0' && val <= '9'){
+			h.id = Integer.parseInt("" + val);
+		} else if (val == '#'){
+			h.id = KP_HASH;
+		} else {
+			h.id = (int)val;
+		}
 		h.value = 1;
 		
 		parent.getConsoleAudio().randomBeep();
