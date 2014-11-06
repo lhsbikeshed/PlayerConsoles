@@ -81,7 +81,7 @@ public class AuthDisplay extends Display {
 				if (authResult == false) {
 					parent.fill(255, 0, 0);
 					parent.textFont(font, 40);
-					parent.text("CODE FAIL", 266, 573);
+					parent.text("CODE FAIL", 357, 369);
 				} else {
 					parent.fill(0, 255, 0);
 					parent.textFont(font, 40);

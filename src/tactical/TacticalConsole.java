@@ -238,7 +238,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		
-		mainPanelHardware = new TacticalHardwareController("mainPanel", "COM7", 9600, this);
+		mainPanelHardware = new TacticalHardwareController("mainPanel", "COM7", 115200, this);
 		hardwareControllers.add(mainPanelHardware);
 		mainPanelHardware.setPowerState(false);
 
