@@ -142,7 +142,7 @@ public class TacticalHardwareController extends HardwareController {
 		
 		//trackball buttons
 		if(c == 'B'){
-			if(serialBuffer[0] == '0'){
+			if(serialBuffer[1] == '0'){
 				HardwareEvent h = new HardwareEvent();
 				h.event = "MOUSECLICK";
 				h.id = 0;
