@@ -82,7 +82,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 						pg.fill(255);
 						
 						pg.pushMatrix();
-						pg.rotate((rItem.hashCode() + parent.millis() + 100000) * 0.001f);
+						pg.rotateX((rItem.hashCode() + parent.millis() + 100000) * 0.001f);
+						pg.rotateY((rItem.hashCode() + parent.millis() + 1000) * 0.001f);
 						pg.scale(0.5f);
 						if(newPos.mag() < 4.0f){
 							pg.tint(255,0,0);
@@ -90,7 +91,9 @@ public class CollisionRadarDisplay extends RadarDisplay {
 							pg.noTint();
 						}
 						PImage rock = rockIcon[Math.abs(rItem.id / 10) % 3];
-						pg.image(rock, -rock.width/2, -rock.height/2);
+						//pg.image(rock, -rock.width/2, -rock.height/2);
+						pg.noFill(); pg.stroke(255); pg.strokeWeight(1); pg.sphereDetail(5);
+						pg.sphere(105);;
 						pg.popMatrix();
 						pg.fill(255);
 						pg.text(newPos.mag(), 28, 70);

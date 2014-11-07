@@ -230,15 +230,18 @@ public class WeaponConsoleNew extends WeaponsConsole {
 			}
 			float xOffset = 0;
 			if(parent.getShipState().weaponState == ShipState.WEAPON_TRANSIT_OUT){
-				 xOffset = PApplet.map(animPos, 0, 4000, 0, -10);
+				 xOffset = -10;//PApplet.map(animPos, 0, 4000, 0, -10);
+				 parent.tint((float) Math.sin(parent.millis() / 100f) * 255 + 128);
 			} else if(parent.getShipState().weaponState == ShipState.WEAPON_TRANSIT_IN){
-				 xOffset = PApplet.map(animPos, 0, 4000, -10, 0);
+				 xOffset = -10;// PApplet.map(animPos, 0, 4000, -10, 0);
+				 parent.tint((float) Math.sin(parent.millis() / 100f) * 255 + 128);
 			} else if(parent.getShipState().weaponState == ShipState.WEAPON_DEPLOYED){
 				 xOffset = -10;
 			} else if(parent.getShipState().weaponState == ShipState.WEAPON_STOWED){
 				 xOffset = 0;
 			}
 			parent.image(weaponIcon, xOffset, 0);
+			
 			
 //			if(parent.getShipState().weaponState == ShipState.WEAPON_DEPLOYED){
 //				float health = parent.getShipState().weaponHealth[i];
@@ -254,7 +257,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 			parent.popMatrix();
 			
 		}
-		
+		parent.noTint();
 		parent.image(shipIcon, 532, 643);
 		
 		
