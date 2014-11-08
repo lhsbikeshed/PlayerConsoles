@@ -39,8 +39,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		pg.stroke(255);
 		pg.strokeWeight(2);
 		
-		pg.line(512, 0, 512, 1024);
-		pg.line(0, 384, 1024, 384);
+		pg.line(512, 350, 512, 420);
+		pg.line(480, 384, 544, 384);
 		pg.pushMatrix();
 		
 		pg.translate(512, 384 , 100);
@@ -130,8 +130,11 @@ public class CollisionRadarDisplay extends RadarDisplay {
 			parent.fill(255);
 			
 		}
-		if(showCollisionAlert){
-			parent.text("COLLISION ALERT", 316, 743);
+		if(showCollisionAlert && parent.globalBlinker){
+			parent.text("COLLISION ALERT", 366, 743);
+			
+			parent.getConsoleAudio().playClip("blip");
+			
 		}
 	}
 

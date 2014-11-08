@@ -99,10 +99,12 @@ public class ConsoleAudio {
 
 	public void playClip(String name) {
 		AudioPlayer c = audioList.get(name);
-		if (c != null) {
-			c.setPan(pan);
-			c.rewind();
-			c.play();
+		if (c != null ) {
+			if(c.isPlaying() == false){
+				c.setPan(pan);
+				c.rewind();
+				c.play();
+			}
 		} else {
 			ConsoleLogger.log(this, "ALERT: tried to play " + name
 					+ " but not found");
