@@ -18,6 +18,7 @@ public class CollisionRadarDisplay extends RadarDisplay {
 	PImage[] rockIcon = new PImage[3];
 	
 	PGraphics pg;
+	boolean showCollisionAlert = false;
 	
 	public CollisionRadarDisplay(PlayerConsole parent) {
 		super(parent);
@@ -30,6 +31,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 
 	@Override
 	public void draw() {
+		showCollisionAlert = false;//this will be set if there are any hightlight targets
+									//drawn later on
 		parent.background(0);
 		pg.beginDraw();
 		pg.background(0);
@@ -72,6 +75,7 @@ public class CollisionRadarDisplay extends RadarDisplay {
 							rItem.position.z,
 							(parent.millis() - rItem.lastUpdateTime) / 250.0f);
 					
+					
 					pg.pushMatrix();
 					pg.translate(newPos.x  *22f, -newPos.y *22f, -newPos.z * 22f);
 					//parent.rotateX(parent.PI / 2f);
@@ -85,14 +89,21 @@ public class CollisionRadarDisplay extends RadarDisplay {
 						pg.rotateX((rItem.hashCode() + parent.millis() + 100000) * 0.001f);
 						pg.rotateY((rItem.hashCode() + parent.millis() + 1000) * 0.001f);
 						pg.scale(0.5f);
-						if(newPos.mag() < 4.0f){
-							pg.tint(255,0,0);
+						//in this view highlighted items need to blink
+						//rocks that are on a collision course are tagged as highlighted
+						
+						if(rItem.targetted){
+							showCollisionAlert = true;
+							pg.stroke((int)(parent.millis()/5f) % 255, 0,0);
+							//pg.stroke(255,0,0);
+							pg.strokeWeight(4);
 						} else {
-							pg.noTint();
+							
+							pg.stroke(255);
+							pg.strokeWeight(1);
 						}
-						PImage rock = rockIcon[Math.abs(rItem.id / 10) % 3];
-						//pg.image(rock, -rock.width/2, -rock.height/2);
-						pg.noFill(); pg.stroke(255); pg.strokeWeight(1); pg.sphereDetail(5);
+						
+						pg.noFill(); ; ; pg.sphereDetail(4);
 						pg.sphere(105);;
 						pg.popMatrix();
 						pg.fill(255);
@@ -103,6 +114,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 					
 					clearDeadItems(rItem);
 				}
+				
+				
 			}
 		}
 		
@@ -117,7 +130,9 @@ public class CollisionRadarDisplay extends RadarDisplay {
 			parent.fill(255);
 			
 		}
-		parent.text("ROTATION CONTROL OFFLINE", 286, 743);
+		if(showCollisionAlert){
+			parent.text("COLLISION ALERT", 316, 743);
+		}
 	}
 
 	
