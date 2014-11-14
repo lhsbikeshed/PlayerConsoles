@@ -9,9 +9,9 @@ import processing.core.PVector;
 import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
-import common.LerpedFloat;
 import common.PlayerConsole;
-import common.UsefulShit;
+import common.util.LerpedFloat;
+import common.util.UsefulShit;
 
 public class CollisionRadarDisplay extends RadarDisplay {
 

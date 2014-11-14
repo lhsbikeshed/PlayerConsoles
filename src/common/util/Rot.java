@@ -27,10 +27,13 @@
  * It has been rewritten to make use of the PVector class that is 
  * part of Processing.
  */
-package common;
+package common.util;
 
 import java.io.Serializable;
 
+import common.Messages;
+import common.VectorConstants;
+import common.VectorUtil;
 import processing.core.PApplet;
 import processing.core.PVector;
 

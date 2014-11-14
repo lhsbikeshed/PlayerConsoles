@@ -26,6 +26,7 @@ public class PlottingDisplay extends Display {
 	String currentCode = "";
 
 	private String failReason = "";
+	int lastPlottedScene = 0;	//scene that the last successful plot was in
 
 	// debug animation stuff
 	long lastKeyTime = 0;
@@ -34,7 +35,12 @@ public class PlottingDisplay extends Display {
 		super(parent);
 		backgroundImage = parent.loadImage("tacticalconsole/plottingBG.png");
 		loadMap();
-
+		clearRoute();
+	}
+	
+	@Override
+	public void gameReset(){
+		lastPlottedScene = 0;
 	}
 
 	@Override
@@ -116,12 +122,16 @@ public class PlottingDisplay extends Display {
 				keyTyped(evt.value);
 			} else if (evt.value == KeyEvent.VK_SPACE) {
 				codeEntered();
+			} else if (evt.value == KeyEvent.VK_BACK_SPACE){
+				clearRoute();
 			}
 		} else if (evt.event.equals("KEYPAD")) {
 			if (evt.id >= 0 && evt.id <= 9) {
 				keyTyped((char) (48 + evt.id));
 			} else if (evt.id == TacticalHardwareController.KP_SCAN) {
 				codeEntered();
+			} else if (evt.id == TacticalHardwareController.KP_STAR){
+				clearRoute();
 			}
 		}
 	}
@@ -232,6 +242,7 @@ public class PlottingDisplay extends Display {
 				parent.getBannerSystem().displayFor(2000);
 				currentRoute.add(destNode);
 				routeComplete = true;
+				lastPlottedScene = parent.getShipState().currentScene;
 				
 				
 
@@ -259,7 +270,17 @@ public class PlottingDisplay extends Display {
 	 */
 	@Override
 	public void start() {
-		// TODO Auto-generated method stub
+		// if this screen has appeared check to see if the last plot we did was
+		// from a different game scene. If it is then clear the route.
+		// prevents screen changes from clearing a half plotted route
+		if(lastPlottedScene != parent.getShipState().currentScene){
+			ConsoleLogger.log(this, "last s: " + lastPlottedScene + " cs : " + parent.getShipState().currentScene);
+			clearRoute();
+		}
+		
+	}
+
+	private void clearRoute() {
 		currentRoute = new ArrayList<MapNode>();
 		int curScene = parent.getShipState().currentScene;
 		if (curScene == ShipState.SCENE_LAUNCH
@@ -275,10 +296,10 @@ public class PlottingDisplay extends Display {
 		} else {
 			startNode = new MapNode();
 			startNode.pos = new PVector(1000, 1000);
-			startNode.id = "HAHAHA";
+			startNode.id = "MID-ROUTE";
 			destNode = new MapNode();
 			destNode.pos = new PVector(-1000, -1000);
-			destNode.id = "HAHAHA";
+			destNode.id = "MID-ROUTE";
 			currentRoute.add(startNode);
 		}
 		for (MapNode m : mapNodes) {
@@ -290,6 +311,7 @@ public class PlottingDisplay extends Display {
 
 		OscMessage msg = new OscMessage("/system/jump/clearRoute");
 		parent.getOscClient().send(msg, parent.getServerAddress());
+		
 	}
 
 	@Override

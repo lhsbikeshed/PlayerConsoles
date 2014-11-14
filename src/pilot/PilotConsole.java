@@ -10,7 +10,6 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
-import common.Rot;
 import common.ShipState;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
@@ -18,6 +17,7 @@ import common.displays.DestructDisplay;
 import common.displays.FailureScreen;
 import common.displays.RestrictedAreaScreen;
 import common.displays.WarpDisplay;
+import common.util.Rot;
 import ddf.minim.Minim;
 
 public class PilotConsole extends PlayerConsole {

@@ -16,7 +16,7 @@ import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
 import common.ShipState;
-import common.UsefulShit;
+import common.util.UsefulShit;
 import engineer.powersystems.CoilSubSystem;
 import engineer.powersystems.FuelFlowRateSystem;
 import engineer.powersystems.ModeratorCoilSystem;

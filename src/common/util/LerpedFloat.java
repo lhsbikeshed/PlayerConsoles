@@ -1,4 +1,4 @@
-package common;
+package common.util;
 
 /* store a float and update witha  given timestamp. 
  * Retrieving the value smooths between the last two updates

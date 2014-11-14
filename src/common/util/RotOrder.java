@@ -1,5 +1,6 @@
-package common;
+package common.util;
 
+import common.VectorConstants;
 import processing.core.PVector;
 
 /*

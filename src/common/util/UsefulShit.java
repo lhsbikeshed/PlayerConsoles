@@ -1,4 +1,4 @@
-package common;
+package common.util;
 
 public class UsefulShit {
 

@@ -9,10 +9,10 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
-import common.Rot;
-import common.RotOrder;
 import common.ShipState;
-import common.UsefulShit;
+import common.util.Rot;
+import common.util.RotOrder;
+import common.util.UsefulShit;
 
 public class RadarDisplay extends Display {
 	Object lock = new Object();

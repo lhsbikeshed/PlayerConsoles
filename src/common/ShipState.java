@@ -1,5 +1,7 @@
 package common;
 
+import common.util.LerpedFloat;
+import common.util.Rot;
 import oscP5.OscMessage;
 import processing.core.PVector;
 

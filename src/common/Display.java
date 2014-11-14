@@ -27,6 +27,8 @@ public abstract class Display {
 
 	public void keyReleased(char key) {
 	}
+	
+	public void gameReset(){}
 
 	/* received an osc message from server */
 	public abstract void oscMessage(OscMessage theOscMessage);

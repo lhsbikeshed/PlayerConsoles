@@ -344,10 +344,7 @@ public class TacticalConsole extends PlayerConsole {
 			if(h.value == 83){
 				ignoreMouse = !ignoreMouse;
 			} else if (h.value == KeyEvent.VK_P){
-				OscMessage m = new OscMessage("/control/screenSelection");
-				m.add("TacticalStation");
-				m.add("plottingDisplay");
-				getOscClient().send(m, getServerAddress());
+				mainPanelHardware.cycleScreen();
 			}
 		} else if (h.event.equals("MOUSECLICK")){
 			ConsoleLogger.log(this, "mx: " + mousePosition.x + " y: " + mousePosition.y);

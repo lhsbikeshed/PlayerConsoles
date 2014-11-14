@@ -9,7 +9,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
-import common.UsefulShit;
+import common.util.UsefulShit;
 
 
 /* generic authorisation display, ask the player for a code then report back to game with pass and fail

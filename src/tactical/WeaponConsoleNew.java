@@ -158,11 +158,14 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		PVector pos = ((TacticalConsole)parent).mousePosition;
 		parent.pushMatrix();
 		parent.translate(pos.x, pos.y);		
-		parent.rotate(parent.millis() / 1000f);
 		parent.noFill();
-		parent.ellipse(0, 0,  mouseRadius, mouseRadius);
 		parent.line(-20,0, 20,0);
 		parent.line(0, 20, 0, -20);
+		float scale = parent.sin(parent.millis() / 200f) * 0.2f + 0.8f;
+		parent.scale(scale);
+		
+		parent.ellipse(0, 0,  mouseRadius, mouseRadius);
+		
 		
 		parent.popMatrix();
 		

@@ -9,7 +9,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
-import common.UsefulShit;
+import common.util.UsefulShit;
 
 public class DropDisplay extends Display {
 

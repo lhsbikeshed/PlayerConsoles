@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import common.displays.BootDisplay;
+import common.util.Rot;
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -377,6 +378,11 @@ public abstract class PlayerConsole extends PApplet {
 	protected void gameReset(){
 		shipState.resetState();
 		damageEffects.clearCracks();
+		for(String k : displayMap.keySet()){
+			ConsoleLogger.log(this, "resetting console : " + k);
+			displayMap.get(k).gameReset();
+			
+		}
 		
 	}
 	protected abstract void shipDead();

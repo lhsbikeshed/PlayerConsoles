@@ -161,7 +161,7 @@ public class TacticalHardwareController extends HardwareController {
 		}
 	}
 
-	protected void cycleScreen() {
+	public void cycleScreen() {
 		if(parent.getShipState().poweredOn == true){
 
 			screenIndex ++;

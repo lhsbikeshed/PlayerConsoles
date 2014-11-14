@@ -3,8 +3,7 @@ package pilot;
 import java.util.HashMap;
 
 import processing.core.PVector;
-
-import common.UsefulShit;
+import common.util.UsefulShit;
 
 public class RadarObject {
 	public boolean active = false;
