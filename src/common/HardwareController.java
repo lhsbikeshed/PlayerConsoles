@@ -107,7 +107,7 @@ public class HardwareController {
 		HardwareEvent h = new HardwareEvent();
 		h.event = "MOUSECLICK";
 		h.id = button;
-		h.value = 1;
+		h.value = parent.mouseX << 16 | parent.mouseY;
 		parent.hardwareEvent(h);
 		
 	}

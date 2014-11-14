@@ -57,7 +57,11 @@ public class ShipState {
 	public int currentScene = 0;
 	public boolean thrustReverser = false;
 	
-	public ShipState() {
+	public LerpedFloat altitude = new LerpedFloat(2000f, 0, 250);
+	private PlayerConsole parent;
+	
+	public ShipState(PlayerConsole parent) {
+		this.parent = parent;
 	};
 
 	public void resetState() {
@@ -87,6 +91,8 @@ public class ShipState {
 			currentScene = msg.get(0).intValue();
 		} else if(msg.checkAddrPattern("/system/propulsion/setThrustReverser")){
 			thrustReverser  = msg.get(0).intValue() == 1 ? true : false;
+		} else if (msg.checkAddrPattern("/ship/state/altitude")){
+			altitude.update(msg.get(0).floatValue(), parent.millis());
 		}
 	}
 }

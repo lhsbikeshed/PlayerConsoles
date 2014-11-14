@@ -264,6 +264,8 @@ public class EngineerConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 		
+		displayMap.put("power2", new NewPowerDisplay(this));
+		
 		displayMap.put("authdisplay", new AuthDisplay(this));
 
 		//now console is loaded up, load the sound config
@@ -276,7 +278,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("power"));
+		changeDisplay(displayMap.get("power2"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");

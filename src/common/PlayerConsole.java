@@ -102,7 +102,7 @@ public abstract class PlayerConsole extends PApplet {
 	protected NetAddress serverAddress;
 
 	// ------ ship sate -----
-	protected ShipState shipState = new ShipState(); // container for ship data
+	protected ShipState shipState ; // container for ship data
 	// ----- common assets ----
 	protected PFont globalFont; // default font for game
 
@@ -338,8 +338,10 @@ public abstract class PlayerConsole extends PApplet {
 
 		size(1024, 768, P3D);
 		frameRate(25);
-		hideCursor();
-		
+		if(!testMode){
+			hideCursor();
+		}
+		shipState = new ShipState(this);
 		// SOUND!
 		minim = new Minim(this);
 		

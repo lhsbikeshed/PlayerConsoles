@@ -9,6 +9,7 @@ import processing.core.PVector;
 import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
+import common.LerpedFloat;
 import common.PlayerConsole;
 import common.UsefulShit;
 
@@ -19,6 +20,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 	
 	PGraphics pg;
 	boolean showCollisionAlert = false;
+	
+	
 	
 	public CollisionRadarDisplay(PlayerConsole parent) {
 		super(parent);
@@ -117,6 +120,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 				
 				
 			}
+			
+			
 		}
 		
 		pg.popMatrix();
@@ -124,6 +129,34 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		parent.image(pg, 0, 0);;
 		parent.image(overlayImage, 0, 0);
 		parent.textFont(font, 20);
+		//-- distance marker --
+		parent.fill(255);
+		float h = (int)parent.getShipState().altitude.getValue(parent.millis());
+		if(h < 400f){
+			showCollisionAlert = true;
+			parent.fill(255,0,0);
+		}
+		
+		int startY = 85;
+		int startX = 40;
+		parent.stroke(255);
+		parent.line(startX, startY, startX, startY + 600);
+		int len = 20;
+		for(int i = 0; i <= 600 / 20; i++){
+			if(i % 5 == 0){
+				len = 40;
+			} else {
+				len = 20;
+			}
+			parent.line(startX, startY + i * 20, startX + len, startY + i * 20);
+			
+		}
+		float markerY = PApplet.map(h, 2900, 0, startY, startY + 600);
+		parent.line(startX, markerY, startX + 50, markerY);
+		
+		parent.text((int)(parent.getShipState().altitude.getValue(parent.millis()) * 10 )+ "m", 100, markerY);
+		
+		//=------- collision warning -----
 		if(parent.globalBlinker){
 			parent.fill(255,0,0);
 		} else {
@@ -131,19 +164,21 @@ public class CollisionRadarDisplay extends RadarDisplay {
 			
 		}
 		if(showCollisionAlert && parent.globalBlinker){
-			parent.text("COLLISION ALERT", 366, 743);
+			parent.text("COLLISION ALERT", 386,420);
 			
 			parent.getConsoleAudio().playClip("blip");
 			
 		}
+		
 	}
 
 	
 	/* incoming osc message are forwarded to the oscEvent method. */
 	@Override
-	public void oscMessage(OscMessage theOscMessage) {
+	public void oscMessage(OscMessage msg) {
 
-		super.oscMessage(theOscMessage);
+		super.oscMessage(msg);
+		
 	}
 
 	@Override

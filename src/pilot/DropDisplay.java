@@ -18,8 +18,7 @@ public class DropDisplay extends Display {
 	Point[] labelPos = new Point[6];
 	float[] temps = new float[6];
 
-	float altitude = 10000;
-	float lastAltitude = 10000;
+	
 	long lastUpdate = 0;
 	boolean structFail = false;
 
@@ -51,8 +50,7 @@ public class DropDisplay extends Display {
 		parent.image(bg, 0, 0, parent.width, parent.height);
 		parent.fill(255, 255, 255);
 		parent.textFont(font, 60);
-		float alt = PApplet.lerp(lastAltitude, altitude,
-				(parent.millis() - lastUpdate) / 250.0f);
+		float alt = parent.getShipState().altitude.getValue(parent.millis());
 		parent.text((int) alt + "m", 448, 704);
 		parent.textFont(font, 30);
 		for (int t = 0; t < 6; t++) {
@@ -151,8 +149,7 @@ public class DropDisplay extends Display {
 		// println(theOscMessage);
 		if (theOscMessage.checkAddrPattern("/scene/drop/statupdate") == true) {
 			lastUpdate = parent.millis();
-			lastAltitude = altitude;
-			altitude = theOscMessage.get(0).floatValue();
+		
 			for (int t = 0; t < 6; t++) {
 				temps[t] = theOscMessage.get(1 + t).floatValue();
 			}
