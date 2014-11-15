@@ -19,6 +19,7 @@ public class RadarDisplay extends Display {
 	PImage overlayImage, indicatorImage;
 	PImage radarBaseImage;
 	
+	protected boolean silenceNewTargets = false;
 	
 	RadarObject targetted;
 	float zoomLevel = 0.1f;
@@ -550,8 +551,9 @@ public class RadarDisplay extends Display {
 							.equals("INCOMING DEBRIS")) {
 						parent.getConsoleAudio().playClip("collisionAlert");
 					} else {
-
-						parent.getConsoleAudio().playClip("newTarget");
+						if(silenceNewTargets == false){
+							parent.getConsoleAudio().playClip("newTarget");
+						}
 					}
 
 					newItem = true;

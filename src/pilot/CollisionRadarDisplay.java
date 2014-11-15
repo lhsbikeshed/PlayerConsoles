@@ -25,6 +25,7 @@ public class CollisionRadarDisplay extends RadarDisplay {
 	
 	public CollisionRadarDisplay(PlayerConsole parent) {
 		super(parent);
+		silenceNewTargets = true;
 		overlayImage = parent.loadImage("pilotconsole/collisionOverlay.png");
 		for(int i = 1; i < 4; i++){
 			rockIcon[i-1] = parent.loadImage("pilotconsole/rockIcon" + i + ".png");
