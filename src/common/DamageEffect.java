@@ -126,13 +126,6 @@ public class DamageEffect {
 			
 			
 			parent.popMatrix();
-			if(parent.random(10) <= 1){
-				
-				parent.fill(parent.random(255));
-				parent.noStroke();
-				int pos = (int) (c.screenPosition.y + p.height/2f + parent.random(2));
-				parent.rect(0,pos, parent.width, 2);
-			}
 		}
 
 	}
