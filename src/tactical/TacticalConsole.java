@@ -255,7 +255,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("weapons"));
+		changeDisplay(displayMap.get("plottingDisplay"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");

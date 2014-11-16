@@ -123,7 +123,7 @@ public class PlottingDisplay extends Display {
 			} else if (evt.value == KeyEvent.VK_SPACE) {
 				codeEntered();
 			} else if (evt.value == KeyEvent.VK_BACK_SPACE){
-				clearRoute();
+				clearLast();
 			}
 		} else if (evt.event.equals("KEYPAD")) {
 			if (evt.id >= 0 && evt.id <= 9) {
@@ -131,7 +131,7 @@ public class PlottingDisplay extends Display {
 			} else if (evt.id == TacticalHardwareController.KP_SCAN) {
 				codeEntered();
 			} else if (evt.id == TacticalHardwareController.KP_STAR){
-				clearRoute();
+				clearLast();
 			}
 		}
 	}
@@ -278,6 +278,24 @@ public class PlottingDisplay extends Display {
 			clearRoute();
 		}
 		
+	}
+	
+	/* clear the last char typed, if char pos it at zero then roll back to prev entry */
+	private void clearLast(){
+		if(currentCode.length() > 0){
+			currentCode = currentCode.substring(0, currentCode.length() -1);
+		} else {
+			if(currentRoute.size() > 1 && routeComplete == false){
+				
+				currentNode = currentRoute.get(currentRoute.size()-1);
+				currentCode = currentNode.id;
+				currentCode = currentCode.substring(0, currentCode.length() -1);
+				
+				
+				MapNode removedNode = currentRoute.remove(currentRoute.size()-1);
+				removedNode.visited = false;
+			} 
+		}
 	}
 
 	private void clearRoute() {
