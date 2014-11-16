@@ -157,6 +157,7 @@ public abstract class PlayerConsole extends PApplet {
 		drawConsole();
 
 		// post-draw
+		damageEffects.setDamageLevel( 100 - shipState.hullState );
 		damageEffects.draw();
 		damageEffects.drawCracks();
 		
