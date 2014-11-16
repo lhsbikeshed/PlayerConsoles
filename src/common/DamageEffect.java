@@ -74,16 +74,18 @@ public class DamageEffect {
 	int lastDistort = 0;
 
 	public void draw() {
+		int now = parent.millis();
+		damageDistortion.set("timer", now);
 		if (running) {
-			int now = parent.millis();
 			if (damageTimer < now) {
 				running = false;
+				damageDistortion.set("boom", false);
+				ConsoleLogger.log(this, String.format("unbooming at %d!", now));
 			} else {
-				damageDistortion.set("timer", now);
-				parent.filter(damageDistortion);
+				damageDistortion.set("boom", true);				
 			}
 		}
-
+		parent.filter(damageDistortion);
 	}
 
 	/*
@@ -112,10 +114,15 @@ public class DamageEffect {
 		}
 
 	}
+	public void setDamageLevel(float dmg) {
+		damageDistortion.set("damage", dmg);
+	}
 
 	public void startEffect(long ms) {
 		damageTimer = parent.millis() + ms;
 		running = true;
+		damageDistortion.set("boom", true);	
+		ConsoleLogger.log(this, String.format("Enbooming at %d for %d!", parent.millis(), ms));
 	}
 
 }
