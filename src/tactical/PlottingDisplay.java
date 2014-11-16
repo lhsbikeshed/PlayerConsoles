@@ -41,6 +41,7 @@ public class PlottingDisplay extends Display {
 	@Override
 	public void gameReset(){
 		lastPlottedScene = 0;
+		clearRoute();
 	}
 
 	@Override
