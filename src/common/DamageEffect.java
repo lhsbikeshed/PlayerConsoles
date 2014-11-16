@@ -21,8 +21,6 @@ public class DamageEffect {
 	long damageTimer = -1000;
 
 	boolean running = false;
-	int tileX = 5;
-	int tileY = 5;
 	
 	ArrayList<CrackItem> crackList = new ArrayList<CrackItem>();
 	PImage[] crackImages;
@@ -82,21 +80,6 @@ public class DamageEffect {
 				running = false;
 			} else {
 				damageDistortion.set("timer", now);
-				int i, j, tx = 0, ty = 0;
-				int distortio = PApplet.round(now / 10);
-				if ( distortio > lastDistort) {
-					lastDistort = distortio;
-					for (i = 0; i < tileX; i++) {
-						for (j = 0; j < tileY; j++) {
-							if (parent.random(100) < 25) {
-								tx |= 1 << i;
-								ty |= 1 << j;
-							}
-						}
-					}
-					damageDistortion.set("tiles", tx, ty);
-				}
-
 				parent.filter(damageDistortion);
 			}
 		}
