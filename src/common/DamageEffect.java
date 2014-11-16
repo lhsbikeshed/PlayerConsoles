@@ -135,20 +135,4 @@ public class DamageEffect {
 		running = true;
 	}
 
-	public void startTransform() {
-		parent.pushMatrix();
-		if (running) {
-
-			parent.translate(parent.random(-20, 20), parent.random(-20, 20));
-			parent.tint(parent.random(255));
-		}
-	}
-
-	public void stopTransform() {
-		parent.popMatrix();
-		if (running) {
-			parent.noTint();
-		}
-	}
-
 }

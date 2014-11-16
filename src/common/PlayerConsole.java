@@ -152,15 +152,11 @@ public abstract class PlayerConsole extends PApplet {
 		for(HardwareController h : hardwareControllers){
 			h.update();
 		}
-		
-		// translate stuff
-		damageEffects.startTransform();
 
 		// call draw method
 		drawConsole();
 
 		// post-draw
-		damageEffects.stopTransform();
 		damageEffects.draw();
 		damageEffects.drawCracks();
 		
