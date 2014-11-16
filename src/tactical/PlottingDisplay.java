@@ -298,6 +298,7 @@ public class PlottingDisplay extends Display {
 		}
 	}
 
+
 	private void clearRoute() {
 		currentRoute = new ArrayList<MapNode>();
 		int curScene = parent.getShipState().currentScene;
