@@ -6,7 +6,6 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 import processing.core.PVector;
-import processing.opengl.PShader;
 
 public class DamageEffect {
 	private class CrackItem {
@@ -20,23 +19,31 @@ public class DamageEffect {
 	// time we last got damaged
 	long damageTimer = -1000;
 
+	PImage noiseImage; // static image that flashes
+
 	boolean running = false;
-	
+	int tileX = 5;
+
+	int tileY = 5;
 	ArrayList<CrackItem> crackList = new ArrayList<CrackItem>();
 	PImage[] crackImages;
 
 	int maxCracks = 3;
 
 	PApplet parent;
-	PShader damageDistortion;
 	
 	Object lock = new Object();
 
 	public DamageEffect(PApplet parent) {
 		this.parent = parent;
-		
-		ConsoleLogger.log(this, "Loading damage shader..");
-		damageDistortion = parent.loadShader("common/damageEffects/distort.glsl");
+		ConsoleLogger.log(this, "generating damage images...");
+		noiseImage = parent.createImage(parent.width / tileX, parent.height
+				/ tileY, PConstants.RGB);
+		noiseImage.loadPixels();
+		for (int i = 0; i < noiseImage.width * noiseImage.height; i++) {
+			noiseImage.pixels[i] = parent.color(parent.random(255));
+		}
+		noiseImage.updatePixels();
 		ConsoleLogger.log(this, "     ...done");
 
 		// window crack images
@@ -70,22 +77,25 @@ public class DamageEffect {
 			crackList.clear();
 		}
 	}
-	
-	int lastDistort = 0;
 
 	public void draw() {
-		int now = parent.millis();
-		damageDistortion.set("timer", now);
+		// image(noiseImage, 100,100);
 		if (running) {
-			if (damageTimer < now) {
+			if (damageTimer < parent.millis()) {
 				running = false;
-				damageDistortion.set("boom", false);
-				ConsoleLogger.log(this, String.format("unbooming at %d!", now));
 			} else {
-				damageDistortion.set("boom", true);				
+
+				for (int x = 0; x < tileX; x++) {
+					for (int y = 0; y < tileY; y++) {
+						if (parent.random(100) < 25) {
+							parent.image(noiseImage, x * noiseImage.width, y
+									* noiseImage.height);
+						}
+					}
+				}
 			}
 		}
-		parent.filter(damageDistortion);
+
 	}
 
 	/*
@@ -111,18 +121,36 @@ public class DamageEffect {
 			
 			
 			parent.popMatrix();
+			if(parent.random(10) <= 1){
+				
+				parent.fill(parent.random(255));
+				parent.noStroke();
+				int pos = (int) (c.screenPosition.y + p.height/2f + parent.random(2));
+				parent.rect(0,pos, parent.width, 2);
+			}
 		}
 
-	}
-	public void setDamageLevel(float dmg) {
-		damageDistortion.set("damage", dmg);
 	}
 
 	public void startEffect(long ms) {
 		damageTimer = parent.millis() + ms;
 		running = true;
-		damageDistortion.set("boom", true);	
-		ConsoleLogger.log(this, String.format("Enbooming at %d for %d!", parent.millis(), ms));
+	}
+
+	public void startTransform() {
+		parent.pushMatrix();
+		if (running) {
+
+			parent.translate(parent.random(-20, 20), parent.random(-20, 20));
+			parent.tint(parent.random(255));
+		}
+	}
+
+	public void stopTransform() {
+		parent.popMatrix();
+		if (running) {
+			parent.noTint();
+		}
 	}
 
 }
