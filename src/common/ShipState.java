@@ -40,7 +40,7 @@ public class ShipState {
 
 	public long lastTransformUpdate = 0;
 	public int smartBombsLeft;
-	public float hullState;
+	public float hullState = 100;
 	public boolean fuelLeaking;
 	public boolean sillinessInProgress;
 	public int sillinessLevel;
