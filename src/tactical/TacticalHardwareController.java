@@ -52,6 +52,7 @@ public class TacticalHardwareController extends HardwareController {
 	// is the decoy blinker on?
 	boolean decoyBlinker = false;
 	private boolean weaponPanelState;
+	private boolean preshutdownWeaponPanelState;
 
 	//there should only ever be one of these per console
 	public static TacticalHardwareController instance;
@@ -242,17 +243,15 @@ public class TacticalHardwareController extends HardwareController {
 		if(b){
 			/* power up the tac console panel */			
 			serialPort.write("P,");	
-			if(weaponPanelState){
-				serialPort.write("W,");	//restore weapon panel state
-			} else {
-				serialPort.write("w,");
-			}
+			setWeaponPanelState(preshutdownWeaponPanelState);
 			setWeaponsArmedLight(previousWeaponLightState);
 		} else {
 			serialPort.write("p,");
-			serialPort.write("w,"); //turn off weapon Panel without affecting our state
+			
 			decoyBlinker = false;
 			previousWeaponLightState = weaponLightState;
+			preshutdownWeaponPanelState = weaponPanelState;
+			setWeaponPanelState(false);
 			setWeaponsArmedLight(false);
 		}
 		

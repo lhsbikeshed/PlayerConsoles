@@ -447,6 +447,10 @@ public class WeaponConsoleNew extends WeaponsConsole {
 						parent.getConsoleAudio().playClip("targetDestroyed");
 						scanningState = SCAN_TYPING;
 						scanString = "";
+						if(currentTarget == t){
+							currentTarget = null;
+							
+						}
 					}
 					targets.remove(i);
 				}
