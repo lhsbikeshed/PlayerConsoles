@@ -109,6 +109,8 @@ public class ReactorVesselSystem extends ReactorSystem {
 			
 			plasmaPos += (plasmaDamageDelta + plasmaDelta) * plasmaSize;	//scale with size, implying that larger ones will move quicker
 			
+			
+			
 			//test for wall collisions and heat the reactor up if plasma is touching it
 			float warmAmount = 0;
 			if(plasmaPos <= 0){
@@ -130,7 +132,7 @@ public class ReactorVesselSystem extends ReactorSystem {
 			float heatLevel = resourceStore.get("HEAT").getAmount();
 			if(heatLevel >= 90){
 				float damgAmount = heatLevel - 90;
-				resourceStore.get("STRUCTURE").change(-damgAmount * 0.02f);
+				resourceStore.get("STRUCTURE").change(-damgAmount * 0.005f);
 			}
 			
 			
@@ -212,7 +214,7 @@ public class ReactorVesselSystem extends ReactorSystem {
 
 	private void startReactor() {
 		reactorRunning = true;
-		plasmaSize = 0.1f;
+		plasmaSize = 1.1f;
 	}
 
 	@Override
@@ -221,7 +223,8 @@ public class ReactorVesselSystem extends ReactorSystem {
 		context.translate(screenPosition.x, screenPosition.y);
 		context.noFill();
 		context.rect(0,0, 200,200);
-		
+		//optimal area
+		context.rect(50,50, 100, 100);
 		
 		//field coils
 		for(int i = 0; i < 2; i++){
@@ -239,8 +242,9 @@ public class ReactorVesselSystem extends ReactorSystem {
 		if(reactorRunning){
 			context.fill(255);
 			//draw plasma
-			
-			context.ellipse(plasmaPos, 75, 14 * plasmaSize,50 * plasmaSize);
+			float offsetX = (float)Math.sin(System.currentTimeMillis()/50 ) * 3;
+			float offsetY = (float)Math.sin(System.currentTimeMillis()/ 80 ) * 3;
+			context.ellipse(plasmaPos + offsetX, 75 + offsetY, 14 * plasmaSize,50 * plasmaSize);
 			context.text(plasmaSize, plasmaPos, 120);
 		} else {
 			context.text("NO PLASMA", 80,120);

@@ -5,11 +5,15 @@ import java.awt.Rectangle;
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.HardwareEvent;
+import common.ShipState;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 public class FuelTankSystem extends ReactorSystem {
 
 	float[] flowRates = { 0.0f, 0.0f};
+	float leakRate = 0.0f;
+	float leakHealth = 0.0f;
+	
 	ReactorResource fuel;
 	
 	public FuelTankSystem() {
@@ -54,6 +58,19 @@ public class FuelTankSystem extends ReactorSystem {
 	}
 
 	@Override
+	public void tick(){
+		super.tick();
+		if(leakRate > 0.0f){
+			leakHealth += ShipState.instance.powerStates[ShipState.POWER_DAMAGE] / 100.0f + 0.01f;
+			if(leakHealth > 10.0f){
+				leakRate = 0.0f;
+			}
+			
+			resourceStore.get("FUEL").change(-leakRate);
+		}
+	}
+	
+	@Override
 	public void draw(PApplet context) {
 		context.pushMatrix();
 		context.translate(screenPosition.x, screenPosition.y);
@@ -65,6 +82,10 @@ public class FuelTankSystem extends ReactorSystem {
 		context.fill(255);
 		context.text(flowRates[0], 20, 50);
 		context.text(flowRates[1], 120, 50);
+		
+		if(leakRate > 0.0f){
+			context.text("LEAKING : " + leakHealth, 0, -20);
+		}
 		context.popMatrix();
 	}
 	
@@ -94,8 +115,8 @@ public class FuelTankSystem extends ReactorSystem {
 
 	@Override
 	public void applyDamage(float amount) {
-		// TODO Auto-generated method stub
-
+		leakRate = 10.0f;
+		leakHealth = 0.0f;
 	}
 
 }

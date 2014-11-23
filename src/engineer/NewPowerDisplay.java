@@ -3,6 +3,7 @@ package engineer;
 import java.awt.event.KeyEvent;
 
 import oscP5.OscMessage;
+import processing.core.PApplet;
 import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
@@ -13,11 +14,13 @@ import engineer.reactorsim.ReactorSystem;
 public class NewPowerDisplay extends Display {
 
 	ReactorModel reactorModel;
+	float power = 0f;
+	
 	
 	public NewPowerDisplay(PlayerConsole parent) {
 		super(parent);
 		reactorModel = new ReactorModel();
-		
+	
 	}
 
 	@Override
@@ -27,6 +30,17 @@ public class NewPowerDisplay extends Display {
 		for(ReactorSystem sys : reactorModel.getSystems()){
 			sys.draw(parent);
 		}
+		parent.noFill();
+		parent.rect(950, 750, 30, -650);
+		
+		
+		power = PApplet.lerp(power, reactorModel.getAvailablePower(), .5f);
+		
+		float amt = PApplet.map(power, 0, 500, 0, -650);
+		float c = PApplet.map(power, 0, 500, 0, 255);
+		parent.fill(255 - c, c,0);
+		parent.rect(950, 750, 30, amt);
+		parent.text("Available power " + (int)power, 810, 755 + amt);
 	}
 
 	@Override

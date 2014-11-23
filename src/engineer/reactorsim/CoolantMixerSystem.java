@@ -43,6 +43,10 @@ public class CoolantMixerSystem extends ReactorSystem {
 			//and increase the coolant gen rate			
 			heat.amountPerTick = 0.08f;			
 			coolant.amountPerTick = 30f;
+			if(coolant.getAmount() <= 0.01f){
+				heat.amountPerTick += 0.08f;		
+			}
+			
 		} else if (runningState[0] == PowerState.STATE_OFF){
 			heat.amountPerTick = -1f;
 			coolant.amountPerTick = 0f;
@@ -50,7 +54,7 @@ public class CoolantMixerSystem extends ReactorSystem {
 		} else if (runningState[0] == PowerState.STATE_COOLING){
 			heat.amountPerTick = -4f;
 			coolant.amountPerTick = 0f;
-			if (heat.getAmount() <= 0.1f){
+			if (heat.getAmount() <= 5.1f){
 				runningState[0] = PowerState.STATE_OFF;
 			}
 		}

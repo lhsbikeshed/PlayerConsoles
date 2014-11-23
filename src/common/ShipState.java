@@ -62,8 +62,15 @@ public class ShipState {
 	public LerpedFloat altitude = new LerpedFloat(2000f, 0, 250);
 	private PlayerConsole parent;
 	
+	public static ShipState instance;
+	
 	public ShipState(PlayerConsole parent) {
 		this.parent = parent;
+		this.instance = this;
+		powerStates[0] = 6;
+		powerStates[1] = 6;
+		powerStates[2] = 6;
+		powerStates[3] = 6;
 	};
 
 	public void resetState() {

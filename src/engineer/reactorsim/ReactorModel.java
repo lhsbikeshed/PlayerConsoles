@@ -19,7 +19,7 @@ public class ReactorModel {
 	ArrayList<ReactorSystem> systems = new ArrayList<ReactorSystem>();
 	
 	Hashtable<String, ReactorSystem> switchToSystemMap = new Hashtable<String, ReactorSystem>(); // map switch numbers to subsystems
-	
+	PowerDistributionSystem powerSys;
 	
 	public ArrayList<ReactorSystem> getSystems() {
 		return systems;
@@ -52,7 +52,7 @@ public class ReactorModel {
 		turbines.addInboundConnection(rvSystem);
 		systems.add(turbines);
 		
-		PowerDistributionSystem powerSys = new PowerDistributionSystem();
+	    powerSys = new PowerDistributionSystem();
 		powerSys.setScreenPosition(new PVector(650, 600));
 		powerSys.addInboundConnection(turbines);
 		systems.add(powerSys);
@@ -74,6 +74,11 @@ public class ReactorModel {
 			sys.controlSignal(e);
 		}
 	
+		
+	}
+	
+	public float getAvailablePower(){
+		return ((PowerDistributionSystem) powerSys).getOutputPower();
 		
 	}
 	
