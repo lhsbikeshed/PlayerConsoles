@@ -66,13 +66,30 @@ public class ReactorVesselSystem extends ReactorSystem {
 		
 		if(reactorRunning){
 			
+			//consume some fuel and grow plasma by some amount
+			FuelTankSystem fuelTanks = (FuelTankSystem) inboundConnections.get("Fuel Tank");
+			float fuel = fuelTanks.consumeResource("FUEL", 1f);
+		//	ConsoleLogger.log(this, "consumed : " + fuel);
+			
+			float targetSize = (fuel / 1f) * 2f;
+			//ConsoleLogger.log(this, "targets zies: " + targetSize);
+			plasmaSize = PApplet.lerp(plasmaSize, targetSize, 0.1f);
+			if(plasmaSize <= 0.1f){
+				stopReactor();
+			} else if (plasmaSize > 2.5){
+				plasmaSize = 2.5f;
+			}
+			
+			
+			
 			//update the plasma position in the vessel
 			//calculate plasma delta, based on size, coil modes		
+			float sizeModifier = plasmaSize / 0.5f;		//larger plasmas should be harder to control
 			if(coilMode[0] != coilMode[1]){
 				if(coilMode[0] == 0){
-					plasmaDelta = -.05f;
+					plasmaDelta = -.06f * sizeModifier;
 				} else if (coilMode[0] == 1){
-					plasmaDelta = .05f;
+					plasmaDelta = .06f * sizeModifier;
 				}
 			} else {
 				plasmaDelta = 0f;
@@ -80,13 +97,15 @@ public class ReactorVesselSystem extends ReactorSystem {
 			}
 			//tend plasma damage delta toward zero
 			if(plasmaDamageDelta <= -0.1f){
-				plasmaDamageDelta += 0.01f;
+				plasmaDamageDelta += 0.005f;
+				ConsoleLogger.log(this, "elt " + plasmaDamageDelta);
 			} else if (plasmaDamageDelta >= 0.1f){
-				plasmaDamageDelta -= 0.01f;
+				plasmaDamageDelta -= 0.005f;
+				ConsoleLogger.log(this, "elt " + plasmaDamageDelta);
 			} else {
 				plasmaDamageDelta = 0f;
 			}
-			//ConsoleLogger.log(this, "elt " + plasmaDamageDelta);
+			
 			
 			plasmaPos += (plasmaDamageDelta + plasmaDelta) * plasmaSize;	//scale with size, implying that larger ones will move quicker
 			
@@ -98,6 +117,11 @@ public class ReactorVesselSystem extends ReactorSystem {
 			} else if (plasmaPos >= 200){
 				plasmaPos = 200;
 				warmAmount = 0.5f * plasmaSize;
+			} else {
+				warmAmount = 0.19f * plasmaSize;	//slowly warm the reactor anyway
+													//with all 3 valves open this slowly creeps up
+													//to prevent players running reactor at full power all the time
+
 			}
 			warmAmount += 0.1f;	//just heat up for being turned on
 			resourceStore.get("HEAT").change(warmAmount);
@@ -125,7 +149,7 @@ public class ReactorVesselSystem extends ReactorSystem {
 			resourceStore.get("STEAM").change(plasmaSize * 2.0f);
 			
 			} else {
-			
+				plasmaSize = 0f;
 			}
 		
 	}
@@ -183,11 +207,12 @@ public class ReactorVesselSystem extends ReactorSystem {
 	private void stopReactor() {
 		// TODO Auto-generated method stub
 		reactorRunning = false;
+		plasmaSize = 0f;
 	}
 
 	private void startReactor() {
 		reactorRunning = true;
-		
+		plasmaSize = 0.1f;
 	}
 
 	@Override
@@ -214,8 +239,9 @@ public class ReactorVesselSystem extends ReactorSystem {
 		if(reactorRunning){
 			context.fill(255);
 			//draw plasma
-			plasmaSize = 2f;
+			
 			context.ellipse(plasmaPos, 75, 14 * plasmaSize,50 * plasmaSize);
+			context.text(plasmaSize, plasmaPos, 120);
 		} else {
 			context.text("NO PLASMA", 80,120);
 		}
@@ -231,7 +257,8 @@ public class ReactorVesselSystem extends ReactorSystem {
 
 	@Override
 	public void applyDamage(float amount) {
-		plasmaDelta = 1.5f;
+		plasmaDamageDelta = PApplet.map((float)Math.random(), 0, 1, -0.9f, 0.9f);
+		plasmaDamageDelta *= plasmaSize * 0.2f;
 	}
 
 }

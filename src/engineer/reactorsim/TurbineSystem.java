@@ -9,16 +9,16 @@ import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 public class TurbineSystem extends ReactorSystem {
 	
-	boolean[] powerStates = new boolean[2];
+	//boolean[] powerStates = new boolean[2];
 	int testVal = 0;
 	float[] temperature = new float[2];
 	
 
 	public TurbineSystem() {
 		name = "Turbines";
-		ReactorResource steam = new ReactorResource();
-		steam.typeTag = "STEAM";
-		resourceStore.put("STEAM", steam);
+		//ReactorResource steam = new ReactorResource();
+		//steam.typeTag = "STEAM";
+		//resourceStore.put("STEAM", steam);
 		
 		ReactorResource heat = new ReactorResource();
 		heat.typeTag = "HEAT";
@@ -28,13 +28,16 @@ public class TurbineSystem extends ReactorSystem {
 		ReactorResource power = new ReactorResource();
 		power.typeTag = "POWER";
 		resourceStore.put("POWER", power);
+		runningState = new PowerState[2];
+		runningState[0] = PowerState.STATE_OFF;
+		runningState[1] = PowerState.STATE_OFF;
 		
 		
 	}
-	public int getNumberInState(boolean state){
+	public int getNumberInState(PowerState state){
 		int ct = 0;
 		for(int i = 0; i < 2; i++){
-			if(powerStates[i] == state){
+			if(runningState[i] == state){
 				ct++;
 			}
 		}
@@ -52,42 +55,56 @@ public class TurbineSystem extends ReactorSystem {
 	public void tick(){
 		ReactorVesselSystem rs = (ReactorVesselSystem) inboundConnections.get("Reactor Vessel");
 		if(rs != null){
-			//take steam from reactor, add to our pool, then draw from that to make power
-			float steamAmount =  4f;
-			float steamConsumed = rs.consumeResource("STEAM", steamAmount);
-			resourceStore.get("STEAM").change(steamConsumed);
 			
-			//now consume from our pool
-			steamAmount = getNumberInState(true) * 1.5f;
-			steamConsumed = consumeResource("STEAM", steamAmount);
-			resourceStore.get("POWER").change(steamConsumed);
-			
-			
-			
-			
-			float warmAmount = -1f;
-			if(steamConsumed > 0){
-				for(int i = 0; i < 2; i++){
-					if(powerStates[i]){
-						temperature[i] += 0.02f;
-						
-					} else {
-						temperature[i] -= 0.8f;
-					}
-					if(temperature[i] <= 0){
-						temperature[i] = 0;
-					} else if (temperature[i] >= 100f){
-						temperature[i] = 100;
-					}
+			for(int i = 0; i < 2; i++){
+				if(runningState[i] == PowerState.STATE_ON){
+					temperature[i] += 0.04f;
+					
+				} else {
+					temperature[i] -= 0.8f;
 				}
+				
+				if(temperature[i] <= 0){
+					temperature[i] = 0;
+					if(runningState[i] == PowerState.STATE_COOLING){
+						runningState[i] = PowerState.STATE_OFF;
+
+					}
+
+				} else if (temperature[i] >= 100f){
+					temperature[i] = 100;
+					runningState[i] = PowerState.STATE_COOLING;
+				}
+				
+				
 			}
+		
 			resourceStore.get("HEAT").setAmount(temperature[0] + temperature[1]);
 		}
 		
 		
 	}
 	
+	public float consumeResource(String resName, float amount) {
+		if(resName.equals("POWER")){
+			
+			
+			ReactorVesselSystem rs = (ReactorVesselSystem) inboundConnections.get("Reactor Vessel");
+			if(rs != null){
+				//take steam from reactor, add to our pool, then draw from that to make power
+				float steamAmount =  2f;
+				steamAmount = getNumberInState(PowerState.STATE_ON) * 1.5f;
+
+				float steamConsumed = rs.consumeResource("STEAM", steamAmount);
+				
+				return steamConsumed;
+			}
+			return 0;
 	
+		} else {
+			return super.consumeResource(resName, amount);
+		}
+	}
 
 	@Override
 	public void controlSignal(HardwareEvent e) {
@@ -95,10 +112,19 @@ public class TurbineSystem extends ReactorSystem {
 		if(e.event == "MOUSECLICK"){
 			testVal ++;
 			testVal %= 4;
+			PowerState newState;
+			for (int i = 0; i < 2; i++){
+				if((testVal & (i + 1)) > 0){
+					newState = PowerState.STATE_ON;
+				} else {
+					newState= PowerState.STATE_OFF;
+				}
+				
+				if(runningState[i] != PowerState.STATE_COOLING){
+					runningState[i] = newState;
+				}
+			}
 			
-			powerStates[0] = (testVal & 1) > 0 ? true : false;
-			powerStates[1] = (testVal & 2) > 0 ? true : false;
-
 		}
 
 	}
@@ -108,15 +134,24 @@ public class TurbineSystem extends ReactorSystem {
 		context.pushMatrix();
 		context.translate(screenPosition.x, screenPosition.y);
 		
-		for(int i = 0; i < powerStates.length; i++){
+		for(int i = 0; i < runningState.length; i++){
 			String text = "OFF  ";
-			if(powerStates[i]){
+			switch (runningState[i]){
+			case STATE_ON:
 				context.fill(0,255,0);
 				text = "ON  ";
-			} else {
+				break;
+			case STATE_OFF:
 				context.fill(255,0,0);
+				text = "OFF";
+				break;
+			case STATE_COOLING:
+				context.fill(255,255,0);
+				text = "COOLDOWN";
+				
 			}
-			text += (int)temperature[i];
+			
+			text += " " + (int)temperature[i];
 			context.rect(0,i * 30, 100, 30);
 			context.fill(255);
 			context.text(text, 10, 20+i*30);

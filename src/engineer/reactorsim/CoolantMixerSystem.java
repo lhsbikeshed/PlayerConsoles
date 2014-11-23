@@ -30,20 +30,34 @@ public class CoolantMixerSystem extends ReactorSystem {
 
 	}
 	
+	/* generate coolant if turned on, if off or in cooldown state then drop pressure and heat
+	 * 
+	 */
 	@Override
 	public void tick(){
 		super.tick();
 		ReactorResource heat = resourceStore.get("HEAT");
 		ReactorResource coolant = resourceStore.get("COOLANT");
-		if(powerState){
+		if(runningState[0] == PowerState.STATE_ON){
 			//when turned on (i.e. mixing coolant) increase the heat (implying the mixer gets hot) 
 			//and increase the coolant gen rate			
-			heat.amountPerTick = 0.05f;			
+			heat.amountPerTick = 0.08f;			
 			coolant.amountPerTick = 30f;
-		} else {
+		} else if (runningState[0] == PowerState.STATE_OFF){
 			heat.amountPerTick = -1f;
 			coolant.amountPerTick = 0f;
-			//coolant doesnt change, its only lowered by being consumed by something else
+		
+		} else if (runningState[0] == PowerState.STATE_COOLING){
+			heat.amountPerTick = -4f;
+			coolant.amountPerTick = 0f;
+			if (heat.getAmount() <= 0.1f){
+				runningState[0] = PowerState.STATE_OFF;
+			}
+		}
+		//check to see if we overheated. If we did then go into cooldown state
+		if(heat.getAmount() >= heat.maxAmount){
+			runningState[0] = PowerState.STATE_COOLING;
+			
 		}
 	}
 
@@ -51,7 +65,14 @@ public class CoolantMixerSystem extends ReactorSystem {
 	public void controlSignal(HardwareEvent e) {
 		// TODO Auto-generated method stub
 		if(e.event == "MOUSECLICK"){
-			powerState = !powerState;
+			if(runningState[0] != PowerState.STATE_COOLING){
+				if(runningState[0] == PowerState.STATE_OFF){
+					runningState[0] = PowerState.STATE_ON;
+				} else {
+					runningState[0] = PowerState.STATE_OFF;
+					
+				}
+			}
 		}
 
 	}
@@ -62,11 +83,19 @@ public class CoolantMixerSystem extends ReactorSystem {
 		context.pushMatrix();
 		context.translate(screenPosition.x, screenPosition.y);
 		String textLabel = "OFF";
-		if(powerState){
+		switch(runningState[0]){
+		case STATE_ON:
 			context.fill(0,255,0);
 			textLabel = "ON";
-		} else {
+			break;
+		case STATE_OFF:
+		
 			context.fill(255,0,0);
+			break;
+		case STATE_COOLING:
+			context.fill(255,255,0);
+			textLabel = "COOLING";
+			break;
 		}
 		context.rect(0,0,100,30);
 		context.fill(255);

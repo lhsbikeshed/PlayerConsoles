@@ -20,6 +20,16 @@ public abstract class ReactorSystem {
 	protected String name = "Test";
 	
 	long lastTick = 0;
+	
+	public enum PowerState{
+		STATE_OFF, 				//system is off
+		STATE_ON, 				//system is on 
+		STATE_COOLING;			//system is in cooldown state. Will not work until cooled
+	};
+	
+	protected PowerState[] runningState = {PowerState.STATE_OFF};
+	protected float cooldownTimer = 0f;
+	
 
 	public String getName() {
 		return name;

@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 
 
-import common.ConsoleLogger;
+import java.util.Hashtable;
 
+import common.ConsoleLogger;
+import common.HardwareEvent;
+import engineer.powersystems.SubSystem;
 import processing.core.PVector;
 
 public class ReactorModel {
@@ -15,6 +18,7 @@ public class ReactorModel {
 	
 	ArrayList<ReactorSystem> systems = new ArrayList<ReactorSystem>();
 	
+	Hashtable<String, ReactorSystem> switchToSystemMap = new Hashtable<String, ReactorSystem>(); // map switch numbers to subsystems
 	
 	
 	public ArrayList<ReactorSystem> getSystems() {
@@ -32,10 +36,15 @@ public class ReactorModel {
 		
 		coolantValves.addInboundConnection(coolantMixer);
 		
+		FuelTankSystem fuelTank = new FuelTankSystem();
+		fuelTank.setScreenPosition(new PVector(460, 50));
+		systems.add(fuelTank);
+		
 		//reactor vessel
 		ReactorVesselSystem rvSystem = new ReactorVesselSystem();
 		rvSystem.setScreenPosition(new PVector(460, 280));
 		rvSystem.addInboundConnection(coolantValves);
+		rvSystem.addInboundConnection(fuelTank);
 		systems.add(rvSystem);
 		
 		TurbineSystem turbines = new TurbineSystem();
@@ -56,6 +65,20 @@ public class ReactorModel {
 			r.tick();
 		}
 	
+	}
+	
+	public void hardwareEvent(HardwareEvent e){
+		String lookup = e.event + e.id;
+		ReactorSystem sys = switchToSystemMap.get(lookup);
+		if(sys != null){
+			sys.controlSignal(e);
+		}
+	
+		
+	}
+	
+	public void repairReactor(float rate){
+		
 	}
 	
 	public void damageReactor(float amount){

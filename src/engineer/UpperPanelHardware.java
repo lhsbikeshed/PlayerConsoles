@@ -38,7 +38,12 @@ public class UpperPanelHardware extends HardwareController {
 		} else if (p == 'S') {		//reactor control switches
 			controlSwitches();
 		} else if (p == 'R') {		//reactor start signal
-			reactorStarted();			
+			if(serialBuffer[1] == '1'){
+				reactorState(true);		
+			} else {
+				reactorState(false);
+			
+			}
 		} else if (p == 'p') {		//power buttons on right of monitor
 			powerButtons();
 		} else if (p == 'L') {		//airlock button
@@ -90,7 +95,14 @@ public class UpperPanelHardware extends HardwareController {
 		
 	}
 
-	private void reactorStarted() {
+	private void reactorState(boolean b) {
+		HardwareEvent h = new HardwareEvent();
+		h.event = "REACTORSWITCH";
+		h.id = 0;
+		h.value = b == true ? 1:0;
+		parent.hardwareEvent(h);
+		
+		//we dont want to send this just yet. Eventually this will be renamed "inject plasma" rather than "reactor start"
 		OscMessage myMessage = new OscMessage(
 				"/system/reactor/setstate");
 		myMessage.add(1);
