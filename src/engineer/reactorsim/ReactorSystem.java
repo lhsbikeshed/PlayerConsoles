@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import common.ConsoleLogger;
 import common.HardwareEvent;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -96,6 +97,8 @@ public abstract class ReactorSystem {
 	public abstract void draw(PApplet context);
 	
 	public abstract void applyDamage(float amount);
+	
+	public abstract ArrayList<ReactorCheck> checkForProblems();	//check this system for problems and return a string
 	
 	public void addInboundConnection(ReactorSystem sys){
 		ConsoleLogger.log(this, "adding inbound from " + sys.name);

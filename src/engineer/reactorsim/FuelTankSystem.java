@@ -1,11 +1,13 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.HardwareEvent;
 import common.ShipState;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 public class FuelTankSystem extends ReactorSystem {
@@ -117,6 +119,12 @@ public class FuelTankSystem extends ReactorSystem {
 	public void applyDamage(float amount) {
 		leakRate = 10.0f;
 		leakHealth = 0.0f;
+	}
+
+	@Override
+	public ArrayList<ReactorCheck> checkForProblems() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

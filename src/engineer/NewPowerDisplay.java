@@ -8,19 +8,22 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import engineer.reactorsim.ReactorManager;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorModel;
 import engineer.reactorsim.ReactorSystem;
 
 public class NewPowerDisplay extends Display {
 
 	ReactorModel reactorModel;
+	ReactorManager reactorManager;
 	float power = 0f;
 	
 	
 	public NewPowerDisplay(PlayerConsole parent) {
 		super(parent);
 		reactorModel = new ReactorModel();
-	
+		reactorManager = new ReactorManager(reactorModel);
 	}
 
 	@Override
@@ -30,6 +33,11 @@ public class NewPowerDisplay extends Display {
 		for(ReactorSystem sys : reactorModel.getSystems()){
 			sys.draw(parent);
 		}
+		
+		reactorManager.tick();
+		//get the reactor manager failure list and draw it
+		
+		
 		parent.noFill();
 		parent.rect(950, 750, 30, -650);
 		
@@ -41,6 +49,14 @@ public class NewPowerDisplay extends Display {
 		parent.fill(255 - c, c,0);
 		parent.rect(950, 750, 30, amt);
 		parent.text("Available power " + (int)power, 810, 755 + amt);
+		
+		int ct = 100;
+		for(ReactorCheck p : reactorManager.getProblemList()){
+			if(p.getMessage() != null){
+				parent.text(p.getMessage(), 20, ct);
+				ct += 20;
+			}
+		}
 	}
 
 	@Override

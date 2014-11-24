@@ -1,11 +1,13 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.ConsoleLogger;
 import common.HardwareEvent;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 /* simulate the actual reactor
@@ -227,14 +229,19 @@ public class ReactorVesselSystem extends ReactorSystem {
 		context.rect(50,50, 100, 100);
 		
 		//field coils
+		String t = "";
 		for(int i = 0; i < 2; i++){
 			if(coilMode[i] == 0){
 				context.fill(0,0,255);
+				t = "+";
 				
 			} else {
 				context.fill(255,0,0);
+				t = "-";
 			}
 			context.rect(i * 200  -10, 20, 20, 150);
+			context.fill(255);;
+			context.text(t, i * 200, -20);
 		}
 		
 		
@@ -263,6 +270,62 @@ public class ReactorVesselSystem extends ReactorSystem {
 	public void applyDamage(float amount) {
 		plasmaDamageDelta = PApplet.map((float)Math.random(), 0, 1, -0.9f, 0.9f);
 		plasmaDamageDelta *= plasmaSize * 0.2f;
+	}
+
+	@Override
+	public ArrayList<ReactorCheck> checkForProblems() {
+		ArrayList<ReactorCheck> returnProblems = new ArrayList<ReactorCheck>();
+		//current checks
+		//1. check plasma pos and movement rate, suggest altering polarity
+		//2. suggest plasma size as too small/large (based on coolant levels?)
+		//3. low structure warnings (tell them to engage internal repairs
+		
+		//check if plasma is near the walls
+		ReactorCheck movementCheck = new ReactorCheck("PLASMA_POSITION", false);
+		if(plasmaPos < 50){
+			movementCheck.setMessage("PLASMA OUTSIDE SAFE AREA, SWITCH COILS TO - and +");
+		} else if (plasmaPos > 150){
+			movementCheck.setMessage("PLASMA OUTSIDE SAFE AREA, SWITCH COILS TO + and -");
+		} else {
+			movementCheck.isOk = true;
+		}
+		returnProblems.add(movementCheck);
+		
+		//check were in the safe area, if so and the plasma is still moving then add a warning to stop it
+		ReactorCheck positionCheck = new ReactorCheck("PLASMA_SAFE", false);
+		if(plasmaPos >= 50 && plasmaPos <= 150){
+			if(plasmaDelta >= -0.01f && plasmaDelta <= 0.01f){
+				positionCheck.isOk = true;
+			} else {
+				positionCheck.setMessage("PLASMA IN SAFE ZONE, SET COILS TO + / +");
+			}
+		}
+		returnProblems.add(positionCheck);
+		
+		//check the plasma size, suggest larger or smaller (1 is a good figure)
+		ReactorCheck sizeCheck = new ReactorCheck("PLASMA_SIZE", false);
+		if(plasmaSize < 0.8f){
+			sizeCheck.setMessage("PLASMA TOO SMALL, INCREASE FUEL FLOW");
+		} else if (plasmaSize > 1.4f){
+			sizeCheck.setMessage("PLASMA TOO LARGE, DECREASE FUEL FLOW");
+		} else {
+			sizeCheck.isOk = true;
+		}
+		returnProblems.add(sizeCheck);
+		
+		//now for heat checks
+		ReactorResource heatRes = resourceStore.get("HEAT");
+		ReactorCheck heatCheck = new ReactorCheck("REACTORTEMP", false);
+		if(heatRes.getAmount() > heatRes.maxAmount * 0.66f){
+			heatCheck.setMessage("REACTOR TEMPERATURE CRITICAL");
+		} else {
+			heatCheck.isOk = true;
+		}
+		returnProblems.add(heatCheck);
+		
+		
+
+		return returnProblems;
 	}
 
 }

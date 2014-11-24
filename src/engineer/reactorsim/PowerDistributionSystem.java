@@ -1,12 +1,14 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.ConsoleLogger;
 import common.HardwareEvent;
 import common.ShipState;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 public class PowerDistributionSystem extends ReactorSystem {
@@ -126,6 +128,12 @@ public class PowerDistributionSystem extends ReactorSystem {
 		
 		
 
+	}
+
+	@Override
+	public ArrayList<ReactorCheck> checkForProblems() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

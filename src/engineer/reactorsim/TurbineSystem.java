@@ -1,10 +1,12 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.HardwareEvent;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 public class TurbineSystem extends ReactorSystem {
@@ -16,10 +18,6 @@ public class TurbineSystem extends ReactorSystem {
 
 	public TurbineSystem() {
 		name = "Turbines";
-		//ReactorResource steam = new ReactorResource();
-		//steam.typeTag = "STEAM";
-		//resourceStore.put("STEAM", steam);
-		
 		ReactorResource heat = new ReactorResource();
 		heat.typeTag = "HEAT";
 		heat.maxAmount = 200;
@@ -110,18 +108,23 @@ public class TurbineSystem extends ReactorSystem {
 	public void controlSignal(HardwareEvent e) {
 		// TODO Auto-generated method stub
 		if(e.event == "MOUSECLICK"){
-			testVal ++;
-			testVal %= 4;
-			PowerState newState;
+			int mx = (int) (( e.value >> 16 ) - screenPosition.x);
+			int my = (int) (( e.value & 65535 ) - screenPosition.y);
+			
+			PowerState newState  = PowerState.STATE_OFF;
 			for (int i = 0; i < 2; i++){
-				if((testVal & (i + 1)) > 0){
-					newState = PowerState.STATE_ON;
-				} else {
-					newState= PowerState.STATE_OFF;
-				}
 				
-				if(runningState[i] != PowerState.STATE_COOLING){
-					runningState[i] = newState;
+				if(my >= i * 30 && my <= i * 30 + 30){
+				
+					if(runningState[i] == PowerState.STATE_OFF){
+						newState = PowerState.STATE_ON;
+					} else if(runningState[i] == PowerState.STATE_ON){
+						newState= PowerState.STATE_OFF;
+					}
+				
+					if(runningState[i] != PowerState.STATE_COOLING){
+						runningState[i] = newState;
+					}
 				}
 			}
 			
@@ -165,6 +168,11 @@ public class TurbineSystem extends ReactorSystem {
 	public void applyDamage(float amount) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public ArrayList<ReactorCheck> checkForProblems() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,15 +1,20 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.ConsoleLogger;
 import common.HardwareEvent;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 
 public class CoolantMixerSystem extends ReactorSystem {
 
 	boolean powerState = false;
+	
+	
+	int lowCoolantTime = 0;	//how many ticks has the coolant pressure been low for?
 	
 	
 	public CoolantMixerSystem() {
@@ -43,8 +48,8 @@ public class CoolantMixerSystem extends ReactorSystem {
 			//and increase the coolant gen rate			
 			heat.amountPerTick = 0.08f;			
 			coolant.amountPerTick = 30f;
-			if(coolant.getAmount() <= 0.01f){
-				heat.amountPerTick += 0.08f;		
+			if(coolant.getAmount() <= 10.01f){
+				heat.amountPerTick += 1.08f;		
 			}
 			
 		} else if (runningState[0] == PowerState.STATE_OFF){
@@ -132,8 +137,56 @@ public class CoolantMixerSystem extends ReactorSystem {
 	}
 	@Override
 	public void applyDamage(float amount) {
-		// TODO Auto-generated method stub
 		
+		
+		
+	}
+	@Override
+	public ArrayList<ReactorCheck> checkForProblems() {
+		ReactorResource heat = resourceStore.get("HEAT");
+		ReactorResource coolant = resourceStore.get("COOLANT");
+		ArrayList<ReactorCheck> returnProblems = new ArrayList<ReactorCheck>();
+		
+		if(heat.getAmount() > heat.maxAmount * 0.66f){
+			ReactorCheck r = new ReactorCheck("MIXER_OVERHEAT", false);
+			r.setMessage("COOLANT MIXER OVERHEAT, TURN OFF");
+			returnProblems.add(r);
+		} else {
+			ReactorCheck r = new ReactorCheck("MIXER_OVERHEAT", true);
+			returnProblems.add(r);
+
+		}
+		
+		if(coolant.getAmount() < 40f){
+			lowCoolantTime += 1;
+			if(lowCoolantTime > 5){
+				
+				if(runningState[0] != PowerState.STATE_ON){
+					ReactorCheck r = new ReactorCheck("MIXER_LOWCOOLANT_OFF", false);
+					r.setMessage("LOW COOLANT PRESSURE, TURN ON PRESSURISER");	
+					returnProblems.add(r);
+
+				} else {
+					ReactorCheck r = new ReactorCheck("MIXER_LOWCOOLANT_VALVE", false);
+					r.setMessage("LOW COOLANT PRESSURE, TURN OFF COOLANT VALVES");
+					returnProblems.add(r);
+
+				}
+				
+			}
+		} else {
+			if(lowCoolantTime > 5){
+				ReactorCheck r = new ReactorCheck("MIXER_LOWCOOLANT_OFF", true);
+				returnProblems.add(r);
+				r = new ReactorCheck("MIXER_LOWCOOLANT_VALVE", true);
+				returnProblems.add(r);
+			}
+			lowCoolantTime = 0;
+		}
+		
+		
+		
+		return returnProblems;
 	}
 
 }

@@ -2,10 +2,12 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
 import common.HardwareEvent;
+import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
 /* ooolant valves draw from the mixer and produce coolant when turned on */
@@ -30,14 +32,15 @@ public class CoolantValveSystem extends ReactorSystem {
 		// TODO Auto-generated method stub
 		
 		if(e.event == "MOUSECLICK"){
-			testValveState ++;
-			testValveState %= 8;
+			int mx = (int) ((e.value >> 16) - screenPosition.x);
+			int my = (int) ((e.value & 65535) - screenPosition.y);
 			for(int i = 0; i < 3; i++){
-				if(((testValveState >> i) &1) > 0){
-					valveStates[i] = true;
-				} else {
-					valveStates[i] = false;
+
+				if(mx >= i * 30 && mx <= i * 30 + 20){
+					valveStates[i] = !valveStates[i];
 				}
+				
+				
 			}
 		}
 	}
@@ -111,6 +114,12 @@ public class CoolantValveSystem extends ReactorSystem {
 	public void applyDamage(float amount) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public ArrayList<ReactorCheck> checkForProblems() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
