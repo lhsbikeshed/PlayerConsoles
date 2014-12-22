@@ -538,76 +538,85 @@ public class RadarDisplay extends Display {
 		/* print the address pattern and the typetag of the received OscMessage */
 
 		if (theOscMessage.checkAddrPattern("/radar/update")) {
-			synchronized (lock) {
-				// get the id
-
-				int id = theOscMessage.get(0).intValue();
-				int rId = findRadarItemById(id);
-				boolean newItem = false;
-				if (rId == -1) {
-					rId = getNewRadarItem();
-					ConsoleLogger.log(this, "new item : " + rId + " - " + id);
-					if (theOscMessage.get(1).stringValue()
-							.equals("INCOMING DEBRIS")) {
-						parent.getConsoleAudio().playClip("collisionAlert");
-					} else {
-						if(silenceNewTargets == false){
-							parent.getConsoleAudio().playClip("newTarget");
-						}
-					}
-
-					newItem = true;
-				}
-
-				radarList[rId].id = id;
-				radarList[rId].active = true;
-
-				radarList[rId].lastUpdateTime = parent.millis();
-				radarList[rId].name = theOscMessage.get(1).stringValue();
-				if (newItem) {
-					radarList[rId].lastPosition.x = theOscMessage.get(2)
-							.floatValue();
-					radarList[rId].lastPosition.y = theOscMessage.get(3)
-							.floatValue();
-					radarList[rId].lastPosition.z = theOscMessage.get(4)
-							.floatValue();
-					radarList[rId].clearStats();
-				} else {
-					radarList[rId].lastPosition.x = radarList[rId].position.x;
-					radarList[rId].lastPosition.y = radarList[rId].position.y;
-					radarList[rId].lastPosition.z = radarList[rId].position.z;
-				}
-
-				radarList[rId].position.x = theOscMessage.get(2).floatValue();
-				radarList[rId].position.y = theOscMessage.get(3).floatValue();
-				radarList[rId].position.z = theOscMessage.get(4).floatValue();
-				// println("1:" + radarList[rId].position);
-				// println("2:" + radarList[rId].lastPosition);
-
-				String colour = theOscMessage.get(5).stringValue();
-				String[] splitColour = colour.split(":");
-				radarList[rId].displayColor = UsefulShit.makeColor(
-						(int) (Float.parseFloat(splitColour[0]) * 255),
-						(int) (Float.parseFloat(splitColour[1]) * 255),
-						(int) (Float.parseFloat(splitColour[2]) * 255));
-				// radarList[rId].lastUpdateTime = millis();
-
-				radarList[rId].statusText = theOscMessage.get(6).stringValue();
-				radarList[rId].targetted = theOscMessage.get(7).intValue() == 1 ? true
-						: false;
-
-				// now unpack the stat string
-				String statString = theOscMessage.get(8).stringValue();
-				String[] pairs = statString.split(",");
-				for (String p : pairs) {
-					String[] vals = p.split(":");
-					radarList[rId].setStat(vals[0], Float.parseFloat(vals[1]));
-				}
-			}
-		
+			updateTarget(theOscMessage);
 		} else if (theOscMessage.checkAddrPattern("/radar/wayPointReached")) {
 			parent.getConsoleAudio().playClip("waypointReached");
 		} 
+	}
+
+	protected void updateTarget(OscMessage theOscMessage) {
+		synchronized (lock) {
+			// get the id
+
+			int id = theOscMessage.get(0).intValue();
+			int rId = findRadarItemById(id);
+			boolean doNotInterpolate = false;
+			if (rId == -1) {
+				rId = getNewRadarItem();
+				ConsoleLogger.log(this, "new item : " + rId + " - " + id);
+				if (theOscMessage.get(1).stringValue()
+						.equals("INCOMING DEBRIS")) {
+					parent.getConsoleAudio().playClip("collisionAlert");
+				} else {
+					if(silenceNewTargets == false){
+						parent.getConsoleAudio().playClip("newTarget");
+					}
+				}
+
+				doNotInterpolate = true;
+			}
+			//check for the doNotInterpolate flag on the update
+			if(theOscMessage.get(9).intValue() == 1	){
+				doNotInterpolate = true;
+			}
+
+			radarList[rId].id = id;
+			radarList[rId].active = true;
+
+			radarList[rId].lastUpdateTime = parent.millis();
+			radarList[rId].name = theOscMessage.get(1).stringValue();
+			if (doNotInterpolate) {
+				radarList[rId].lastPosition.x = theOscMessage.get(2)
+						.floatValue();
+				radarList[rId].lastPosition.y = theOscMessage.get(3)
+						.floatValue();
+				radarList[rId].lastPosition.z = theOscMessage.get(4)
+						.floatValue();
+				radarList[rId].clearStats();
+			} else {
+				radarList[rId].lastPosition.x = radarList[rId].position.x;
+				radarList[rId].lastPosition.y = radarList[rId].position.y;
+				radarList[rId].lastPosition.z = radarList[rId].position.z;
+			}
+
+			radarList[rId].position.x = theOscMessage.get(2).floatValue();
+			radarList[rId].position.y = theOscMessage.get(3).floatValue();
+			radarList[rId].position.z = theOscMessage.get(4).floatValue();
+			// println("1:" + radarList[rId].position);
+			// println("2:" + radarList[rId].lastPosition);
+
+			String colour = theOscMessage.get(5).stringValue();
+			String[] splitColour = colour.split(":");
+			radarList[rId].displayColor = UsefulShit.makeColor(
+					(int) (Float.parseFloat(splitColour[0]) * 255),
+					(int) (Float.parseFloat(splitColour[1]) * 255),
+					(int) (Float.parseFloat(splitColour[2]) * 255));
+			// radarList[rId].lastUpdateTime = millis();
+
+			radarList[rId].statusText = theOscMessage.get(6).stringValue();
+			radarList[rId].targetted = theOscMessage.get(7).intValue() == 1 ? true
+					: false;
+
+			// now unpack the stat string
+			String statString = theOscMessage.get(8).stringValue();
+			String[] pairs = statString.split(",");
+			for (String p : pairs) {
+				String[] vals = p.split(":");
+				radarList[rId].setStat(vals[0], Float.parseFloat(vals[1]));
+			}
+		}
+	
+		
 	}
 
 	@Override

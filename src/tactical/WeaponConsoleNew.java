@@ -622,15 +622,21 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		int tgtHash = theOscMessage.get(0).intValue();
 		synchronized (targets) {
 			TargetObject t = findTargetById(tgtHash);
-			boolean newTarget = false;
+			boolean doNotInterpolate = false;
 			if (t == null) {
 				ConsoleLogger.log(this, "new target: " + tgtHash);
 				t = new TargetObject();
 				t.hashCode = tgtHash;
-				newTarget = true;
+				doNotInterpolate = true;
 				targets.add(t);
 				parent.getConsoleAudio().playClip("newTarget");
 			}
+			
+			//check for the donotinterpolate flag
+			if(theOscMessage.get(11).intValue() == 1){
+				doNotInterpolate = true;
+			}
+			
 			t.scanId = theOscMessage.get(1).intValue();
 			t.trackingPlayer = theOscMessage.get(2).intValue() == 1 ? true
 					: false;
@@ -639,7 +645,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 			float x = theOscMessage.get(4).floatValue();
 			float y = theOscMessage.get(5).floatValue();
 			float z = theOscMessage.get(6).floatValue();
-			if (newTarget) {
+			if (doNotInterpolate) {
 				t.lastPos.x = x;
 				t.lastPos.y = y;
 				t.lastPos.z = z;
