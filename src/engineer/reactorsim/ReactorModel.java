@@ -82,6 +82,11 @@ public class ReactorModel {
 		
 	}
 	
+	public float getRequiredPower(){
+		return ((PowerDistributionSystem) powerSys).getRequiredPower();
+		
+	}
+	
 	public void repairReactor(float rate){
 		
 	}

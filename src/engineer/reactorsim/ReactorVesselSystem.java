@@ -301,17 +301,25 @@ public class ReactorVesselSystem extends ReactorSystem {
 			}
 		}
 		returnProblems.add(positionCheck);
-		
-		//check the plasma size, suggest larger or smaller (1 is a good figure)
-		ReactorCheck sizeCheck = new ReactorCheck("PLASMA_SIZE", false);
-		if(plasmaSize < 0.8f){
-			sizeCheck.setMessage("PLASMA TOO SMALL, INCREASE FUEL FLOW");
-		} else if (plasmaSize > 1.4f){
-			sizeCheck.setMessage("PLASMA TOO LARGE, DECREASE FUEL FLOW");
+		if(reactorRunning){
+			//check the plasma size, suggest larger or smaller (1 is a good figure)
+			ReactorCheck sizeCheck = new ReactorCheck("PLASMA_SIZE", false);
+			if(plasmaSize < 0.8f){
+				sizeCheck.setMessage("PLASMA TOO SMALL, INCREASE FUEL FLOW");
+			} else if (plasmaSize > 1.4f){
+				sizeCheck.setMessage("PLASMA TOO LARGE, DECREASE FUEL FLOW");
+			} else {
+				sizeCheck.isOk = true;
+			}
+			returnProblems.add(sizeCheck);
+			ReactorCheck noPlasma = new ReactorCheck("REACTOR_NOPLASMA", false);
+			noPlasma.isOk = true;
+			returnProblems.add(noPlasma);
 		} else {
-			sizeCheck.isOk = true;
+			ReactorCheck noPlasma = new ReactorCheck("REACTOR_NOPLASMA", false);
+			noPlasma.setMessage("NO PLASMA IN REACTOR, INJECT");
+			returnProblems.add(noPlasma);
 		}
-		returnProblems.add(sizeCheck);
 		
 		//now for heat checks
 		ReactorResource heatRes = resourceStore.get("HEAT");
@@ -323,7 +331,16 @@ public class ReactorVesselSystem extends ReactorSystem {
 		}
 		returnProblems.add(heatCheck);
 		
-		
+		ReactorResource structureRes = resourceStore.get("STRUCTURE");
+		ReactorCheck structCheck = new ReactorCheck("REACTOR_STRUCT", false);
+		if(structureRes.getAmount() < 20f){
+			structCheck.setMessage("REACTOR VESSEL CRITICAL - BREACH IMMINENT");
+		} else if (structureRes.getAmount() < 40f){
+			structCheck.setMessage("REACTOR VESSEL DAMAGED");
+		} else {
+			structCheck.isOk = true;
+		}
+		returnProblems.add(structCheck);
 
 		return returnProblems;
 	}

@@ -1,10 +1,12 @@
 package engineer.reactorsim;
 
 import java.awt.Rectangle;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+import common.ConsoleLogger;
 import common.HardwareEvent;
 import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
@@ -90,12 +92,11 @@ public class TurbineSystem extends ReactorSystem {
 			ReactorVesselSystem rs = (ReactorVesselSystem) inboundConnections.get("Reactor Vessel");
 			if(rs != null){
 				//take steam from reactor, add to our pool, then draw from that to make power
-				float steamAmount =  2f;
-				steamAmount = getNumberInState(PowerState.STATE_ON) * 1.5f;
+				float steamAmount =  getNumberInState(PowerState.STATE_ON) * 1.95f;
 
-				float steamConsumed = rs.consumeResource("STEAM", steamAmount);
+				float powerGenerated = rs.consumeResource("STEAM", steamAmount) * .99f;
 				
-				return steamConsumed;
+				return powerGenerated;
 			}
 			return 0;
 	
@@ -166,13 +167,41 @@ public class TurbineSystem extends ReactorSystem {
 	}
 	@Override
 	public void applyDamage(float amount) {
-		// TODO Auto-generated method stub
+		ConsoleLogger.log(this, "TURBINE DAMAGE");
+		//damaged turbines overheat quicker?
+		
 		
 	}
 	@Override
 	public ArrayList<ReactorCheck> checkForProblems() {
-		// TODO Auto-generated method stub
-		return null;
+		//check that one of the two turbines is turned on
+		ArrayList<ReactorCheck> returnProblems = new ArrayList<ReactorCheck>();
+
+		
+		if(getNumberInState(PowerState.STATE_ON) == 0 ){
+			ReactorCheck r = new ReactorCheck("TURBINE_OFF", false);
+			r.setMessage("NO TURBINES RUNNING, NO POWER WILL GENERATE");
+			returnProblems.add(r);
+		} else {
+			ReactorCheck r = new ReactorCheck("TURBINE_OFF", true);
+			returnProblems.add(r);
+		}
+		
+		//do temps
+		for(int i = 0; i < 2; i++){
+			ReactorCheck r;
+			if(temperature[i] > 55){
+				r = new ReactorCheck("TURBINE_TEMP_" + i, false);
+				r.setMessage("TURBINE #" + (i+1) + " RISKS OVERHEATING");
+			} else {
+				r = new ReactorCheck("TURBINE_TEMP_" + i, true);
+
+			}
+			returnProblems.add(r);
+		}
+		
+		
+		return returnProblems;
 	}
 
 }

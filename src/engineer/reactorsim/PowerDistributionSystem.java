@@ -8,6 +8,7 @@ import processing.core.PVector;
 import common.ConsoleLogger;
 import common.HardwareEvent;
 import common.ShipState;
+import common.util.UsefulShit;
 import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorSystem.ReactorResource;
 
@@ -18,6 +19,12 @@ public class PowerDistributionSystem extends ReactorSystem {
 	boolean[] routeUsable = new boolean[3];
 	float[] routeHealth = {1.0f, 1.0f, 1.0f};
 	
+	float requiredPower = 0f;
+	
+	public float getRequiredPower() {
+		return requiredPower;
+	}
+
 	public PowerDistributionSystem() {
 		name = "Power Distribution";
 		ReactorResource power = new ReactorResource();
@@ -32,14 +39,9 @@ public class PowerDistributionSystem extends ReactorSystem {
 	
 	public float getOutputPower(){
 		
-		float modifier = 1.0f;
-		if(routeUsable[currentRoute] == false){
-			modifier = 0.0f;
-		} else {
-			modifier = routeHealth[currentRoute];
-		}
 		
-		return resourceStore.get("POWER").getAmount() * modifier;
+		
+		return resourceStore.get("POWER").getAmount();
 	}
 	
 	@Override
@@ -50,9 +52,14 @@ public class PowerDistributionSystem extends ReactorSystem {
 		if(reqAmount > 10f){
 			reqAmount = 10f;
 		}
-		
+		float modifier = 1.0f;
+		if(routeUsable[currentRoute] == false){
+			modifier = 0.0f;
+		} else {
+			modifier = routeHealth[currentRoute];
+		}
 		float source = inboundConnections.get("Turbines").consumeResource("POWER", reqAmount);
-		resourceStore.get("POWER").change(source);
+		resourceStore.get("POWER").change(source * modifier);
 		
 		
 		//calculate how much power to draw off for the 4 subsystems
@@ -60,9 +67,10 @@ public class PowerDistributionSystem extends ReactorSystem {
 		for(int i = 0; i < 4; i++){
 			totalPower += ShipState.instance.powerStates[i];
 		}
-		float toUse = (totalPower / 48f) * 3f;
+		float powerChange = (totalPower / 48f) * 3.87f;
+		requiredPower = totalPower * 10f;
 		//ConsoleLogger.log(this, "" + toUse + "t: " + totalPower);
-		resourceStore.get("POWER").change(-toUse);
+		resourceStore.get("POWER").change(-powerChange);
 		
 		//repair slowly
 		float repairRate = ShipState.instance.powerStates[ShipState.POWER_DAMAGE] / 120f;
@@ -132,8 +140,15 @@ public class PowerDistributionSystem extends ReactorSystem {
 
 	@Override
 	public ArrayList<ReactorCheck> checkForProblems() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<ReactorCheck> returnProblems = new ArrayList<ReactorCheck>();
+		ReactorCheck r = new ReactorCheck("ROUTE_DEAD", false);
+		if(routeUsable[currentRoute] == false){
+			r.setMessage("POWER DISTRIBUTION ROUTE DOWN, SWITCH TO ALTERNATIVE");
+		} else {
+			r.isOk = true;
+		}
+		returnProblems.add(r);
+		return returnProblems;
 	}
 
 }

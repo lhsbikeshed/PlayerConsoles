@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import processing.core.PApplet;
 import processing.core.PVector;
+import common.ConsoleLogger;
 import common.HardwareEvent;
 import common.ShipState;
 import engineer.reactorsim.ReactorManager.ReactorCheck;
@@ -15,6 +16,7 @@ public class FuelTankSystem extends ReactorSystem {
 	float[] flowRates = { 0.0f, 0.0f};
 	float leakRate = 0.0f;
 	float leakHealth = 0.0f;
+	float fuelRatio = 0f;
 	
 	ReactorResource fuel;
 	
@@ -88,6 +90,9 @@ public class FuelTankSystem extends ReactorSystem {
 		if(leakRate > 0.0f){
 			context.text("LEAKING : " + leakHealth, 0, -20);
 		}
+		fuelRatio = flowRates[0] / flowRates[1];
+
+		context.text("fuel ratio: " + fuelRatio + "  (keep this at 0.8)", 0, 120);
 		context.popMatrix();
 	}
 	
@@ -99,6 +104,11 @@ public class FuelTankSystem extends ReactorSystem {
 		
 		float rateModifier = (flowRates[0] + flowRates[1]) / 20f;
 		amount *= rateModifier;
+		
+		//now modify based on ratio of one to the other
+		amount *= 1f - Math.abs((0.8f - fuelRatio));
+		//ConsoleLogger.log(this, "ratio: " + ratio);
+		
 		float amt = (res.getAmount() - amount );
 		if(amt <= 0 ){
 			amt = amount + amt;

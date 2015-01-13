@@ -8,6 +8,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 import engineer.reactorsim.ReactorManager;
 import engineer.reactorsim.ReactorManager.ReactorCheck;
 import engineer.reactorsim.ReactorModel;
@@ -18,7 +19,7 @@ public class NewPowerDisplay extends Display {
 	ReactorModel reactorModel;
 	ReactorManager reactorManager;
 	float power = 0f;
-	
+	float reqPower = 0f;
 	
 	public NewPowerDisplay(PlayerConsole parent) {
 		super(parent);
@@ -50,6 +51,10 @@ public class NewPowerDisplay extends Display {
 		parent.rect(950, 750, 30, amt);
 		parent.text("Available power " + (int)power, 810, 755 + amt);
 		
+		reqPower = PApplet.lerp(reqPower, reactorModel.getRequiredPower(), .5f);
+		amt = PApplet.map(reqPower, 0, 500, 0, -650);
+		parent.text("Required power " + (int)reqPower, 810, 755 + amt);
+		
 		int ct = 100;
 		for(ReactorCheck p : reactorManager.getProblemList()){
 			if(p.getMessage() != null){
@@ -57,6 +62,14 @@ public class NewPowerDisplay extends Display {
 				ct += 20;
 			}
 		}
+		
+		//for reference draw the current power levels
+		parent.text("ENGINES: " + ShipState.instance.powerStates[0], 50, 500);
+		parent.text("DAMAGECON: " + ShipState.instance.powerStates[1], 50, 520);
+		parent.text("SENSORS: " + ShipState.instance.powerStates[2], 50, 540);
+		parent.text("WEAPONS: " + ShipState.instance.powerStates[3], 50, 560);
+		
+		
 	}
 
 	@Override
