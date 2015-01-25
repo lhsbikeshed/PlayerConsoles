@@ -152,6 +152,7 @@ public class EngineerConsole extends PlayerConsole {
 	@Override
 	protected void oscEvent(OscMessage theOscMessage) {
 		super.oscEvent(theOscMessage);
+	
 
 		if (theOscMessage.checkAddrPattern("/engineer/powerState") == true) {
 
@@ -210,8 +211,11 @@ public class EngineerConsole extends PlayerConsole {
 			jamDisplay.oscMessage(theOscMessage);
 		
 		} else {
+			
 			if (currentScreen != null) {
+				//ConsoleLogger.log(this, currentScreen.toString());
 				currentScreen.oscMessage(theOscMessage);
+				
 			}
 		}
 	}
@@ -262,10 +266,8 @@ public class EngineerConsole extends PlayerConsole {
 
 		displayMap.put("cablepuzzle", new CablePuzzleDisplay(this));
 		displayMap.put("failureScreen", new FailureScreen(this));
-		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
-		
-		displayMap.put("power2", new NewPowerDisplay(this));
-		
+		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));		
+		displayMap.put("power2", new NewPowerDisplay(this));		
 		displayMap.put("authdisplay", new AuthDisplay(this));
 
 		//now console is loaded up, load the sound config
@@ -278,7 +280,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("power2"));
+		changeDisplay(displayMap.get("authdisplay"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");

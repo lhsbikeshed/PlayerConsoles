@@ -128,16 +128,21 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		pg.popMatrix();
 		pg.endDraw();
 		parent.image(pg, 0, 0);;
+		
+		//gui overlay bits
 		parent.image(overlayImage, 0, 0);
 		parent.textFont(font, 20);
+		
 		//-- distance marker --
 		parent.fill(255);
 		float h = (int)parent.getShipState().altitude.getValue(parent.millis());
+		//when close to the main asteroid constantly show a collision alert
 		if(h < 400f){
 			showCollisionAlert = true;
 			parent.fill(255,0,0);
 		}
 		
+		//altimeter
 		int startY = 85;
 		int startX = 40;
 		parent.stroke(255);
@@ -152,7 +157,7 @@ public class CollisionRadarDisplay extends RadarDisplay {
 			parent.line(startX, startY + i * 20, startX + len, startY + i * 20);
 			
 		}
-		float markerY = PApplet.map(h, 2900, 0, startY, startY + 600);
+		float markerY = PApplet.map(h, 35000, 0, startY, startY + 600);
 		parent.line(startX, markerY, startX + 50, markerY);
 		
 		parent.text((int)(parent.getShipState().altitude.getValue(parent.millis()) * 10 )+ "m", 100, markerY);

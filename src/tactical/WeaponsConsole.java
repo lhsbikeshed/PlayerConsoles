@@ -46,7 +46,7 @@ public class WeaponsConsole extends Display {
 		public String[] statNames = new String[2];
 		public PVector screenSpacePos = new PVector(0,0);
 
-		
+		public int fadeTimer = 0;
 		
 		
 		public float randomAngle;

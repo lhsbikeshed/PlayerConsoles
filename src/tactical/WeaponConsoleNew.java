@@ -29,6 +29,8 @@ public class WeaponConsoleNew extends WeaponsConsole {
 	
 	float mouseRadius = 20f;
 	
+	float screenSpaceScaleFactor = 0.0005f;
+	
 	public WeaponConsoleNew(PlayerConsole parent) {
 		super(parent);
 		bgImage = parent.loadImage("tacticalconsole/tacticalscreen2.png");
@@ -86,7 +88,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		radarGraphics.rotateZ(parent.radians(parent.millis() / 200f));
 
 		
-		//parent.image(bgImage, 0, 0);
+		//radar base
 		radarGraphics.fill(0, 128, 0, 100);
 		radarGraphics.noStroke();
 		int sensorSize = (int) PApplet.map(sensorPower, 0f, 12f, 270,1450) ;
@@ -95,6 +97,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		
 		radarGraphics.pushMatrix();
 		
+		//angle pips
 		for(int i=0; i < 24; i++){
 			radarGraphics.rotate((float)((Math.PI * 2f) / 24));
 			if((i + 1 ) % 3 == 0){
@@ -106,7 +109,10 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		}
 		radarGraphics.popMatrix();
 
+		//radar range
 		radarGraphics.ellipse(0, 0, sensorSize, sensorSize);
+		
+		//cross lines
 		radarGraphics.stroke(0,0,255);
 		radarGraphics.line(-725,0,0,725,0,0);
 		radarGraphics.stroke(255,0,0);
@@ -115,14 +121,17 @@ public class WeaponConsoleNew extends WeaponsConsole {
 		
 		
 		
-		
+		//ship
 		radarGraphics.box(30);
+		
+		//radar pulse
 		radarTicker += 20;
 		radarGraphics.noStroke();
 		int alpha = (int) PApplet.map(radarTicker, 0, sensorSize, 45f, 0f );
 		radarGraphics.fill(0,255,0, alpha);
-		radarGraphics.ellipse(0, 0, radarTicker, radarTicker);
-		
+		//radarGraphics.ellipse(0, 0, radarTicker, radarTicker);
+		radarGraphics.sphereDetail(20);
+		radarGraphics.sphere(radarTicker/2f);
 		if (radarTicker > sensorRange) {
 			radarTicker = 15;
 		}
@@ -187,13 +196,14 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				radarGraphics.translate(t.screenSpacePos.x, t.screenSpacePos.y);
 				if (distanceToTarget < sensorRange * 0.6f) { 
 					radarGraphics.textFont(font, 13);
-					radarGraphics.fill(255,255,0);
+					radarGraphics.fill(255,255,0, 155+ t.fadeTimer *5);
 					
 					//radarGraphics.rotateX(-0.8f);;
 					String h = String.format("%.2f", t.stats[0] * 100);
 					radarGraphics.text(t.name + ": " + h + "%", 30, 25);
 					radarGraphics.textFont(font, 18);
 					radarGraphics.text(scanCode, 30, 5);
+					
 					radarGraphics.stroke(255,255,0);
 					radarGraphics.line(30, 15, 20, 15);
 					radarGraphics.line(0, 0, 20, 15);
@@ -439,6 +449,10 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				TargetObject t = targets.get(i);
 				
 				float distanceToTarget = t.pos.mag();
+				t.fadeTimer--;
+				if(t.fadeTimer <= 0){
+					t.fadeTimer = 0;
+				}
 
 				// update logic bits
 				// if no update received for 280ms then remove this target
@@ -462,7 +476,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				float lerpZ = PApplet.lerp(t.lastPos.y, t.pos.y,
 						(parent.millis() - t.lastUpdateTime) / 250.0f);
 
-				float screenSpaceScaleFactor = 0.0005f;
+				
 				
 				float x =  lerpX * screenSpaceScaleFactor;
 				float y =  lerpY * screenSpaceScaleFactor;
@@ -480,11 +494,11 @@ public class WeaponConsoleNew extends WeaponsConsole {
 					y += parent.random(-5, 5);
 				} else if (distanceToTarget < 200) {
 
-					radarGraphics.fill(255, 0, 0);
+					radarGraphics.fill(255, 0, 0, t.fadeTimer*2);
 				} else if (distanceToTarget < 500) {
-					radarGraphics.fill(255, 255, 0);
+					radarGraphics.fill(255, 255, 0, t.fadeTimer*2);
 				} else {
-					radarGraphics.fill(0, 255, 0);
+					radarGraphics.fill(0, 255, 0, t.fadeTimer*2);
 				}
 
 				// draw the target on the radar
@@ -630,6 +644,7 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				doNotInterpolate = true;
 				targets.add(t);
 				parent.getConsoleAudio().playClip("newTarget");
+				t.fadeTimer = 0;
 			}
 			
 			//check for the donotinterpolate flag
@@ -674,7 +689,13 @@ public class WeaponConsoleNew extends WeaponsConsole {
 				String[] vals = p.split(":");
 				t.setStat(vals[0], Float.parseFloat(vals[1]));
 			}
+			
+			if(t.pos.mag() < radarTicker / 2f && t.fadeTimer <= 0){
+				t.fadeTimer = 40;
+			}
+			
 		}
+	
 		
 	}
 	

@@ -16,6 +16,8 @@ public class Highlighter {
 
 	long startTime = 0;
 	PlayerConsole parent;
+	
+	
 
 	public Highlighter(PlayerConsole parent, PVector centre, PVector startSize,
 			PVector endSize, int time, int hang) {
@@ -28,6 +30,7 @@ public class Highlighter {
 
 		running = true;
 		startTime = parent.millis();
+		
 	}
 
 	public boolean isDone() {

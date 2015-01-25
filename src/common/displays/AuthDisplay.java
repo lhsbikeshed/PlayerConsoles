@@ -25,7 +25,19 @@ public class AuthDisplay extends Display {
 	String promptText = "NEED CODE";
 	long puzzleDuration = 10000;
 	
-
+	//code values
+	String[][] codeVals = new String[25][10];
+	int codeSheet = 0;
+	String[] codeSheetNames = {"ALPHA", "BETA", "GAMMA"};
+	CodePos[][] codePositions = { 	{ new CodePos(1,1), new CodePos(2,2), new CodePos(3,3), new CodePos(4,4), new CodePos(5,5)}, 
+									{ new CodePos(6,6), new CodePos(7,7), new CodePos(8,8), new CodePos(9,9), new CodePos(3,9)},
+									{ new CodePos(11,1), new CodePos(12,2), new CodePos(13,3), new CodePos(14,4), new CodePos(15,6)}
+								};
+	
+	
+	
+	
+	long lastChangeTime = 0;
 	public int STATE_AUTH = 0;
 	public int STATE_CODEOK = 1;
 	int state = STATE_AUTH;
@@ -52,10 +64,27 @@ public class AuthDisplay extends Display {
 		serverIP = parent.getServerIP();
 		
 		authImage = parent.loadImage("common/authscreenbg.png");
-		
+		newCodeVals();
 	}
 
-	
+	void newCodeVals(){
+		int ct = 0;
+		codeSheet = 0;
+		for(int x = 0; x < 25; x++){
+			for(int y = 0; y < 10; y++){
+				if(parent.random(10) < 4 || codeVals[x][y] == null){
+					codeVals[x][y] = "" + (int)parent.random(10);
+				}
+				for (CodePos pos : codePositions[codeSheet]){
+					if(pos.x == x && pos.y == y){
+						codeVals[x][y] = "" + currentAuthCode.charAt(ct);
+						ct++;
+						break;
+					} 
+				}
+			}
+		}
+	}
 
 	@Override
 	public void draw() {
@@ -64,35 +93,64 @@ public class AuthDisplay extends Display {
 			
 			parent.fill(255, 255, 255);
 			parent.image(authImage, 0, 0, parent.width, parent.height);
+			
+			//code block
+			parent.textFont(font, 17);
+			for(int x = 0; x < 25; x++){
+				for(int y = 0; y < 10; y++){
+					parent.fill(255);
+					for (CodePos pos : codePositions[codeSheet]){
+						if(pos.x == x && pos.y == y){
+							//parent.fill(255,0,0);
+							break;
+						}
+					}
+					
+					parent.text(codeVals[x][y], 265 + x *20, 354 + y*15);
+					
+				}
+			}
+			if(parent.millis() - lastChangeTime > 1000){
+				newCodeVals();
+				lastChangeTime = parent.millis();
+			}
+			
 			parent.textFont(font, 40);
 			float tw = parent.textWidth(promptText);
-			parent.text(promptText, 512 - tw/2f, 303);
+			parent.text(promptText, 512 - tw/2f, 220);
 			if(authResult){
 				parent.fill(0,255,0);
 			}
+			parent.textFont(font, 25);
+		//	parent.text("CODE LEVEL : " + codeSheetNames[codeSheet], 328, 307);
+			
 			parent.textFont(font, 80);
 			String code = authCode;
-			if(parent.globalBlinker){
-				code += "_";
-			}
-			parent.text(code, 158, 495);
-
+			
+			
+			
 			if (authDisplayTime + 1500 > parent.millis()) {
 				if (authResult == false) {
-					parent.fill(255, 0, 0);
-					parent.textFont(font, 40);
-					parent.text("CODE FAIL", 357, 369);
+					//parent.fill(255, 0, 0);
+					//parent.textFont(font, 40);
+					//parent.text("CODE FAIL", 357, 369);
+					code += "!! FAIL !!";
 				} else {
-					parent.fill(0, 255, 0);
-					parent.textFont(font, 40);
-					parent.text("CODE OK", 266, 573);
+					//parent.fill(0, 255, 0);
+					//parent.textFont(font, 40);
+					//parent.text("CODE OK", 266, 573);
+					code += " - OK";
 				}
 			} else if (authDisplayTime + 2500 > parent.millis()
 					&& authResult == true) {
 				state = STATE_CODEOK;
+			} else {
+				if(parent.globalBlinker){
+					code += "_";
+				}
 			}
 
-			
+			parent.text(code, 158, 626);
 			
 			//parent.text(puzzleDuration - (parent.millis() - sceneStartTime), 200,200); 
 		}
@@ -191,5 +249,15 @@ public class AuthDisplay extends Display {
 		authCode = "";
 		authResult = false;
 		authDisplayTime = 0; // start for auth fail/ok display timesplay time
+	}
+	
+	class CodePos {
+		public int x = 0;
+		public int y = 0;
+		public CodePos(int x, int y){
+			this.x = x;
+			this.y = y;
+		}
+	
 	}
 }
