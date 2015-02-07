@@ -75,14 +75,14 @@ public class Joystick {
 		if (state == false) {
 			OscMessage myMessage = new OscMessage("/control/joystick/state");
 
-			myMessage.add(0);
-			myMessage.add(0);
+			myMessage.add(0f);
+			myMessage.add(0f);
 			myMessage.add(0.0f);
 
 			myMessage.add(0.0f);
 			myMessage.add(0.0f);
 
-			myMessage.add(0);
+			myMessage.add(0f);
 
 			oscP5.send(myMessage, myRemoteLocation);
 		}
