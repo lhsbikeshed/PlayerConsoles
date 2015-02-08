@@ -46,7 +46,7 @@ public class TacticalConsole extends PlayerConsole {
 	
 	//hardware
 	TacticalHardwareController mainPanelHardware;
-	FanLightHardwareController fanController;
+	//FanLightHardwareController fanController;
 
 	public PVector mousePosition = new PVector(0,0);
 	Robot mouseRobot;
@@ -130,13 +130,13 @@ public class TacticalConsole extends PlayerConsole {
 						"/game/Hello/TacticalStation");
 				oscP5.send(myMessage, new NetAddress(serverIP, 12000));
 				mainPanelHardware.setPowerState(true);
-				fanController.setPowerState(true);
+			//	fanController.setPowerState(true);
 				
 			} else {
 				shipState.poweredOn = false;
 				shipState.poweringOn = false;
 				mainPanelHardware.setPowerState(false);
-				fanController.setPowerState(false);
+				//fanController.setPowerState(false);
 			}
 	
 
@@ -148,7 +148,7 @@ public class TacticalConsole extends PlayerConsole {
 			int internalPower = theOscMessage.get(1).intValue()/4 - 1;
 
 			mainPanelHardware.setChargeRate(beamPower);
-			fanController.setPowerLevels(propPower, beamPower, sensorPower,internalPower);
+			//fanController.setPowerLevels(propPower, beamPower, sensorPower,internalPower);
 			
 			
 			currentScreen.oscMessage(theOscMessage);
@@ -242,8 +242,8 @@ public class TacticalConsole extends PlayerConsole {
 		hardwareControllers.add(mainPanelHardware);
 		mainPanelHardware.setPowerState(false);
 
-		fanController = new FanLightHardwareController("fanController", "COM5", 9600, this);
-		fanController.setPowerState(false);
+	//	fanController = new FanLightHardwareController("fanController", "COM5", 9600, this);
+		//fanController.setPowerState(false);
 
 		
 		
@@ -255,7 +255,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("weapons"));
+		changeDisplay(displayMap.get("cablepuzzle"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");
@@ -294,7 +294,7 @@ public class TacticalConsole extends PlayerConsole {
 	protected void shipDamaged(float amount) {
 		//flash the lights attached to this console
 		mainPanelHardware.shipDamage(amount);
-		fanController.shipDamage();
+	//	fanController.shipDamage();
 
 	}
 
@@ -315,14 +315,14 @@ public class TacticalConsole extends PlayerConsole {
 	protected void shipDead() {
 		ConsoleLogger.log(this, "Ship exploded");
 		mainPanelHardware.setPowerState(false);
-		fanController.setPowerState(false);
+	//	fanController.setPowerState(false);
 	}
 
 	@Override
 	protected void reactorStarted() {
 		ConsoleLogger.log(this, "Reactor started");
 		mainPanelHardware.setPowerState(true);
-		fanController.setPowerState(true);
+		//fanController.setPowerState(true);
 
 		
 	}
@@ -331,7 +331,7 @@ public class TacticalConsole extends PlayerConsole {
 	protected void reactorStopped() {
 		ConsoleLogger.log(this, "Reactor stopped");
 		mainPanelHardware.setPowerState(false);
-		fanController.setPowerState(false);
+	//	fanController.setPowerState(false);
 
 		
 	}

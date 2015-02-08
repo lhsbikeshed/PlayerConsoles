@@ -21,7 +21,7 @@ public class CablePuzzleDisplay extends Display {
 	
 	PVector[][] breakLocations = { 	{new PVector(179, 431), new PVector(579,463), new PVector(614, 600) },  
 									{new PVector(752, 487), new PVector(568,560), new PVector(466, 607) }, 
-									{new PVector(447, 404), new PVector(500,691), new PVector(790, 657) }, 
+									{new PVector(447, 404), new PVector(299,589), new PVector(790, 657) }, 
 									{new PVector(476, 534), new PVector(630,706), new PVector(791, 595) },
 									{new PVector(299, 588), new PVector(453,497), new PVector(767, 514) }
 	};
@@ -48,7 +48,7 @@ public class CablePuzzleDisplay extends Display {
 		//draw breaks
 		
 		
-		
+		selectedPatch = 2;
 		PVector[] pv = breakLocations[selectedPatch];
 		for(PVector p : pv){
 			parent.tint(255,0,0);
