@@ -48,7 +48,7 @@ public class CablePuzzleDisplay extends Display {
 		//draw breaks
 		
 		
-		selectedPatch = 2;
+		
 		PVector[] pv = breakLocations[selectedPatch];
 		for(PVector p : pv){
 			parent.tint(255,0,0);
