@@ -1,6 +1,12 @@
 package tactical;
 
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.ho.yaml.Yaml;
+
 import java.util.ArrayList;
 
 import oscP5.OscMessage;
@@ -15,7 +21,7 @@ import common.ShipState;
 public class PlottingDisplay extends Display {
 	PImage backgroundImage;
 
-	ArrayList<MapNode> mapNodes = new ArrayList<MapNode>();
+	MapNode[] mapNodes;;
 	MapNode currentNode;
 	MapNode startNode;
 	MapNode destNode;
@@ -137,28 +143,21 @@ public class PlottingDisplay extends Display {
 		}
 	}
 
+	//TODO: store this in a yaml file
 	private void loadMap() {
-		String[] s = parent.loadStrings("tacticalconsole/map.txt");
-		ConsoleLogger.log(this, "loading " + s.length + " mapnodes");
-
-		for (String it : s) {
-			if (!it.startsWith("#")) {
-				String[] parts = it.split(":");
-				int xp = Integer.parseInt(parts[0]);
-				int yp = Integer.parseInt(parts[1]);
-
-				String id = parts[2];
-				MapNode n = new MapNode();
-				
-				int routeTag = Integer.parseInt(parts[3]);
-				
-				n.pos = new PVector(xp, yp);
-				n.id = id;
-				n.routeTag = routeTag;
-				
-				mapNodes.add(n);
-			}
+		
+		ConsoleLogger.log(this, "loading mapnodes..");
+		try {
+			mapNodes = Yaml.loadType(new File("bin/data/tacticalconsole/map.yaml"), MapNode[].class);
+			ConsoleLogger.log(this, "..loaded " + mapNodes.length + " nodes");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		for(MapNode m : mapNodes){
+			m.pos = new PVector(m.posx, m.posy);
+		}
+		
 	}
 
 	private void codeFailed(String reason) {
@@ -228,7 +227,7 @@ public class PlottingDisplay extends Display {
 			if (diff.mag() < 165) { // too far
 				
 				//look at the last entered waypoint and send the route tag it has
-				int routeTag = currentRoute.get(currentRoute.size() - 1).routeTag;
+				String routeTag = currentRoute.get(currentRoute.size() - 1).routeTag;
 				
 				ConsoleLogger.log(this, "setting route tag " + routeTag);
 						
@@ -349,14 +348,6 @@ public class PlottingDisplay extends Display {
 		return null;
 	}
 
-	class MapNode {
-		public PVector pos;				//position on map
-		public String id;				//id that the user types
-		public boolean visited = false;	//have we visited this node already while planning route
-		public int routeTag = -1;		//the route tag to transmit when setting route
-
-		public MapNode() {
-		}
-	}
+	
 
 }
