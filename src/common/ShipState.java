@@ -56,7 +56,7 @@ public class ShipState {
 	public int weaponState = 0;
 	public float[] weaponHealth = {1f, 1f,1f,1f, 1f};
 	
-	public int currentScene = 0;
+	public String currentScene = "";
 	public boolean thrustReverser = false;
 	
 	public LerpedFloat altitude = new LerpedFloat(2000f, 0, 250);
@@ -97,7 +97,7 @@ public class ShipState {
 			}
 			
 		} else if(msg.checkAddrPattern("/scene/change")){
-			currentScene = msg.get(0).intValue();
+			currentScene = msg.get(0).stringValue();
 		} else if(msg.checkAddrPattern("/system/propulsion/setThrustReverser")){
 			thrustReverser  = msg.get(0).intValue() == 1 ? true : false;
 		} else if (msg.checkAddrPattern("/ship/state/altitude")){

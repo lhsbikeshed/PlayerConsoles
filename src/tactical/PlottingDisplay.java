@@ -26,7 +26,7 @@ public class PlottingDisplay extends Display {
 	String currentCode = "";
 
 	private String failReason = "";
-	int lastPlottedScene = 0;	//scene that the last successful plot was in
+	String lastPlottedScene = "";	//scene that the last successful plot was in
 
 	// debug animation stuff
 	long lastKeyTime = 0;
@@ -40,7 +40,7 @@ public class PlottingDisplay extends Display {
 	
 	@Override
 	public void gameReset(){
-		lastPlottedScene = 0;
+		lastPlottedScene = "";
 		clearRoute();
 	}
 
@@ -302,14 +302,14 @@ public class PlottingDisplay extends Display {
 
 	private void clearRoute() {
 		currentRoute = new ArrayList<MapNode>();
-		int curScene = parent.getShipState().currentScene;
-		if (curScene == ShipState.SCENE_LAUNCH
-				|| curScene == ShipState.SCENE_LANDING) {
+		String curScene = parent.getShipState().currentScene;
+		if (curScene.equals("launch") 
+				|| curScene.equals("landing")) {
 			startNode = findNodeById("STATION 13");
 			destNode = findNodeById("TRAINING AREA");
 			currentRoute.add(startNode);
 
-		} else if (curScene == ShipState.SCENE_WARZONE) {
+		} else if (curScene.equals("warzone-landing")) {
 			destNode = findNodeById("STATION 13");
 			startNode = findNodeById("TRAINING AREA");
 			currentRoute.add(startNode);
