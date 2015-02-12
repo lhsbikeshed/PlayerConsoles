@@ -166,6 +166,7 @@ public class TacticalConsole extends PlayerConsole {
 			} catch (Exception e) {
 				ConsoleLogger.log(this, "no display found for " + changeTo);
 				changeDisplay(weaponsDisplay);
+				e.printStackTrace();
 			}
 		
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/openFlap")) {
@@ -255,7 +256,7 @@ public class TacticalConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("cablepuzzle"));
+		changeDisplay(displayMap.get("weapons"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/TacticalStation");

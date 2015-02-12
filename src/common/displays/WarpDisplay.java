@@ -31,7 +31,7 @@ public class WarpDisplay extends Display {
 	float lastTimeRemaining = 30;
 	long lastUpdate = 0;
 	boolean thisIsFail = false;
-	private int jumpDestination = 0;
+	private String jumpDestination = "";
 
 	int gridWidth = 20;
 	int gridHeight = 20;
@@ -100,14 +100,12 @@ public class WarpDisplay extends Display {
 
 		drawGrid();
 
-		switch (jumpDestination){
-			case 2:
+		if(jumpDestination.equals("drop")){
 				drawFailPlanet();
-				break;
-			case 7:
+		} else if (jumpDestination.equals("comet-tunnel")){
+		
 				drawFailComet();
-				break;
-				
+			
 		}
 
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
@@ -256,22 +254,20 @@ public class WarpDisplay extends Display {
 			timeRemaining = theOscMessage.get(1).floatValue();
 			thisIsFail = theOscMessage.get(2).intValue() == 1 ? true : false;
 			lastUpdate = parent.millis();
-			jumpDestination = theOscMessage.get(3).intValue();
+			jumpDestination = theOscMessage.get(3).stringValue();
 		} else if (theOscMessage.checkAddrPattern("/scene/warp/failjump") == true) {
 			haveFailed = true;
 			failStart = parent.millis();
 			failDelay = theOscMessage.get(0).intValue() * 1000;
 			bannerSystem.setSize(700, 300);
 			bannerSystem.setTitle("WARNING");
-			switch (jumpDestination){
-			case 2:
+			if(jumpDestination.equals("drop")){
 				bannerSystem
 				.setText("GRAVITATIONAL BODY DETECTED, TUNNEL COLLAPSING, PREPARE FOR UNPLANNED REENTRY");
-				break;
-			case 7:
+			} else if(jumpDestination.equals("comet-tunnel")){
 				bannerSystem
 				.setText("GRAVITATIONAL BODY DETECTED, DISENGAGING JUMP DRIVE");
-				break;
+				
 			}
 			
 			bannerSystem.displayFor(5000);
@@ -293,7 +289,7 @@ public class WarpDisplay extends Display {
 		thisIsFail = false;
 		planetScale = 0.6f;
 		exitStartTime = -1;
-		jumpDestination= 0;
+		jumpDestination= "";
 
 	}
 

@@ -12,43 +12,49 @@ public class ShipState {
 	public static final int POWER_SENSORS = 2;
 	public static final int POWER_WEAPONS = 3;
 	
-	public static final int SCENE_LAUNCH = 0;
-	public static final int SCENE_HYPERSPACE = 1;
-	public static final int SCENE_MARSDROP = 2;
-	public static final int SCENE_WARZONE = 3;
-	public static final int SCENE_LANDING = 4;
-	public static final int SCENE_DEAD = 5;
-	public static final int SCENE_COMET = 6;
-
-
+	//power handling
+	//is the ship on?
 	public boolean poweredOn = true;
+	//is the ship booting?
 	public boolean poweringOn = false;
+	//are we exploded?
 	public boolean areWeDead = false;
+	//text to display on the death screen
 	public String deathText = "";
+	//can the ship jump at the moment? i.e. are all the reqs met
 	public boolean jumpState = false;
 
+	//ship position in unity world space. 
 	public PVector shipPos = new PVector(0, 0, 0);
-	//public PVector shipRot = new PVector(0, 0, 0);
-	//public PVector lastShipRot = new PVector(0, 0, 0);
+	//ships current rotation and last frame rotation (for interpolation)
 	public Rot shipRot = Rot.IDENTITY;
 	public Rot lastShipRot = Rot.IDENTITY;
-
+	//ships world velocity
 	public PVector shipVel = new PVector(0, 0, 0);
-
+	//ships world velocity magnitude
 	public float shipVelocity = 0;
 	public float lastShipVel = 0;
 
 	public long lastTransformUpdate = 0;
+	
+	//how many emp blasts left
 	public int smartBombsLeft;
+	//hull state
 	public float hullState;
+	//is the fuel tank leaking
 	public boolean fuelLeaking;
+	//is the engineer silliness in progress
 	public boolean sillinessInProgress;
+	//how silly is the engineer?
 	public int sillinessLevel;
 	
+	//is the afterburner ready for use?
 	public boolean afterburnerCharging = true;
-	public int[] powerStates = new int[4];
-
 	
+	//power levels of ship systems
+	public int[] powerStates = new int[4];
+	
+	//weapon deployment states
 	public static final int WEAPON_STOWED = 0;
 	public static final int WEAPON_DEPLOYED = 1;
 	public static final int WEAPON_TRANSIT_OUT = 2;
@@ -56,9 +62,16 @@ public class ShipState {
 	public int weaponState = 0;
 	public float[] weaponHealth = {1f, 1f,1f,1f, 1f};
 	
+	// map handling
 	public String currentScene = "";
+	public String currentSceneId = "8593";
+	public boolean returnJourney = false;	//are we on the return leg of the route home? if so 
+											//we can ignore certain events
+	
+	//is the thrust reverser currently deployed?
 	public boolean thrustReverser = false;
 	
+	//ships altitude above something
 	public LerpedFloat altitude = new LerpedFloat(2000f, 0, 250);
 	private PlayerConsole parent;
 	
@@ -78,6 +91,7 @@ public class ShipState {
 		powerStates[1] = 6;
 		powerStates[2] = 6;
 		powerStates[3] = 6;
+		returnJourney = false;
 		
 	}
 	
@@ -98,10 +112,20 @@ public class ShipState {
 			
 		} else if(msg.checkAddrPattern("/scene/change")){
 			currentScene = msg.get(0).stringValue();
+			currentSceneId = msg.get(1).stringValue();
+			ConsoleLogger.log(this, "new scene node: " + currentSceneId);
 		} else if(msg.checkAddrPattern("/system/propulsion/setThrustReverser")){
 			thrustReverser  = msg.get(0).intValue() == 1 ? true : false;
 		} else if (msg.checkAddrPattern("/ship/state/altitude")){
 			altitude.update(msg.get(0).floatValue(), parent.millis());
+		} else if (msg.checkAddrPattern("/ship/state/currentLocationId")){
+			ConsoleLogger.log(this, "new scene node: " + currentSceneId);
+			currentSceneId = msg.get(0).stringValue();
+		} else if (msg.checkAddrPattern("/ship/state/setReturnJourney")){
+			returnJourney = msg.get(0).intValue() == 1;
+			if(returnJourney){
+				ConsoleLogger.log(this, "Congrats chaps! Youre on the return leg");
+			}
 		}
 	}
 }

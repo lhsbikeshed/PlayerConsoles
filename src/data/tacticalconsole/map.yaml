@@ -1,75 +1,81 @@
 -
    posx: 433
    posy: 204
-   id: TRAINING AREA
-   routeTag: 
+   id: 8008
+   displayName: TRAINING AREA
+   interestingThing: warzone-landing
+   planned: true
 -
    posx: 305
    posy: 257
    id: 5384
-   routeTag: comet-tunnel
+   interestingThing: comet-tunnel
+   ignoreOnReturn: true
 -   
    posx: 509
    posy: 337
    id: 0400
-   routeTag: drop
+   interestingThing: drop
+   ignoreOnReturn: true
 -
    posx: 199
    posy: 361
    id: 9421
-   routeTag:  
+   interestingThing:  
 -
    posx: 153
    posy: 458
    id: 5082
-   routeTag:  
+   interestingThing:  
 -
    posx: 285
    posy: 479
    id: 3389
-   routeTag:   
+   interestingThing:   
 -
    posx: 516
    posy: 486
    id: 0027
-   routeTag:  
+   interestingThing:  
 -
    posx: 402
    posy: 554
    id: 6397
-   routeTag:  
+   interestingThing:  
 -
    posx: 537
    posy: 594
    id: 1943
-   routeTag:  
+   interestingThing:  
 -
    posx: 143
    posy: 603
    id: 2289
-   routeTag:  
+   interestingThing:  
 -
    posx: 360
    posy: 701
    id: 9487
-   routeTag:  
+   interestingThing:  
 -
    posx: 154
    posy: 743
    id: 6022
-   routeTag: landing
+   interestingThing: 
 -
    posx: 246
    posy: 802
    id: 7658
-   routeTag: landing
+   interestingThing: 
 -
    posx: 377
    posy: 847
    id: 1043
-   routeTag:  
+   interestingThing:  
 -
    posx: 137
    posy: 890
-   id: STATION 13
-   routeTag:  
+   displayName: STATION 13
+   id: 8593
+   interestingThing: launch
+   planned: true

@@ -9,6 +9,7 @@ import org.ho.yaml.Yaml;
 
 import java.util.ArrayList;
 
+import jogamp.opengl.glu.nurbs.Maplist;
 import oscP5.OscMessage;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -20,11 +21,14 @@ import common.ShipState;
 
 public class PlottingDisplay extends Display {
 	PImage backgroundImage;
-
+	
+	//the map
 	MapNode[] mapNodes;;
+	//last node to be entered properly
 	MapNode currentNode;
+	//start of the route, essentially where the ship is now
 	MapNode startNode;
-	MapNode destNode;
+	//are we done here?
 	boolean routeComplete = false;
 
 	// entered codes
@@ -143,7 +147,8 @@ public class PlottingDisplay extends Display {
 		}
 	}
 
-	//TODO: store this in a yaml file
+
+	//Load the universe map from the yaml file
 	private void loadMap() {
 		
 		ConsoleLogger.log(this, "loading mapnodes..");
@@ -154,6 +159,7 @@ public class PlottingDisplay extends Display {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//yaml cant serialize pvectors, so skim over nodes and setup the positions
 		for(MapNode m : mapNodes){
 			m.pos = new PVector(m.posx, m.posy);
 		}
@@ -221,26 +227,34 @@ public class PlottingDisplay extends Display {
 
 			// now do a quick check to see if we are in range of the destination
 			// node
-			src = m.pos;
-			dst = destNode.pos;
-			diff = PVector.sub(src, dst);
-			if (diff.mag() < 165) { // too far
+			if (m.planned == true && startNode != m) { //we have entered a plannable node, transmit the route to the game
+				//find the first interestingThing we encounter on this route, send it to the game
 				
-				//look at the last entered waypoint and send the route tag it has
-				String routeTag = currentRoute.get(currentRoute.size() - 1).routeTag;
+				String interestingThing = "";
+				for(MapNode routeNode : currentRoute){
+					if(routeNode != startNode && routeNode.interestingThing != null){
+						//if we arent in the return journey from the warzone and the node is set
+						//to not be ignored then its ok. Otherwise ignore it
+						if(! (routeNode.ignoreOnReturn && ShipState.instance.returnJourney)){
+							interestingThing = routeNode.interestingThing;
+							ConsoleLogger.log(this, "found interesting thing:" + interestingThing);
+							break;
+						}
+					}
+				}
 				
-				ConsoleLogger.log(this, "setting route tag " + routeTag);
+				ConsoleLogger.log(this, "setting next Destination tag " + interestingThing);
 						
 				// tell the main game which route we're using
 				OscMessage msg = new OscMessage("/system/jump/setRoute");
-				msg.add(routeTag);
+				msg.add(interestingThing);
+				//combine all of the interesting things en route
 				parent.getOscClient().send(msg, parent.getServerAddress());
 				// fuck yeah, we're there!
 				parent.getBannerSystem().setSize(700, 300);
 				parent.getBannerSystem().setTitle("ROUTE OK");
 				parent.getBannerSystem().setText("JUMP PLOTTING COMPLETE");
 				parent.getBannerSystem().displayFor(2000);
-				currentRoute.add(destNode);
 				routeComplete = true;
 				lastPlottedScene = parent.getShipState().currentScene;
 				
@@ -273,11 +287,27 @@ public class PlottingDisplay extends Display {
 		// if this screen has appeared check to see if the last plot we did was
 		// from a different game scene. If it is then clear the route.
 		// prevents screen changes from clearing a half plotted route
-		if(lastPlottedScene != parent.getShipState().currentScene){
-			ConsoleLogger.log(this, "last s: " + lastPlottedScene + " cs : " + parent.getShipState().currentScene);
+//		if(lastPlottedScene != parent.getShipState().currentScene){
+//			ConsoleLogger.log(this, "last s: " + lastPlottedScene + " cs : " + parent.getShipState().currentScene);
+//			clearRoute();
+//		}
+		//lets see where we are right now
+		OscMessage m = new OscMessage("/system/jump/whereAmI");
+		parent.getOscClient().send(m, parent.getServerAddress());
+
+		//check to see if the current ship location doesnt match what the first entry in our route table is
+		if(currentRoute.size() > 0){
+			String currentId = currentRoute.get(0).id;
+			
+			if( currentId != null && parent.getShipState().currentSceneId.equals(currentId) == false){
+				ConsoleLogger.log(this, "last s: " + lastPlottedScene + " cs : " + parent.getShipState().currentScene);
+				clearRoute();
+			}
+		} else {
 			clearRoute();
 		}
-		
+
+
 	}
 	
 	/* clear the last char typed, if char pos it at zero then roll back to prev entry */
@@ -300,34 +330,25 @@ public class PlottingDisplay extends Display {
 
 
 	private void clearRoute() {
+		ConsoleLogger.log(this, "clearing route..");
 		currentRoute = new ArrayList<MapNode>();
-		String curScene = parent.getShipState().currentScene;
-		if (curScene.equals("launch") 
-				|| curScene.equals("landing")) {
-			startNode = findNodeById("STATION 13");
-			destNode = findNodeById("TRAINING AREA");
-			currentRoute.add(startNode);
-
-		} else if (curScene.equals("warzone-landing")) {
-			destNode = findNodeById("STATION 13");
-			startNode = findNodeById("TRAINING AREA");
-			currentRoute.add(startNode);
-		} else {
-			startNode = new MapNode();
-			startNode.pos = new PVector(1000, 1000);
-			startNode.id = "MID-ROUTE";
-			destNode = new MapNode();
-			destNode.pos = new PVector(-1000, -1000);
-			destNode.id = "MID-ROUTE";
-			currentRoute.add(startNode);
-		}
+		String curSceneId = parent.getShipState().currentSceneId;
+		
+		//TODO : UNFUCK THIS	
+		//problem:
+		//i dont want to hardcode the start/end nodes
+		startNode = findNodeById(curSceneId);
+		
+		
 		for (MapNode m : mapNodes) {
 			m.visited = false;
 		}
 		currentCode = "";
 		failReason = "";
 		routeComplete = false;
-
+		if(startNode != null){
+			currentRoute.add(startNode);
+		}
 		OscMessage msg = new OscMessage("/system/jump/clearRoute");
 		parent.getOscClient().send(msg, parent.getServerAddress());
 		
