@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.ho.yaml.Yaml;
 
@@ -153,7 +154,8 @@ public class PlottingDisplay extends Display {
 		
 		ConsoleLogger.log(this, "loading mapnodes..");
 		try {
-			mapNodes = Yaml.loadType(new File("bin/data/tacticalconsole/map.yaml"), MapNode[].class);
+			InputStream in = getClass().getResourceAsStream("/data/tacticalconsole/map.yaml");
+			mapNodes = Yaml.loadType(in, MapNode[].class);
 			ConsoleLogger.log(this, "..loaded " + mapNodes.length + " nodes");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
