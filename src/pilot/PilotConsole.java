@@ -43,6 +43,7 @@ public class PilotConsole extends PlayerConsole {
 	RadarDisplay radarDisplay;
 	LaunchDisplay launchDisplay;
 	CablePuzzleDisplay cablePuzzleDisplay;
+	SlingshotDisplay slingShotDisplay;
 
 	FailureScreen failureScreen;
 	
@@ -224,6 +225,8 @@ public class PilotConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 		displayMap.put("collisionradar", new CollisionRadarDisplay(this));
+		displayMap.put("slingshot", new SlingshotDisplay(this));
+		
 		
 		//configure the pilot console hardware stuff
 		pilotHardware = new PilotHardwareController("mainconsole", "COM8", 115200, this);
@@ -244,7 +247,7 @@ public class PilotConsole extends PlayerConsole {
 		oscP5.send(myMessage, serverAddress);
 
 		// set initial screen
-		Display d = displayMap.get("radar");
+		Display d = displayMap.get("slingshot");
 		changeDisplay(d);
 
 	}

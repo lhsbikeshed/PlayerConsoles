@@ -284,27 +284,7 @@ public abstract class PlayerConsole extends PApplet {
 				}
 			}
 			currentScreen.oscMessage(theOscMessage);
-		} else if (theOscMessage.checkAddrPattern("/ship/transform") == true) {
-			shipState.shipPos.x = theOscMessage.get(0).floatValue();
-			shipState.shipPos.y = theOscMessage.get(1).floatValue();
-			shipState.shipPos.z = theOscMessage.get(2).floatValue();
-			/*
-			 * shipState.shipRot.x = theOscMessage.get(3).floatValue();
-			 * shipState.shipRot.y = theOscMessage.get(4).floatValue();
-			 * shipState.shipRot.z = theOscMessage.get(5).floatValue();
-			 */
-			float w = theOscMessage.get(3).floatValue();
-			float x = theOscMessage.get(4).floatValue();
-			float y = theOscMessage.get(5).floatValue();
-			float z = theOscMessage.get(6).floatValue();
-			shipState.lastShipRot = shipState.shipRot;
-			shipState.shipRot = new Rot(w, x, y, z, false);
-			shipState.shipVel.x = theOscMessage.get(7).floatValue();
-			shipState.shipVel.y = theOscMessage.get(8).floatValue();
-			shipState.shipVel.z = theOscMessage.get(9).floatValue();
-
-			shipState.lastShipVel = shipState.shipVelocity;
-			shipState.lastTransformUpdate = millis();
+	
 		} else if (theOscMessage.checkAddrPattern("/ship/effect/playSound")) {
 			String name = theOscMessage.get(0).stringValue();
 			consoleAudio.playClip(name);

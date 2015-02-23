@@ -114,7 +114,7 @@ public class ShipState {
 			currentScene = msg.get(0).stringValue();
 			currentSceneId = msg.get(1).stringValue();
 			ConsoleLogger.log(this, "new scene node: " + currentSceneId);
-		} else if(msg.checkAddrPattern("/system/propulsion/setThrustReverser")){
+		} else if(msg.checkAddrPattern("/system/propul.sion/setThrustReverser")){
 			thrustReverser  = msg.get(0).intValue() == 1 ? true : false;
 		} else if (msg.checkAddrPattern("/ship/state/altitude")){
 			altitude.update(msg.get(0).floatValue(), parent.millis());
@@ -126,6 +126,30 @@ public class ShipState {
 			if(returnJourney){
 				ConsoleLogger.log(this, "Congrats chaps! Youre on the return leg");
 			}
+		
+		} else if (msg.checkAddrPattern("/ship/transform")) {
+			//ships position in unity coords relative to centre of game space
+			
+			shipPos.x = msg.get(0).floatValue();
+			shipPos.y = msg.get(1).floatValue();
+			shipPos.z = msg.get(2).floatValue();
+			
+			//rotation as a quaternion
+			float w = msg.get(3).floatValue();
+			float x = msg.get(4).floatValue();
+			float y = msg.get(5).floatValue();
+			float z = msg.get(6).floatValue();
+			lastShipRot = shipRot;
+			shipRot = new Rot(w, x, y, z, false);
+			
+			//ships velocity
+			shipVel.x = msg.get(7).floatValue();
+			shipVel.y = msg.get(8).floatValue();
+			shipVel.z = msg.get(9).floatValue();
+
+			lastShipVel = shipVelocity;
+			
+			lastTransformUpdate = parent.millis();
 		}
 	}
 }
