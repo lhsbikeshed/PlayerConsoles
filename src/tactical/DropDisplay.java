@@ -21,6 +21,7 @@ public class DropDisplay extends Display {
 	PImage structFailOverlay;
 	PImage offlineBlinker;
 	PImage damagedIcon;
+	
 
 	boolean fixed = false;
 	boolean structFail = false;
@@ -45,40 +46,10 @@ public class DropDisplay extends Display {
 		parent.background(0);
 		parent.fill(255, 255, 255);
 		parent.image(bg, 0, 0, parent.width, parent.height);
-		if (fixed) {
-			parent.strokeWeight(8);
-			parent.stroke(0,
-					PApplet.map(parent.millis() % 1250, 0, 1250, 0, 255), 0);
-			parent.line(462, 280, 585, 280);
-			parent.textFont(font, 30);
-			parent.fill(0, 255, 0);
-			if (jumpCharged) {
-
-				parent.text("JUMP SYSTEM CHARGING", 10, 148);
-				parent.textFont(font, 20);
-
-				parent.text("CHARGING", 61, 440);
-			} else {
-				parent.text("JUMP SYSTEM READY", 10, 148);
-				parent.textFont(font, 20);
-
-				parent.text("READY", 61, 440);
-			}
-		} else {
-			parent.strokeWeight(8);
-			parent.stroke(PApplet.map(parent.millis() % 250, 0, 250, 0, 255),
-					0, 0);
-			parent.line(462, 280, 585, 280);
-			parent.image(damagedIcon, 530, 204);
-
-			// if (globalBlinker) {
-			parent.textFont(font, 30);
-			parent.fill(PApplet.map(parent.millis() % 800, 0, 800, 0, 255), 0,
-					0);
-			parent.text("JUMP SYSTEM OFFLINE", 10, 148);
-			parent.textFont(font, 20);
-			parent.text("OFFLINE", 61, 440);
-			// }
+		parent.fill(0);
+		parent.noStroke();
+		if(parent.globalBlinker){
+			parent.rect(179,396, 664, 62);
 		}
 
 		if (structFail) { // show the "structural failure" warning
