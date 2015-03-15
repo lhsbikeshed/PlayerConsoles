@@ -42,7 +42,7 @@ public class TacticalHardwareController extends HardwareController {
 	String[] screenNames = {"weapons", "plottingDisplay"};
 	int screenIndex = 1;
 	
-	String[] weaponNames = {"LASER", "LASER", "LASER", "EMP"};
+	String[] weaponNames = {"CANNON", "CANNON", "CANNON", "EMP"};
 	
 	
 	boolean decoyLightState = false;

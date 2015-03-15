@@ -93,11 +93,11 @@ public class SlingshotDisplay extends Display {
 			parent.line(startX, startY + i * 20, startX + len, startY + i * 20);
 			
 		}
-		float markerY = PApplet.map(h, 35000, 0, startY, startY + 600);
+		float markerY = PApplet.map(h, 160, 0, startY, startY + 600);
 		parent.line(startX, markerY, startX + 50, markerY);
 		parent.textFont(parent.getGlobalFont(), 15);
 
-		parent.text((int)(parent.getShipState().altitude.getValue(parent.millis()) * 10 )+ "m", 100, markerY);
+		parent.text((int)(parent.getShipState().altitude.getValue(parent.millis()) * 100 )+ "m", 100, markerY);
 		
 		
 		//-------- burn indicators

@@ -37,6 +37,7 @@ public class TacticalConsole extends PlayerConsole {
 
 	DropDisplay dropDisplay; // display for the drop scene
 	WarpDisplay warpDisplay; // warp scene
+	SlingshotDisplay slingShotDisplay;
 
 	WeaponsConsole weaponsDisplay; // tactical weapons display
 	PlottingDisplay plottingDisplay;
@@ -225,7 +226,7 @@ public class TacticalConsole extends PlayerConsole {
 		dropDisplay = new DropDisplay(this);
 		// radarDisplay = new RadarDisplay();
 		warpDisplay = new WarpDisplay(this);
-		weaponsDisplay = new WeaponConsoleNew(this);
+		weaponsDisplay = new WeaponsConsole(this);
 
 		displayMap.put("weapons", weaponsDisplay);
 		displayMap.put("drop", dropDisplay);
@@ -235,7 +236,7 @@ public class TacticalConsole extends PlayerConsole {
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 		displayMap.put("plottingDisplay", new PlottingDisplay(this));
-		
+		displayMap.put("slingshot", new SlingshotDisplay(this));
 		
 
 		
