@@ -259,7 +259,7 @@ public class EngineerConsole extends PlayerConsole {
 		jamDisplay = new JamDisplay(this);
 		displayMap.put("power", powerDisplay);
 		displayMap.put("drop", new DropDisplay(this));
-		displayMap.put("hyperspace", new HyperSpaceDisplay(this));
+		displayMap.put("hyperspace", new NewHyperSpaceDisplay(this));
 		displayMap.put("jamming", jamDisplay);
 		displayMap.put("airlockdump", new AirlockDisplay(this));
 		displayMap.put("selfdestruct", new DestructDisplay(this));
@@ -280,7 +280,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("authdisplay"));
+		changeDisplay(displayMap.get("hyperspace"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");
