@@ -23,6 +23,8 @@ public class DamageEffect {
 	Boolean running = false;
 	Boolean doBoom = false;
 	
+	Float damageSet = 0f;
+	
 	ArrayList<CrackItem> crackList = new ArrayList<CrackItem>();
 	PImage[] crackImages;
 
@@ -83,6 +85,12 @@ public class DamageEffect {
 				doBoom = false;
 			}
 		}
+		synchronized(damageSet) {
+			if (damageSet > 0) {
+				damageDistortion.set("damage", damageSet);
+				damageSet = 0f;
+			}
+		}
 		synchronized(running) {
 			if (running) {
 				if (damageTimer < now) {
@@ -124,7 +132,9 @@ public class DamageEffect {
 
 	}
 	public void setDamageLevel(float dmg) {
-		damageDistortion.set("damage", dmg);
+		synchronized(damageSet) {
+			damageSet += dmg;
+		}
 	}
 
 	public void startEffect(long ms) {
