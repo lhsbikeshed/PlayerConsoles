@@ -72,7 +72,7 @@ void main() {
 
 		val += gauss( coords.t * 20 - 10, height, a, b, offset ) * damageAmt;
 
-		val += ( (1 - (rand(vec2(coords.t, timer / 1000)) * 2)) / 10 ) * (0.05 * damageAmt);
+		val += ( (1 - (rand(vec2(coords.t, timer / 1000)) * 2)) / 10 ) * (0.02 * damageAmt);
 		// val
 		// val *= damageAmt;
 
