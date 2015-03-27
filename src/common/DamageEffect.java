@@ -20,7 +20,8 @@ public class DamageEffect {
 	// time we last got damaged
 	long damageTimer = -1000;
 
-	boolean running = false;
+	Boolean running = false;
+	Boolean doBoom = false;
 	
 	ArrayList<CrackItem> crackList = new ArrayList<CrackItem>();
 	PImage[] crackImages;
@@ -76,13 +77,21 @@ public class DamageEffect {
 	public void draw() {
 		int now = parent.millis();
 		damageDistortion.set("timer", now);
-		if (running) {
-			if (damageTimer < now) {
-				running = false;
-				damageDistortion.set("boom", false);
-				ConsoleLogger.log(this, String.format("unbooming at %d!", now));
-			} else {
-				damageDistortion.set("boom", true);				
+		synchronized(doBoom) {
+			if (doBoom) {
+				damageDistortion.set("boom", true);
+				doBoom = false;
+			}
+		}
+		synchronized(running) {
+			if (running) {
+				if (damageTimer < now) {
+					running = false;
+					damageDistortion.set("boom", false);
+					ConsoleLogger.log(this, String.format("unbooming at %d!", now));
+				} else {
+					damageDistortion.set("boom", true);				
+				}
 			}
 		}
 		parent.filter(damageDistortion);
@@ -119,10 +128,14 @@ public class DamageEffect {
 	}
 
 	public void startEffect(long ms) {
-		damageTimer = parent.millis() + ms;
-		running = true;
-		damageDistortion.set("boom", true);	
 		ConsoleLogger.log(this, String.format("Enbooming at %d for %d!", parent.millis(), ms));
+		synchronized(doBoom) {
+			doBoom = true;
+		}
+		synchronized(running) {
+			damageTimer = parent.millis() + ms;
+			running = true;
+		}
 	}
 
 }
