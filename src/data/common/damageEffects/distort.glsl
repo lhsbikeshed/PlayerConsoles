@@ -63,7 +63,7 @@ void main() {
 		b = sqrt(.5);
 		offset = 0;
 		// TODO: Mix this with a much lower level one for a bump spike
-		val = gauss( coords.t * 20 - 10, height, a, b, offset );
+		val = gauss( coords.t * 20 - 2, height, a, b, offset );
 
 		height = .1;
 		a = rand(vec2(1, timer / ( 10 * idamage) ) ) * 2 + 4;
