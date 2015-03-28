@@ -1,8 +1,13 @@
 package common;
 
-public class ConsoleLogger {
-	public static void log(Object obj, String text) {
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
-		System.out.println(obj.getClass().getName() + " - " + text);
+public class ConsoleLogger {
+	
+	
+	public static void log(Object obj, String text) {
+		String t = new SimpleDateFormat("HH:mm:ss").format(new Date());
+		System.out.println(t + " - " + obj.getClass().getName() + ": " + text);
 	}
 }

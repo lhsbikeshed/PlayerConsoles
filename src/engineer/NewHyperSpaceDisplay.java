@@ -12,6 +12,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.util.LerpedFloat;
 
 /*
  * present player with a cross section of the hyperspace warp bubble around the ship
@@ -59,6 +60,8 @@ public class NewHyperSpaceDisplay extends Display {
 	float goodTimer = 0.0f;
 	
 	long lastUpdateSendTime = 0;
+	
+	LerpedFloat currentVelocity = new LerpedFloat(0, 0, 250);
 	
 	//points to draw
 	PVector[] targetPoints, playerPoints;
@@ -108,6 +111,15 @@ public class NewHyperSpaceDisplay extends Display {
 		//draw things
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
 
+		//--test
+		parent.noStroke();
+		parent.fill(100,100,208,128);
+		float size = (float) (parent.map(tunnelStability, 0.0f, 5.0f, 20, 600) + Math.sin(parent.frameCount * 0.1f) * 10f);
+		parent.ellipse(centreX, centreY, size, size);
+		
+		//--test
+		
+		
 		parent.stroke(255);
 		
 		//draw peak lines for player
@@ -119,10 +131,14 @@ public class NewHyperSpaceDisplay extends Display {
 		    p.mult(350);
 		  //  parent.line(centreX, centreY, centreX + p.x, centreY + p.y);
 		}
-		if(tunnelStability < 0.3f && parent.globalBlinker){
+		if(tunnelStability < 1.0f && parent.globalBlinker){
 			parent.fill(255,0,0,100);
 			parent.noStroke();
 			parent.ellipse(centreX, centreY, 600, 600);
+			parent.getConsoleAudio().playClip("lowFuelBeep");
+			if(tunnelStability < 0.5f){
+				parent.getConsoleAudio().playClip("bubbleCollapse");
+			}
 
 		}
 		
@@ -175,6 +191,11 @@ public class NewHyperSpaceDisplay extends Display {
 		drawAngleGraph();
 		drawFrequencyGraph();
 		
+		float vel = currentVelocity.getValue(parent.millis());
+		//parent.text("Current velocity: " + vel  + "c", 678, 741);
+		
+		
+		//updates
 		
 		/* every 250ms send a tunnel size update to the game, if the tunnel stability < 0
 		 * then the game will destroy / damage the ship
@@ -183,22 +204,34 @@ public class NewHyperSpaceDisplay extends Display {
 			lastUpdateSendTime = parent.millis();
 			//send an osc update with the current bubble stablility in it
 			OscMessage m = new OscMessage("/scene/warp/tunnelStability");
-			m.add(tunnelStability);
+			m.add(tunnelStability / 5.0f);
 			parent.getOscClient().send(m, parent.getServerAddress());
 		}
 		
 	}
 	
 	void drawStability(){
-		float h = parent.map(tunnelStability, 0.0f, 5.0f, 0.0f, 400f);
-		parent.rect(10,500, 20, -h);
+		parent.pushMatrix();
+		parent.translate(950,530);
+		parent.fill(60);
+		parent.stroke(255);
+		parent.rect(-60,-420,120,480);
+		
+		parent.fill(255);
+		float h = PApplet.map(tunnelStability, 0.0f, 5.0f, 0.0f, 400f);
+		parent.rect(0,0, 50, -h);
 		parent.noFill();
 		parent.stroke(255);
-		parent.rect(10,500,20,-400);
+		parent.rect(0,0,50,-400);
 		
-		
+		parent.textFont(font, 20);
 		int stabVal = (int)(tunnelStability * 20);
-		parent.text("Bubble Stability\r\n" + stabVal + "%", 40,500);
+		parent.text("Bubble \n     size" , -50,20);
+		
+		parent.textFont(font, 15);
+		parent.text(stabVal + "%", -55, -h);
+		
+		parent.popMatrix();
 		
 	}
 	
@@ -207,7 +240,41 @@ public class NewHyperSpaceDisplay extends Display {
 	}
 	
 	void drawFrequencyGraph(){
+		parent.pushMatrix();
+		parent.translate(50,220);
+		//lines
+		parent.strokeWeight(20);
+		parent.line(-50,20, -29,20);
+		parent.line(-50,220, -29,220);
+		parent.strokeWeight(1);
 		
+		//dial indicators
+		parent.fill(38);
+		parent.stroke(255);
+		parent.ellipse(20,20,100,100);
+		
+		parent.ellipse(20,220,100,100);
+		
+		
+		parent.fill(255);
+		parent.textFont(font, 22);
+		parent.text("Angle", -25,90);
+		parent.text("Peaks", -25,290);
+		
+		//now the contents of the dial bits
+		int peaks = countPeaks(playerFreq * 0.5f);
+		parent.textFont(font, 30);
+		parent.text(peaks, 8,230);
+		
+		int angle = (int)parent.degrees(playerRot);
+		if(angle > 360){
+			angle %= 360;
+		} else if (angle < 0){
+			angle = 360 - angle;
+		}
+		parent.textFont(font, 20);
+		parent.text(angle, 8, 20);
+		parent.popMatrix();
 	}
 	
 	//get the angular difference between the target and player graphs
@@ -215,6 +282,10 @@ public class NewHyperSpaceDisplay extends Display {
 
 		float targetAngles = getPeakAngle(countPeaks(targetFreq * 0.5f));
 		float targetAng = targetRot % targetAngles;
+		if(targetAng < 0.0f){
+			float p = (float) (Math.PI * 2  +targetAng);
+			targetAng = p % targetAngles;
+		}
 		float angles = getPeakAngle(countPeaks(playerFreq * 0.5f));
 		
 		float currentAngles = playerRot % angles;
@@ -222,10 +293,7 @@ public class NewHyperSpaceDisplay extends Display {
 			float p = (float) (Math.PI * 2  +playerRot);
 			currentAngles = p % angles;
 		}
-		parent.text("target phase: " + targetAng, 100,680);
-		parent.text("phase diff: " + currentAngles, 100,700);
-
-				
+		
 		float angDiff = Math.abs(targetAng - currentAngles);
 		return angDiff;
 	}
@@ -251,7 +319,7 @@ public class NewHyperSpaceDisplay extends Display {
 
 		    PVector p = pts[i];
 		    
-		    parent.rect(centreX + p.x, centreY + p.y, 2, 2);
+		    parent.rect(centreX + p.x, centreY + p.y, 4 , 4);
 		    
 		  }
 		}

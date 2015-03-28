@@ -48,7 +48,7 @@ void main() {
 	float cline = mod( (vertTexCoord.t / texOffset.t), scandist );
 
 	// Constant damage screen distortion
-	if (damage > 0) {
+	if (damage > 1 && damage < 100) {
 		float damageAmt = (float(damage) / 100);
 		float idamage = 100 - damage;
 		float idamageAmt = (float(idamage) / 100);
