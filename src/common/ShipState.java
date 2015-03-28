@@ -40,7 +40,7 @@ public class ShipState {
 	//how many emp blasts left
 	public int smartBombsLeft;
 	//hull state
-	public float hullState;
+	public float hullState = 100;
 	//is the fuel tank leaking
 	public boolean fuelLeaking;
 	//is the engineer silliness in progress
