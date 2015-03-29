@@ -7,6 +7,11 @@ import common.HardwareEvent;
 import common.PlayerConsole;
 
 public class LowerPanelHardware extends HardwareController {
+	
+	public static final int STICK_UP = 14;
+	public static final int STICK_RIGHT = 15;
+	public static final int STICK_DOWN = 16;
+	public static final int STICK_LEFT = 17;
 
 	public LowerPanelHardware(String interfaceName, String port, int rate,
 			PlayerConsole parent) {
@@ -25,7 +30,7 @@ public class LowerPanelHardware extends HardwareController {
 				// chop off first two chars, split on the : character
 				vals = vals.substring(2);
 				String[] sw = vals.split(":");
-
+				
 				HardwareEvent h = new HardwareEvent();
 				h.event = "NEWSWITCH";
 				h.id = Integer.parseInt(sw[0]);

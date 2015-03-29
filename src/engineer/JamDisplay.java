@@ -10,6 +10,7 @@ import processing.core.PImage;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.util.UsefulShit;
 
 public class JamDisplay extends Display {
 
@@ -298,13 +299,13 @@ public class JamDisplay extends Display {
 		// jamfrequency change timout, makes it a little easier
 		if(evt.event.equals("JAMDIAL")){
 			if (evt.id == 0) {
-				dialA = evt.value;
+				dialA = (int) (11 - PApplet.map((float)evt.value,0f,1024f,10f,0f));
 				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the
 											// button
 				}
 			} else if (evt.id == 1) {
-				dialB = evt.value;
+				dialB = (int) (11 - PApplet.map((float)evt.value,0f,1024f,10f,0f));
 				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the
 											// button

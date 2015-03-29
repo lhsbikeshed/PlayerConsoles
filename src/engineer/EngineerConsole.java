@@ -343,7 +343,12 @@ public class EngineerConsole extends PlayerConsole {
 				doSilliness();
 			}
 			
+		} else if (h.event.equals("NEWSWITCH")){
+			if(h.id == 12 && h.value == 1){	//button 12,catch it on the press rather than release
+				doSilliness();
+			}
 		}
+		
 		
 		currentScreen.serialEvent(h);
 	}
