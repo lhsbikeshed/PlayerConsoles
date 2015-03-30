@@ -116,13 +116,13 @@ public class AirlockDisplay extends Display {
 			if (codePtr < 4) {
 				if (failedCode == false) {
 					parent.getConsoleAudio().randomBeep();
-					codeAttempt[codePtr] = k - 48;
+					codeAttempt[codePtr] = k - KeyEvent.VK_NUMPAD0;
 					codePtr++;
 				}
 			} else {
 				if (failedCode == false) {
 					parent.getConsoleAudio().randomBeep();
-					codeAttempt[codePtr] = k - 48;
+					codeAttempt[codePtr] = k - KeyEvent.VK_NUMPAD0;
 					codePtr++;
 				}
 
@@ -160,7 +160,7 @@ public class AirlockDisplay extends Display {
 		if (evt.event.equals("KEY")) {		
 			
 			
-			if (evt.value >= KeyEvent.VK_0 && evt.value <= KeyEvent.VK_9) {
+			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9) {
 				char c = (char)evt.value;
 				keyEntered(c);
 			} else if (evt.value == KeyEvent.VK_L){

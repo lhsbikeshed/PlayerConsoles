@@ -306,7 +306,7 @@ public class JamDisplay extends Display {
 				}
 			} else if (evt.id == 1) {
 				dialB = (int) (Math.floor(PApplet.map(evt.value, 50, 1000, 0, 9)));
-				dialB = PApplet.constrain(dialA, 0, 9);
+				dialB = PApplet.constrain(dialB, 0, 9);
 
 				if (dialA  == target[0] && dialB  == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the

@@ -420,11 +420,11 @@ public class NewHyperSpaceDisplay extends Display {
 		}  else if(evt.event.equals("JAMDIAL")){
 			if(evt.id == 0){
 				//top dial, change rotation
-				playerRot = PApplet.map(evt.value, 0f, 1024f, 0, PConstants.PI * 2);
+				playerRot = PApplet.map(evt.value, 0f, 1024f, PConstants.PI * 2, 0);
 				
 			} else if (evt.id == 1){
 				//change the freq
-				playerFreq = (int)PApplet.map(evt.value, 0f, 1024f, 1, 8);
+				playerFreq = (int)PApplet.map(evt.value, 0f, 1024f, 1, 9);
 				
 			}
 		}
