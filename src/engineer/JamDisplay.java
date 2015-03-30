@@ -298,13 +298,13 @@ public class JamDisplay extends Display {
 		// jamfrequency change timout, makes it a little easier
 		if(evt.event.equals("JAMDIAL")){
 			if (evt.id == 0) {
-				dialA = evt.value;
+				dialA = 11 - (int)PApplet.map(evt.value, 0, 1024, 10, 0);
 				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the
 											// button
 				}
 			} else if (evt.id == 1) {
-				dialB = evt.value;
+				dialB = 11 - (int)PApplet.map(evt.value, 0, 1024, 10, 0);
 				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the
 											// button
