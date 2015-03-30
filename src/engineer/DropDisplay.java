@@ -1,5 +1,7 @@
 package engineer;
 
+import java.awt.event.KeyEvent;
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -264,10 +266,13 @@ public class DropDisplay extends Display {
 			char c = (char)evt.value;
 			if (evt.event.equals("KEY")) {
 				parent.getConsoleAudio().randomBeep();
-				if (authCode.length() < 4) {
-					authCode += c;
-				} else {
-					authCode +=c;
+				if(c == KeyEvent.VK_BACK_SPACE){
+					if(authCode.length() > 0){
+						authCode = authCode.substring(0, authCode.length() - 1);
+					}
+				
+				} else if (c == KeyEvent.VK_ENTER || authCode.length() > 10){
+					//authCode +=c;
 					if (authCode.equals(currentAuthCode)) {
 						authResult = true;
 						parent.getConsoleAudio().playClip("codeOk");
@@ -283,6 +288,8 @@ public class DropDisplay extends Display {
 					}
 
 					authDisplayTime = parent.millis();
+				} else if (c >= KeyEvent.VK_NUMPAD0 && c <= KeyEvent.VK_NUMPAD9) {
+					authCode += (c - KeyEvent.VK_NUMPAD0);
 				}
 			}
 		}

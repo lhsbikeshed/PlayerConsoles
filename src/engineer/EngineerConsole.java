@@ -294,14 +294,14 @@ public class EngineerConsole extends PlayerConsole {
 		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim, 1.0f);
 
-		upperPanel = new UpperPanelHardware("upperpanel", "COM11", 9600, this);
-		lowerPanel = new LowerPanelHardware("lowerpanel", "COM12", 115200, this);
+		upperPanel = new UpperPanelHardware("upperpanel", "COM11", 9600, this);//11
+		lowerPanel = new LowerPanelHardware("lowerpanel", "COM12", 115200, this);//12
 		hardwareControllers.add(upperPanel);
 		hardwareControllers.add(lowerPanel);
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("hyperspace"));
+		changeDisplay(displayMap.get("drop"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");
