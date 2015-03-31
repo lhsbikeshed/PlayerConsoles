@@ -26,7 +26,7 @@ public class AirlockDisplay extends Display {
 	String serverIP = "";
 	NetAddress myRemoteLocation;
 
-	int[] possibleAuthCodes = { 12345, 62918, 26192 };
+	String[] possibleAuthCodes = { "12345", "62918", "26192" };
 
 	// game state
 	boolean locked = true;
@@ -36,10 +36,10 @@ public class AirlockDisplay extends Display {
 	String stateText = "DOOR LOCKED";
 	int failTime = 0;
 	int successTime = 0;
-	int codePtr = 0;
-	int[] codeAttempt = new int[5];
+	
+	String authCode = "";
 
-	int doorCode = 12345;
+	String doorCode = "12345";
 	long puzzleStartTime = 0;
 	boolean totalFailure = false;
 
@@ -52,9 +52,7 @@ public class AirlockDisplay extends Display {
 		dumpOverlay = parent.loadImage("engineerconsole/airlockoverlay.png");
 		failedDumpOverlay = parent
 				.loadImage("engineerconsole/airlockFailedOverlay.png");
-		for (int i = 0; i < 5; i++) {
-			codeAttempt[i] = 0;
-		}
+		authCode = "";
 	}
 
 	@Override
@@ -62,9 +60,10 @@ public class AirlockDisplay extends Display {
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
 
 		parent.textFont(font, 50);
-		for (int i = 0; i < codePtr; i++) {
-			parent.fill(0, 255, 0);
-			parent.text(codeAttempt[i], 170 + i * 150, 390);
+		
+		parent.fill(0, 255, 0);
+		for(int i = 0; i < authCode.length(); i++){
+			parent.text("" + authCode.charAt(i), 170 + i * 150, 390);
 		}
 
 		parent.textFont(font, 50);
@@ -78,7 +77,7 @@ public class AirlockDisplay extends Display {
 		if (failedCode) {
 			if (failTime + 1500 < parent.millis()) {
 				failedCode = false;
-				codePtr = 0;
+				authCode = "";
 				stateText = "DOOR LOCKED";
 			}
 		}
@@ -111,27 +110,20 @@ public class AirlockDisplay extends Display {
 	}
 
 	public void keyEntered(int k) {
-		ConsoleLogger.log(this, "received key key entered " + k);
+		char c = (char)k;
+		ConsoleLogger.log(this, "received key key entered " + c);
 		if (locked) {
-			if (codePtr < 4) {
-				if (failedCode == false) {
-					parent.getConsoleAudio().randomBeep();
-					codeAttempt[codePtr] = k - KeyEvent.VK_NUMPAD0;
-					codePtr++;
+			
+			if(c == KeyEvent.VK_BACK_SPACE){
+				if(authCode.length() > 0){
+					
+				
+					authCode = authCode.substring(0, authCode.length() - 1);
 				}
-			} else {
-				if (failedCode == false) {
-					parent.getConsoleAudio().randomBeep();
-					codeAttempt[codePtr] = k - KeyEvent.VK_NUMPAD0;
-					codePtr++;
-				}
-
-				// check the code
-				int testCode = codeAttempt[0] * 10000 + codeAttempt[1] * 1000
-						+ codeAttempt[2] * 100 + codeAttempt[3] * 10
-						+ codeAttempt[4];
-
-				if (testCode == doorCode) {
+			
+			} else if (c == KeyEvent.VK_ENTER || authCode.length() >= 5){
+				//authCode +=c;
+				if (authCode.equals(doorCode)) {
 					failedCode = false;
 					locked = false;
 					stateText = "CODE OK";
@@ -139,16 +131,17 @@ public class AirlockDisplay extends Display {
 					setAirlockLightState(true);
 					parent.getConsoleAudio().playClip("codeOk");
 				} else {
-					failedCode = true;
-					stateText = "CODE FAILED";
-					failTime = parent.millis();
-					// turn off airlock dump light
-					setAirlockLightState(false);
+					ConsoleLogger.log(this, "failed code");
 					parent.getConsoleAudio().playClip("codeFail");
+					authCode = "";
 				}
-			}
+			} else if (c >= KeyEvent.VK_NUMPAD0 && c <= KeyEvent.VK_NUMPAD9) {
+				authCode += (c - KeyEvent.VK_NUMPAD0);
+			
+			} 
 		}
 	}
+	
 
 	
 	@Override
@@ -160,9 +153,10 @@ public class AirlockDisplay extends Display {
 		if (evt.event.equals("KEY")) {		
 			
 			
-			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9) {
-				char c = (char)evt.value;
-				keyEntered(c);
+			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9
+					|| evt.value == KeyEvent.VK_ENTER || evt.value == KeyEvent.VK_BACK_SPACE) {
+				//char c = (char)evt.value;
+				keyEntered(evt.value);
 			} else if (evt.value == KeyEvent.VK_L){
 				dumpAirlock();
 			}
@@ -204,14 +198,12 @@ public class AirlockDisplay extends Display {
 		failedCode = false;
 		totalFailure = false;
 		locked = true;
-		codePtr = 0;
+		authCode = "";
 		greatSuccess = false;
 		successTime = 0;
 		doneSuccessMessage = false;
 		stateText = "DOOR LOCKED";
-		for (int i = 0; i < 5; i++) {
-			codeAttempt[i] = 0;
-		}
+		
 		doorCode = possibleAuthCodes[0];
 
 	}

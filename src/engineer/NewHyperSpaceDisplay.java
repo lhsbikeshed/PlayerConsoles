@@ -100,6 +100,7 @@ public class NewHyperSpaceDisplay extends Display {
 		//rotate the target on a nice wobbly sin wave
 		targetRot = (float) (Math.PI + Math.sin(parent.frameCount / 80f));
 		targetRot += (float) (Math.PI + Math.cos(parent.frameCount / 40f));
+		targetRot *= PApplet.map(tunnelStability, 0f, 5f, 1f, 1.5f);
 		targetRot *= 0.4f;
 		
 		
@@ -163,13 +164,13 @@ public class NewHyperSpaceDisplay extends Display {
 				goodTimer += 0.001f;
 			} else {
 				parent.fill(255, 255, 0);
-				tunnelStability -= 0.002f;;
+				tunnelStability -= 0.004f;;
 				goodTimer -= 0.001f;
 			}
 		}
 		else {
 			parent.fill(255, 0, 0);
-			tunnelStability -= 0.002f;
+			tunnelStability -= 0.004f;
 			goodTimer -= 0.001f;
 		}
 		if(haveFailed){
