@@ -250,22 +250,22 @@ public class RefuelDisplay extends Display {
 			
 			switch(evt.id){
 			case KeyEvent.VK_UP:
-				headVelTarget.y = 1f;
+				headVelTarget.y = 1f * evt.value;
 				break;
 			case KeyEvent.VK_DOWN:
-				headVelTarget.y = -1f;
+				headVelTarget.y = -1f * evt.value;
 				break;
 			case KeyEvent.VK_RIGHT:
-				headVelTarget.x = -1f;
+				headVelTarget.x = -1f * evt.value;
 				break;
 			case KeyEvent.VK_LEFT:
-				headVelTarget.x = 1f;
+				headVelTarget.x = 1f * evt.value;
 				break;
 			case KeyEvent.VK_ADD:
-				headVelTarget.z = 1f;
+				headVelTarget.z = 1f * evt.value;
 				break;
 			case KeyEvent.VK_SUBTRACT:
-				headVelTarget.z = -1f;
+				headVelTarget.z = -1f * evt.value;
 				break;
 			
 			}
