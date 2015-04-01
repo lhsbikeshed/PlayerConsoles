@@ -290,6 +290,8 @@ public class EngineerConsole extends PlayerConsole {
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));		
 		displayMap.put("power2", new NewPowerDisplay(this));		
 		displayMap.put("authdisplay", new AuthDisplay(this));
+		displayMap.put("refuelDisplay", new RefuelDisplay(this));
+		
 
 		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim, 1.0f);
@@ -301,7 +303,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("airlockdump"));
+		changeDisplay(displayMap.get("refuelDisplay"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");
