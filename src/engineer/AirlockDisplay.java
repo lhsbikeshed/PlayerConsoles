@@ -111,7 +111,7 @@ public class AirlockDisplay extends Display {
 
 	public void keyEntered(int k) {
 		char c = (char)k;
-		ConsoleLogger.log(this, "received key key entered " + c);
+		
 		if (locked) {
 			
 			if(c == KeyEvent.VK_BACK_SPACE){
@@ -150,14 +150,16 @@ public class AirlockDisplay extends Display {
 
 	@Override
 	public void serialEvent(HardwareEvent evt) {		
-		if (evt.event.equals("KEY")) {		
+		if (evt.event.equals("KEY") && evt.value == 1) {		
 			
 			
-			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9
-					|| evt.value == KeyEvent.VK_ENTER || evt.value == KeyEvent.VK_BACK_SPACE) {
+			if (evt.id >= KeyEvent.VK_NUMPAD0 && evt.id <= KeyEvent.VK_NUMPAD9
+					|| evt.id == KeyEvent.VK_ENTER || evt.id == KeyEvent.VK_BACK_SPACE) {
 				//char c = (char)evt.value;
-				keyEntered(evt.value);
-			} else if (evt.value == KeyEvent.VK_L){
+				
+				keyEntered(evt.id);
+				
+			} else if (evt.id == KeyEvent.VK_L){
 				dumpAirlock();
 			}
 		}

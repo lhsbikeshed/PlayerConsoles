@@ -303,7 +303,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("refuelDisplay"));
+		changeDisplay(displayMap.get("authdisplay"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");
@@ -363,7 +363,7 @@ public class EngineerConsole extends PlayerConsole {
 	public void hardwareEvent(HardwareEvent h) {
 
 		if(h.event.equals("KEY")){
-			if(h.value == KeyEvent.VK_OPEN_BRACKET){
+			if(h.id == KeyEvent.VK_OPEN_BRACKET && h.value == 1){
 				doSilliness();
 			}
 			

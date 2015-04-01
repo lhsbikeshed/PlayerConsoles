@@ -184,8 +184,8 @@ public class AuthDisplay extends Display {
 	}
 
 	private void keyEntered(HardwareEvent evt) {
-		char c = (char)(evt.value);
-		if (evt.event.equals("KEY")) {
+		char c = (char)(evt.id);
+		if (evt.event.equals("KEY") && evt.value == 1) {
 			parent.getConsoleAudio().randomBeep();
 			if(c == KeyEvent.VK_BACK_SPACE){
 				if(authCode.length() > 0){
@@ -193,7 +193,7 @@ public class AuthDisplay extends Display {
 				
 					authCode = authCode.substring(0, authCode.length() - 1);
 				}
-			} else if (c == KeyEvent.VK_ENTER){
+			} else if (c == KeyEvent.VK_ENTER && evt.value == 1){
 				if (authCode.equals(currentAuthCode)) {
 					authResult = true;
 					parent.getConsoleAudio().playClip("codeOk");
@@ -205,7 +205,7 @@ public class AuthDisplay extends Display {
 				}
 
 				authDisplayTime = parent.millis();
-			} else {
+			} else if (evt.value == 1){
 				authCode += c - KeyEvent.VK_NUMPAD0;
 				
 			}

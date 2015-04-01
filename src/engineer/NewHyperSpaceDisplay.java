@@ -397,6 +397,7 @@ public class NewHyperSpaceDisplay extends Display {
 	@Override
 	public void serialEvent(HardwareEvent evt) {
 		if(evt.event.equals("KEY")){
+			if (evt.value != 1) return;
 			int c = evt.id;
 			if (c == 38) {
 			    playerRot -= 0.03f;

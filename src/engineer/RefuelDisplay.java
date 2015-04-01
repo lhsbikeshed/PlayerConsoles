@@ -35,9 +35,8 @@ public class RefuelDisplay extends Display {
 
 	@Override
 	public void draw() {
-		headVel = PVector.lerp(headVel, headVelTarget, 0.4f);
-		headVelTarget.x = 0;
-		headVelTarget.y = 0;headVelTarget.z = 0;
+		headVel = PVector.lerp(headVel, headVelTarget, 0.02f);
+		
 		headPos.add(headVel);
 		
 		parent.background(0);
@@ -49,6 +48,7 @@ public class RefuelDisplay extends Display {
 		targetGraphics.image(targetImage,0, 0);
 
 		targetGraphics.endDraw();
+		
 
 		parent.image(targetGraphics, 90, 148);
 		
@@ -65,24 +65,24 @@ public class RefuelDisplay extends Display {
 	@Override
 	public void serialEvent(HardwareEvent evt) {
 		if(evt.event.equals("KEY")){
-			switch(evt.value){
+			switch(evt.id){
 			case KeyEvent.VK_UP:
-				headVelTarget.y = 1f;
+				headVelTarget.y = 1f * evt.value;
 				break;
 			case KeyEvent.VK_DOWN:
-				headVelTarget.y = -1f;
+				headVelTarget.y = -1f * evt.value;
 				break;
 			case KeyEvent.VK_RIGHT:
-				headVelTarget.x = -1f;
+				headVelTarget.x = -1f * evt.value;
 				break;
 			case KeyEvent.VK_LEFT:
-				headVelTarget.x = 1f;
+				headVelTarget.x = 1f * evt.value;
 				break;
 			case KeyEvent.VK_ADD:
-				headVelTarget.z = 1f;
+				headVelTarget.z = 1f * evt.value;
 				break;
 			case KeyEvent.VK_SUBTRACT:
-				headVelTarget.z = -1f;
+				headVelTarget.z = -1f * evt.value;
 				break;
 			
 			}

@@ -151,6 +151,7 @@ public class DropDisplay extends Display {
 
 	@Override
 	public void draw() {
+		
 		if (state == STATE_INST) {
 			parent.image(instructionImage, 0, 0, parent.width, parent.height);
 
@@ -263,8 +264,8 @@ public class DropDisplay extends Display {
 	public void serialEvent(HardwareEvent evt) {
 		
 		if (state == STATE_AUTH) {
-			char c = (char)evt.value;
-			if (evt.event.equals("KEY")) {
+			char c = (char)evt.id;
+			if (evt.event.equals("KEY") && evt.value == 1) {
 				parent.getConsoleAudio().randomBeep();
 				if(c == KeyEvent.VK_BACK_SPACE){
 					if(authCode.length() > 0){

@@ -64,11 +64,23 @@ public class HardwareController {
 			HardwareEvent h = new HardwareEvent();
 			h.event = "KEY";
 			h.id = ke.getKeyCode();
-			h.value = ke.getKeyCode();
+			h.value = 1;
 			h.fromDevice = interfaceName;
 			parent.hardwareEvent(h);
 		}
 
+	}
+	
+	public void keyReleased(KeyEvent ke){
+		if (isKeyboard) {
+			HardwareEvent h = new HardwareEvent();
+			h.event = "KEY";
+			h.id = ke.getKeyCode();
+			h.value = 0;
+			h.fromDevice = interfaceName;
+			parent.hardwareEvent(h);
+		}
+		
 	}
 
 	protected void sendSerial(String toSend) {

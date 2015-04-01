@@ -163,6 +163,7 @@ public class JamDisplay extends Display {
 				if (dialB  == i) {
 					parent.fill(0, 255, 255);
 				}
+				parent.noStroke();
 				parent.rect(330 + 60 * i, 640, 40, graphHeightB);
 			}
 
@@ -314,8 +315,8 @@ public class JamDisplay extends Display {
 				}
 			}
 		
-		} else if (evt.event.equals("KEY")) {
-			if (evt.value == KeyEvent.VK_SEMICOLON) {
+		} else if (evt.event.equals("KEY") && evt.value == 1) {
+			if (evt.id == KeyEvent.VK_SEMICOLON) {
 				jamAttempt();
 			}
 		} else if (evt.event.equals("NEWSWITCH")) {

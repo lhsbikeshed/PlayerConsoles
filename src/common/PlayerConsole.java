@@ -302,8 +302,14 @@ public abstract class PlayerConsole extends PApplet {
 		//pass this to the keyboard controller
 		//this will then pass it on to the current consoles "hardwareevent" method
 		//using the hardwareEvent container rather than just keypresses
+		
 		keyboardController.keyPressed(ke);
 	}
+	
+	public void keyReleased(KeyEvent ke){
+		keyboardController.keyReleased(ke);
+	}
+	
 	public void mouseClicked(){
 		
 		keyboardController.mouseClicked(mouseButton);
