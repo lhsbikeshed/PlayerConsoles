@@ -245,8 +245,10 @@ public class RefuelDisplay extends Display {
 
 	@Override
 	public void serialEvent(HardwareEvent evt) {
+		
 		if(evt.event.equals("KEY")){
-			switch(evt.value){
+			
+			switch(evt.id){
 			case KeyEvent.VK_UP:
 				headVelTarget.y = 1f;
 				break;
