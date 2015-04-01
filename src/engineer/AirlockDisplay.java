@@ -1,4 +1,4 @@
-	package engineer;
+package engineer;
 
 import java.awt.event.KeyEvent;
 
@@ -36,7 +36,7 @@ public class AirlockDisplay extends Display {
 	String stateText = "DOOR LOCKED";
 	int failTime = 0;
 	int successTime = 0;
-	
+
 	String authCode = "";
 
 	String doorCode = "12345";
@@ -60,9 +60,9 @@ public class AirlockDisplay extends Display {
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
 
 		parent.textFont(font, 50);
-		
+
 		parent.fill(0, 255, 0);
-		for(int i = 0; i < authCode.length(); i++){
+		for (int i = 0; i < authCode.length(); i++) {
 			parent.text("" + authCode.charAt(i), 170 + i * 150, 390);
 		}
 
@@ -110,19 +110,18 @@ public class AirlockDisplay extends Display {
 	}
 
 	public void keyEntered(int k) {
-		char c = (char)k;
-		ConsoleLogger.log(this, "received key key entered " + c);
+		char c = (char) k;
+
 		if (locked) {
-			
-			if(c == KeyEvent.VK_BACK_SPACE){
-				if(authCode.length() > 0){
-					
-				
+
+			if (c == KeyEvent.VK_BACK_SPACE) {
+				if (authCode.length() > 0) {
+
 					authCode = authCode.substring(0, authCode.length() - 1);
 				}
-			
-			} else if (c == KeyEvent.VK_ENTER || authCode.length() >= 5){
-				//authCode +=c;
+
+			} else if (c == KeyEvent.VK_ENTER || authCode.length() >= 5) {
+				// authCode +=c;
 				if (authCode.equals(doorCode)) {
 					failedCode = false;
 					locked = false;
@@ -137,27 +136,28 @@ public class AirlockDisplay extends Display {
 				}
 			} else if (c >= KeyEvent.VK_NUMPAD0 && c <= KeyEvent.VK_NUMPAD9) {
 				authCode += (c - KeyEvent.VK_NUMPAD0);
-			
-			} 
+
+			}
 		}
 	}
-	
 
-	
 	@Override
 	public void oscMessage(OscMessage theOscMessage) {
 	}
 
 	@Override
-	public void serialEvent(HardwareEvent evt) {		
-		if (evt.event.equals("KEY")) {		
-			
-			
-			if (evt.value >= KeyEvent.VK_NUMPAD0 && evt.value <= KeyEvent.VK_NUMPAD9
-					|| evt.value == KeyEvent.VK_ENTER || evt.value == KeyEvent.VK_BACK_SPACE) {
-				//char c = (char)evt.value;
-				keyEntered(evt.value);
-			} else if (evt.value == KeyEvent.VK_L){
+	public void serialEvent(HardwareEvent evt) {
+		if (evt.event.equals("KEY") && evt.value == 1) {
+
+			if (evt.id >= KeyEvent.VK_NUMPAD0 && evt.id <= KeyEvent.VK_NUMPAD9
+					|| evt.id == KeyEvent.VK_ENTER
+					|| evt.id == KeyEvent.VK_BACK_SPACE) {
+				// char c = (char)evt.value;
+
+				keyEntered(evt.id);
+
+			} else if (evt.id == KeyEvent.VK_L) {
+
 				dumpAirlock();
 			}
 		}
@@ -182,7 +182,7 @@ public class AirlockDisplay extends Display {
 			parent.getConsoleAudio().playClip("airlockDump", -1.0f);
 
 		}
-		
+
 	}
 
 	void setAirlockLightState(boolean state) {
@@ -203,7 +203,7 @@ public class AirlockDisplay extends Display {
 		successTime = 0;
 		doneSuccessMessage = false;
 		stateText = "DOOR LOCKED";
-		
+
 		doorCode = possibleAuthCodes[0];
 
 	}
