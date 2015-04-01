@@ -9,9 +9,15 @@ import common.PlayerConsole;
 public class LowerPanelHardware extends HardwareController {
 	
 	public static final int STICK_UP = 14;
-	public static final int STICK_RIGHT = 15;
 	public static final int STICK_DOWN = 16;
-	public static final int STICK_LEFT = 17;
+	public static final int STICK_LEFT = 15;
+	public static final int STICK_RIGHT = 13;
+	
+	public static final int BTN_DNP = 12;
+	public static final int BTN_JAM = 11;
+	
+	
+	
 
 	public LowerPanelHardware(String interfaceName, String port, int rate,
 			PlayerConsole parent) {
@@ -30,7 +36,7 @@ public class LowerPanelHardware extends HardwareController {
 				// chop off first two chars, split on the : character
 				vals = vals.substring(2);
 				String[] sw = vals.split(":");
-				
+
 				HardwareEvent h = new HardwareEvent();
 				h.event = "NEWSWITCH";
 				h.id = Integer.parseInt(sw[0]);
@@ -89,8 +95,36 @@ public class LowerPanelHardware extends HardwareController {
 			return;
 		} 
 		serialPort.write('R');
+		serialPort.write("D0");
+
 		
 	}
+	
+	public void setDNPBlink(boolean state){
+		if(parent.testMode){
+			ConsoleLogger.log(this, "setting DNP blink to " + state);
+			return;
+		}
+		
+		if(state ){
+			serialPort.write("D1");
+			
+		} else {
+			serialPort.write("D0");
+		}
+	}
+	
+	public void powerOff(){
+		if(parent.testMode){
+			ConsoleLogger.log(this, "powering off..");
+			return;
+		} 
+		
+		serialPort.write("D0");
+
+	}
+	
+	public void powerOn(){}
 
 	public void setFuelRate(int i) {
 		ConsoleLogger.log(this, "Setting fuel leak rate to " + i);

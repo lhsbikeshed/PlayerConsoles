@@ -10,7 +10,6 @@ import processing.core.PImage;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
-import common.util.UsefulShit;
 
 public class JamDisplay extends Display {
 
@@ -154,14 +153,14 @@ public class JamDisplay extends Display {
 				}
 				parent.fill(0, 255, 0);
 				parent.text(i + 1, 340 + 60 * i, 430);
-				if (dialA - 1 == i) {
+				if (dialA == i) {
 					parent.fill(0, 255, 255);
 				}
 				parent.rect(330 + 60 * i, 415, 40, graphHeightA);
 
 				parent.fill(0, 255, 0);
 				parent.text(i + 1, 340 + 60 * i, 655);
-				if (dialB - 1 == i) {
+				if (dialB  == i) {
 					parent.fill(0, 255, 255);
 				}
 				parent.rect(330 + 60 * i, 640, 40, graphHeightB);
@@ -169,8 +168,8 @@ public class JamDisplay extends Display {
 
 			parent.fill(0, 255, 0);
 			parent.textFont(font, 35);
-			parent.text(dialA - 1, 124, 390);
-			parent.text(dialB - 1, 124, 600);
+			parent.text(dialA, 124, 390);
+			parent.text(dialB, 124, 600);
 
 			if (jamAttempt) {
 				// overlay
@@ -240,7 +239,7 @@ public class JamDisplay extends Display {
 		parent.getConsoleAudio().playClip("jamattempt");
 
 		jamTimer = 120;
-		if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
+		if (dialA  == target[0] && dialB == target[1]) {
 			jamSuccess = true;
 		} else {
 			jamSuccess = false;
@@ -254,8 +253,8 @@ public class JamDisplay extends Display {
 	}
 
 	public void newValues() {
-		target[0] = (int) parent.random(10);// (int)random(10);
-		target[1] = (int) parent.random(10);
+		target[0] = 1 + (int) parent.random(10);// (int)random(10);
+		target[1] = 1 + (int) parent.random(10);
 
 		for (int i = 0; i < 10; i++) {
 			prevData[0][i] = targetData[0][i];
@@ -299,14 +298,17 @@ public class JamDisplay extends Display {
 		// jamfrequency change timout, makes it a little easier
 		if(evt.event.equals("JAMDIAL")){
 			if (evt.id == 0) {
-				dialA = (int) (11 - PApplet.map((float)evt.value,0f,1024f,10f,0f));
-				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
+				dialA = (int) (Math.floor(PApplet.map(evt.value, 50, 1000, 0, 9)));
+				dialA = PApplet.constrain(dialA, 0, 9);
+				if (dialA == target[0] && dialB == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the
 											// button
 				}
 			} else if (evt.id == 1) {
-				dialB = (int) (11 - PApplet.map((float)evt.value,0f,1024f,10f,0f));
-				if (dialA - 1 == target[0] && dialB - 1 == target[1]) {
+				dialB = (int) (Math.floor(PApplet.map(evt.value, 50, 1000, 0, 9)));
+				dialB = PApplet.constrain(dialB, 0, 9);
+
+				if (dialA  == target[0] && dialB  == target[1]) {
 					lastChangeTime += 800; // give em an extra 800ms to whack the
 											// button
 				}

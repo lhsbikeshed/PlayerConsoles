@@ -41,6 +41,7 @@ public class NewHyperSpaceDisplay extends Display {
 
 	// assets
 	PImage bgImage;
+	PImage overlayImage;
 
 	PImage warningBanner;
 	
@@ -77,7 +78,8 @@ public class NewHyperSpaceDisplay extends Display {
 		// load assets
 		bgImage = parent.loadImage("engineerconsole/hyperspace 3.png");
 		warningBanner = parent.loadImage("engineerconsole/warpWarning.png");
-		
+		overlayImage = parent.loadImage("engineerconsole/hyperfailoverlay.png");
+
 		//configure graph parts
 		 targetLerpRot = targetRot;
 		 targetLerpFreq = targetFreq * 0.5f;
@@ -98,6 +100,7 @@ public class NewHyperSpaceDisplay extends Display {
 		//rotate the target on a nice wobbly sin wave
 		targetRot = (float) (Math.PI + Math.sin(parent.frameCount / 80f));
 		targetRot += (float) (Math.PI + Math.cos(parent.frameCount / 40f));
+		targetRot *= PApplet.map(tunnelStability, 0f, 5f, 1f, 1.5f);
 		targetRot *= 0.4f;
 		
 		
@@ -115,6 +118,9 @@ public class NewHyperSpaceDisplay extends Display {
 		parent.noStroke();
 		parent.fill(100,100,208,128);
 		float size = (float) (parent.map(tunnelStability, 0.0f, 5.0f, 20, 600) + Math.sin(parent.frameCount * 0.1f) * 10f);
+		if(haveFailed){
+			size = 200 + parent.random(300);
+		}
 		parent.ellipse(centreX, centreY, size, size);
 		
 		//--test
@@ -158,15 +164,19 @@ public class NewHyperSpaceDisplay extends Display {
 				goodTimer += 0.001f;
 			} else {
 				parent.fill(255, 255, 0);
-				tunnelStability -= 0.002f;;
+				tunnelStability -= 0.004f;;
 				goodTimer -= 0.001f;
 			}
 		}
 		else {
 			parent.fill(255, 0, 0);
-			tunnelStability -= 0.002f;
+			tunnelStability -= 0.004f;
 			goodTimer -= 0.001f;
 		}
+		if(haveFailed){
+			tunnelStability = parent.random(2,4);
+		}
+		
 		if(tunnelStability > 5.0f){
 			tunnelStability = 5.0f;
 		} else if (tunnelStability < 0.0f){
@@ -181,6 +191,7 @@ public class NewHyperSpaceDisplay extends Display {
 		} else if (tf < targetFreq){
 			tunnelStability -= 0.5f;
 		}
+		
 		targetFreq = (int)tf;
 		
 		
@@ -208,6 +219,9 @@ public class NewHyperSpaceDisplay extends Display {
 			parent.getOscClient().send(m, parent.getServerAddress());
 		}
 		
+		if(haveFailed){
+			parent.image(overlayImage, 152, 146);
+		}
 	}
 	
 	void drawStability(){
@@ -369,6 +383,16 @@ public class NewHyperSpaceDisplay extends Display {
 		
 	}
 
+	
+	void changePlayerFreq(float delta){
+		
+		playerFreq += delta;
+		if(playerFreq < 1){
+			playerFreq = 1;
+		} else if (playerFreq > 8){
+			playerFreq = 8;
+		}
+	}
 		
 	@Override
 	public void serialEvent(HardwareEvent evt) {
@@ -389,12 +413,22 @@ public class NewHyperSpaceDisplay extends Display {
 
 			  //shape
 			  if (c == 39) {
-			    playerFreq += 1;
+			    changePlayerFreq( 1);
 			  } 
 			  else if (c == 37) {
-			    playerFreq -=1;
+			    changePlayerFreq(-1);
 			  }
-		} 
+		}  else if(evt.event.equals("JAMDIAL")){
+			if(evt.id == 0){
+				//top dial, change rotation
+				playerRot = PApplet.map(evt.value, 0f, 1024f, PConstants.PI * 2, 0);
+				
+			} else if (evt.id == 1){
+				//change the freq
+				playerFreq = (int)PApplet.map(evt.value, 0f, 1024f, 1, 9);
+				
+			}
+		}
 		
 	}
 

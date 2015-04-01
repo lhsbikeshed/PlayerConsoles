@@ -34,6 +34,8 @@ public class EngineerConsole extends PlayerConsole {
 	// Peripheral things
 	UpperPanelHardware upperPanel;
 	LowerPanelHardware lowerPanel;
+	
+	long lastDnpStartTime = 0;
 
 	boolean globalBlinker = false;
 
@@ -82,6 +84,17 @@ public class EngineerConsole extends PlayerConsole {
 						consoleAudio.playClip("lowFuelBeep");
 					}
 				}
+				if(random(1500) < 3){
+					lastDnpStartTime = millis();
+					lowerPanel.setDNPBlink(true);
+
+				}
+				
+				if(lastDnpStartTime + 5000 < millis() && lastDnpStartTime > 0){
+					lowerPanel.setDNPBlink(false);
+					lastDnpStartTime = -1;
+				}
+				
 			} else {
 				if (shipState.poweringOn) {
 					bootDisplay.draw();
@@ -209,6 +222,14 @@ public class EngineerConsole extends PlayerConsole {
 		} else if (theOscMessage.addrPattern().startsWith("/system/jammer/")) {
 
 			jamDisplay.oscMessage(theOscMessage);
+			
+		} else if (theOscMessage.addrPattern().equals("/engineer/setDNPLight")){
+			int state = theOscMessage.get(0).intValue();
+			if(state == 1){
+				lowerPanel.setDNPBlink(true);
+			} else {
+				lowerPanel.setDNPBlink(false);
+			}
 		
 		} else {
 			
@@ -273,14 +294,14 @@ public class EngineerConsole extends PlayerConsole {
 		//now console is loaded up, load the sound config
 		consoleAudio = new ConsoleAudio(this, minim, 1.0f);
 
-		upperPanel = new UpperPanelHardware("upperpanel", "COM11", 9600, this);
-		lowerPanel = new LowerPanelHardware("lowerpanel", "COM12", 115200, this);
+		upperPanel = new UpperPanelHardware("upperpanel", "COM11", 9600, this);//11
+		lowerPanel = new LowerPanelHardware("lowerpanel", "COM12", 115200, this);//12
 		hardwareControllers.add(upperPanel);
 		hardwareControllers.add(lowerPanel);
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("hyperspace"));
+		changeDisplay(displayMap.get("airlockdump"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");
@@ -320,6 +341,7 @@ public class EngineerConsole extends PlayerConsole {
 		shipState.fuelLeaking = false;
 		deathTime = millis();
 		upperPanel.kill();
+		resetDevices();
 		
 	}
 
@@ -343,12 +365,11 @@ public class EngineerConsole extends PlayerConsole {
 				doSilliness();
 			}
 			
-		} else if (h.event.equals("NEWSWITCH")){
-			if(h.id == 12 && h.value == 1){	//button 12,catch it on the press rather than release
+		} else if(h.event.equals("NEWSWITCH")){
+			if(h.id == LowerPanelHardware.BTN_DNP && h.value == 1){
 				doSilliness();
 			}
 		}
-		
 		
 		currentScreen.serialEvent(h);
 	}

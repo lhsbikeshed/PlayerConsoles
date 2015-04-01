@@ -1,5 +1,7 @@
 package common.displays;
 
+import java.awt.event.KeyEvent;
+
 import netP5.NetAddress;
 import oscP5.OscMessage;
 import oscP5.OscP5;
@@ -182,13 +184,16 @@ public class AuthDisplay extends Display {
 	}
 
 	private void keyEntered(HardwareEvent evt) {
-		char c = (char)evt.value;
+		char c = (char)(evt.value);
 		if (evt.event.equals("KEY")) {
 			parent.getConsoleAudio().randomBeep();
-			if (authCode.length() < currentAuthCode.length() - 1) {
-				authCode += c;
-			} else {
-				authCode +=c;
+			if(c == KeyEvent.VK_BACK_SPACE){
+				if(authCode.length() > 0){
+					
+				
+					authCode = authCode.substring(0, authCode.length() - 1);
+				}
+			} else if (c == KeyEvent.VK_ENTER){
 				if (authCode.equals(currentAuthCode)) {
 					authResult = true;
 					parent.getConsoleAudio().playClip("codeOk");
@@ -200,6 +205,9 @@ public class AuthDisplay extends Display {
 				}
 
 				authDisplayTime = parent.millis();
+			} else {
+				authCode += c - KeyEvent.VK_NUMPAD0;
+				
 			}
 		}
 		
