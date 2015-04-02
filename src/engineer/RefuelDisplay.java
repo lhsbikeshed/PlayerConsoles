@@ -30,9 +30,12 @@ public class RefuelDisplay extends Display {
 	PShader damageDistortion;
 	PFont kurzFont;
 	
-	PuzzleState puzzleState = PuzzleState.STATE_PLAYING;
+	PuzzleState puzzleState = PuzzleState.STATE_STARTUP;
 	private int crashTimer;
 	private int pullAwayTimer = 0;
+	private int connectionTimeout = 100;
+	
+	private float MAX_DOCK_SPEED = 0.4f;
 	
 	public enum PuzzleState {
 		STATE_STARTUP, STATE_PLAYING, STATE_CONNECTED, STATE_FUCKED;
@@ -86,7 +89,35 @@ public class RefuelDisplay extends Display {
 	 * 
 	 */
 	void drawConnection(){
+		if(connectionTimeout > 0){
+			connectionTimeout--;
+			
+		} else {
+			puzzleState = PuzzleState.STATE_PLAYING;
+		}
+		targetGraphics.beginDraw();
+		targetGraphics.background(0);
+		targetGraphics.textFont(kurzFont,50);
+		String t = "CONNECTING TO KURS MODULE..";
+		if(connectionTimeout > 50){
+			int pos = (int)PApplet.map(connectionTimeout, 100, 50, 0, t.length());
+			t = t.substring(0,pos);
+		} else if (connectionTimeout > 25){
+			t = "CONNECTING TO KURS MODULE.." + (parent.globalBlinker ? ".." : "");
+			
+			
+		} else {
+			t = "CONNECTING TO KURS MODULE..... OK";
+		}
+		targetGraphics.text(t, 100,100);
 		
+		targetGraphics.hint(PApplet.DISABLE_DEPTH_TEST);
+
+		targetGraphics.image(crosshairImage,-124, -90);
+		targetGraphics.endDraw();
+		
+		targetGraphics.filter(damageDistortion);
+		parent.image(targetGraphics, 90, 148);
 	}
 	
 	/* initiate a connection to the fuel socket
@@ -148,7 +179,7 @@ public class RefuelDisplay extends Display {
 		headVel = PVector.lerp(headVel, headVelTarget, 0.02f);
 		if(headPos.z + headVel.z > 400){	//test for collision
 			
-			if(headVel.z >= 0.3f){
+			if(headVel.z >= MAX_DOCK_SPEED){
 				crash();
 			} else {
 				//test for a connection
@@ -206,7 +237,7 @@ public class RefuelDisplay extends Display {
 		targetGraphics.text("Шx " + (int)(headVel.x * 10f), 680,50);
 		targetGraphics.text("Шy " + (int)(headVel.y * 10f), 680,80);
 		String zText = "Шz " + (int)(headVel.z * 10f);
-		if(headVel.z >= 0.3f && parent.globalBlinker){
+		if(headVel.z >= MAX_DOCK_SPEED && parent.globalBlinker){
 			zText = ">>" + zText + "<<";
 			
 		}
@@ -281,7 +312,7 @@ public class RefuelDisplay extends Display {
 		int randX = (int) -( parent.random(600));
 		int randY = (int) -parent.random(946);
 		
-		return new PVector(-304, -447, 300);//PVector(randX, randY, 0);
+		return new PVector(randX, randY, 0);
 	}
 	
 	@Override
