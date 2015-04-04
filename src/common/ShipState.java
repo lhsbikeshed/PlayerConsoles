@@ -12,6 +12,13 @@ public class ShipState {
 	public static final int POWER_SENSORS = 2;
 	public static final int POWER_WEAPONS = 3;
 	
+	public static final int FUEL_FUCKED = 2;
+	public static final int FUEL_CONNECTED = 1;
+	public static final int FUEL_DISCONNECTED = 0;	
+	public int fuelLineConnectionState = FUEL_DISCONNECTED;
+	
+	
+	
 	//power handling
 	//is the ship on?
 	public boolean poweredOn = true;
@@ -150,6 +157,8 @@ public class ShipState {
 			lastShipVel = shipVelocity;
 			
 			lastTransformUpdate = parent.millis();
+		} else if (msg.checkAddrPattern("/ship/state/setFuelConnectionState")){
+			fuelLineConnectionState = msg.get(0).intValue();
 		}
 	}
 }

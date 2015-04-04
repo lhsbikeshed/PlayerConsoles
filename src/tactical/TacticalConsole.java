@@ -343,9 +343,9 @@ public class TacticalConsole extends PlayerConsole {
 		currentScreen.serialEvent(h);
 		
 		if(h.event.equals("KEY")){
-			if(h.value == 83){
+			if(h.id == 83 && h.value == 1){
 				ignoreMouse = !ignoreMouse;
-			} else if (h.value == KeyEvent.VK_P){
+			} else if (h.id == KeyEvent.VK_P  && h.value == 1){
 				mainPanelHardware.cycleScreen();
 			}
 		} else if (h.event.equals("MOUSECLICK")){

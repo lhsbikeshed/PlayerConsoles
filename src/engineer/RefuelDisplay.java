@@ -15,6 +15,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 
 public class RefuelDisplay extends Display {
 	
@@ -76,13 +77,21 @@ public class RefuelDisplay extends Display {
 			break;
 		case STATE_CONNECTED:
 			doConnected();
+			
 			break;
 		case STATE_FUCKED:
 			doForceDisconnected();
 			break;
 		}
 		parent.image(overlayImage, 10,15);
+		
+		drawTemporaryControls();
 
+	}
+	
+	/* this is temporary whilst we get the hardware installed */
+	void drawTemporaryControls(){
+		
 	}
 	
 	/* draw a "LAODING" screen 
@@ -120,6 +129,26 @@ public class RefuelDisplay extends Display {
 		parent.image(targetGraphics, 90, 148);
 	}
 	
+	private void resetGame() {
+		headPos = getNewStartPos(0.5f);
+		switch (ShipState.instance.fuelLineConnectionState){
+		case(ShipState.FUEL_CONNECTED):
+			puzzleState = PuzzleState.STATE_CONNECTED;
+			headPos = centrePos;
+			break;
+		case(ShipState.FUEL_DISCONNECTED):
+			puzzleState = PuzzleState.STATE_STARTUP;
+			break;
+		case(ShipState.FUEL_FUCKED):
+			puzzleState = PuzzleState.STATE_FUCKED;
+		
+			break;
+			
+		}
+		
+		
+	}
+	
 	/* initiate a connection to the fuel socket
 	 * 
 	 */
@@ -128,6 +157,9 @@ public class RefuelDisplay extends Display {
 		puzzleState = PuzzleState.STATE_CONNECTED;
 		headVelTarget = new PVector(0,0,0);
 		headVel = new PVector(0,0,0);
+		OscMessage msg = new OscMessage("/system/reactor/setFuelConnectionState");
+		msg.add(1);
+		parent.getOscClient().send(msg, parent.getServerAddress());
 	
 	}
 	
@@ -135,6 +167,9 @@ public class RefuelDisplay extends Display {
 	void disconnect(){
 		ConsoleLogger.log(this, "Safe disconnection started");
 		puzzleState = PuzzleState.STATE_PLAYING;
+		OscMessage msg = new OscMessage("/system/reactor/setFuelConnectionState");
+		msg.add(0);
+		parent.getOscClient().send(msg, parent.getServerAddress());
 	}
 	
 	/* forced disconnect, as in "the player flew off with the line connected */
@@ -153,6 +188,7 @@ public class RefuelDisplay extends Display {
 	
 	void doConnected(){
 		damageDistortion.set("damage", 40+parent.random(50));
+		headPos = PVector.lerp(headPos, centrePos, 0.12f);	//move the head position into the docking position
 		drawTarget();
 		
 		//look to see if the player is pulling away with - key
@@ -269,10 +305,18 @@ public class RefuelDisplay extends Display {
 	}
 
 	@Override
-	public void oscMessage(OscMessage theOscMessage) {
-		// TODO Auto-generated method stub
+	public void oscMessage(OscMessage msg) {
+		if(msg.checkAddrPattern("/ship/state/setFuelConnectionState")){
+			if(msg.get(0).intValue() == 2){
+				//ship left whilst connected to tube
+				forceDisconnect();
+			}
+		} else if (msg.checkAddrPattern("/screen/refuelDisplay/resetParams")){
+			resetGame();
+		}
 
 	}
+
 
 	@Override
 	public void serialEvent(HardwareEvent evt) {
@@ -318,7 +362,8 @@ public class RefuelDisplay extends Display {
 	@Override
 	public void start() {
 		// TODO Auto-generated method stub
-
+		headPos = getNewStartPos(0.5f);
+		
 	}
 
 	@Override

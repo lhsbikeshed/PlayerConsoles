@@ -905,9 +905,9 @@ public class WeaponsConsole extends Display {
 	
 			
 		} else if (evt.event.equals("KEY")){
-			if(evt.value == KeyEvent.VK_F){
+			if(evt.id == KeyEvent.VK_F){
 				fireLaser(0);
-			} else if (evt.value == KeyEvent.VK_M){
+			} else if (evt.id == KeyEvent.VK_M){
 				fireSmartBomb();
 			}
 			
