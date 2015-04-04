@@ -17,6 +17,8 @@ public class LowerPanelHardware extends HardwareController {
 	public static final int BTN_JAM = 11;
 	
 	
+	public int fuelValveDirection = 0; //0 off, 1/2/3 are for the other tanks
+									
 	
 
 	public LowerPanelHardware(String interfaceName, String port, int rate,

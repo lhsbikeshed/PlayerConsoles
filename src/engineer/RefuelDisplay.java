@@ -85,14 +85,10 @@ public class RefuelDisplay extends Display {
 		}
 		parent.image(overlayImage, 10,15);
 		
-		drawTemporaryControls();
-
-	}
-	
-	/* this is temporary whilst we get the hardware installed */
-	void drawTemporaryControls(){
 		
 	}
+	
+	
 	
 	/* draw a "LAODING" screen 
 	 * 

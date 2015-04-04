@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import jogamp.opengl.glu.nurbs.Maplist;
 import oscP5.OscMessage;
+import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 import common.ConsoleLogger;
@@ -83,8 +84,14 @@ public class PlottingDisplay extends Display {
 		} else {
 			if (parent.globalBlinker) {
 				parent.textFont(font, 22);
-				parent.fill(0, 255, 0);
-				parent.text("ROUTE OK, BEGIN JUMP SEQUENCE", 39, 246 + yOffset);
+				
+				if(currentRoute.size() * 20 > ShipState.instance.fuelTankState[0]/20){
+					parent.fill(255, 0, 0);
+					parent.text("ROUTE OK, BUT INSUFFICIENT FUEL", 39, 246 + yOffset);					
+				} else {
+					parent.fill(0, 255, 0);
+					parent.text("ROUTE OK, BEGIN JUMP SEQUENCE", 39, 246 + yOffset);
+				}
 			}
 		}
 
@@ -118,6 +125,28 @@ public class PlottingDisplay extends Display {
 		parent.noFill();
 		parent.stroke(255, 255, 0);
 		// parent.rect(721, 204, 268, 340);
+		
+		parent.pushMatrix();
+		parent.translate(25,83);
+		parent.text("FUEL\r\nUSAGE", 0,20);
+		parent.rect(120,0,500,50);
+		
+		float amount = ShipState.instance.fuelTankState[0]/20;
+		parent.fill(0,255,0);
+		parent.noStroke();
+		parent.rect(120,0,amount, 25);
+		
+		
+		float required = currentRoute.size() * 20;
+		parent.fill(0,255,0);
+		parent.noStroke();
+		parent.rect(120,25,required, 25);
+		
+		parent.fill(255);
+		parent.text(required + "/" + amount, 400, 40);
+		
+		parent.popMatrix();
+		
 
 	}
 
@@ -129,12 +158,13 @@ public class PlottingDisplay extends Display {
 
 	@Override
 	public void serialEvent(HardwareEvent evt) {
-		if (evt.event.equals("KEY")) {
-			if (evt.value >= KeyEvent.VK_0 && evt.value <= KeyEvent.VK_9) {
-				keyTyped(evt.value);
-			} else if (evt.value == KeyEvent.VK_SPACE) {
+		if (evt.event.equals("KEY") && evt.value == 1) {
+			
+			if (evt.id >= KeyEvent.VK_0 && evt.id <= KeyEvent.VK_9) {
+				keyTyped(evt.id);
+			} else if (evt.id == KeyEvent.VK_SPACE) {
 				codeEntered();
-			} else if (evt.value == KeyEvent.VK_BACK_SPACE){
+			} else if (evt.id == KeyEvent.VK_BACK_SPACE){
 				clearLast();
 			}
 		} else if (evt.event.equals("KEYPAD")) {
@@ -222,6 +252,14 @@ public class PlottingDisplay extends Display {
 				codeFailed("DISTANCE TOO GREAT");
 				return;
 			}
+			//ShipState.instance.fuelTankState[0] = 1200;
+			//test for fuel
+			if((currentRoute.size() + 1) * 400 > ShipState.instance.fuelTankState[0]){
+				codeFailed("INSUFFICIENT FUEL");
+				return;
+			}
+			
+			
 			m.visited = true;
 			parent.getConsoleAudio().playClip("codeOk");
 			currentRoute.add(m);
@@ -250,6 +288,7 @@ public class PlottingDisplay extends Display {
 				// tell the main game which route we're using
 				OscMessage msg = new OscMessage("/system/jump/setRoute");
 				msg.add(interestingThing);
+				msg.add(currentRoute.size());//how much fuel to consume for the jump
 				//combine all of the interesting things en route
 				parent.getOscClient().send(msg, parent.getServerAddress());
 				// fuck yeah, we're there!
@@ -317,7 +356,7 @@ public class PlottingDisplay extends Display {
 		if(currentCode.length() > 0){
 			currentCode = currentCode.substring(0, currentCode.length() -1);
 		} else {
-			if(currentRoute.size() > 1 && routeComplete == false){
+			if(currentRoute.size() > 1 ){
 				
 				currentNode = currentRoute.get(currentRoute.size()-1);
 				currentCode = currentNode.id;
@@ -326,6 +365,11 @@ public class PlottingDisplay extends Display {
 				
 				MapNode removedNode = currentRoute.remove(currentRoute.size()-1);
 				removedNode.visited = false;
+				if(routeComplete){
+					routeComplete = false;
+					OscMessage msg = new OscMessage("/system/jump/clearRoute");
+					parent.getOscClient().send(msg, parent.getServerAddress());
+				}
 			} 
 		}
 	}

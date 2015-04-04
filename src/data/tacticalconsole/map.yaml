@@ -32,6 +32,11 @@
    posy: 479
    id: 3389
    interestingThing:   
+   
+   posx: 285
+   posy: 603
+   id: 1598
+   interestingThing: refuelScene
 -
    posx: 516
    posy: 486

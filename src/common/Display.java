@@ -10,6 +10,8 @@ public abstract class Display {
 
 	protected PlayerConsole parent;
 	protected PFont font;
+	
+
 
 	public Display(PlayerConsole parent) {
 		this.parent = parent;
@@ -19,6 +21,7 @@ public abstract class Display {
 
 	/* called at 24fps to draw the screen and update its state */
 	public abstract void draw();
+
 
 	
 	public void keyPressed(char key) {

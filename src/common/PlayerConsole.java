@@ -17,10 +17,13 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import ddf.minim.Minim;
 
+
 /* base class for all player consoles
  * 
  */
 public abstract class PlayerConsole extends PApplet {
+	
+	protected boolean drawDebugControls = false;
 
 	public static void main(String[] args) {
 		System.out.println("Start PlayerConsole.....");
@@ -172,8 +175,16 @@ public abstract class PlayerConsole extends PApplet {
 			}
 		}
 
+		if(drawDebugControls){
+			drawDebugControls();
+		}
+
 	}
 
+	/* debug controls / window */
+	public void drawDebugControls(){};
+
+	
 	/* actual draw method for the console */
 	public abstract void drawConsole();
 
@@ -298,6 +309,8 @@ public abstract class PlayerConsole extends PApplet {
 				h.shutDown();
 			}
 			System.exit(0);
+		} else if (ke.getKeyCode() == KeyEvent.VK_BACK_QUOTE){
+			drawDebugControls = !drawDebugControls;
 		}
 		//pass this to the keyboard controller
 		//this will then pass it on to the current consoles "hardwareevent" method

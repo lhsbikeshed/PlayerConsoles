@@ -12,6 +12,7 @@ import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 import common.displays.AuthDisplay;
 import common.displays.BootDisplay;
 import common.displays.CablePuzzleDisplay;
@@ -45,6 +46,8 @@ public class EngineerConsole extends PlayerConsole {
 
 	int fuelBeepTimer = 0;
 
+	
+	
 	public void addHighlight(Highlighter h) {
 		highlightList.add(h);
 	}
@@ -112,12 +115,38 @@ public class EngineerConsole extends PlayerConsole {
 			bannerSystem.draw(); // THIS
 
 		}
-
 		
 
 	}
-
-
+	
+	@Override
+	public void drawDebugControls(){
+		/* this is temporary whilst we get the hardware installed */
+	
+		fill(0);
+		stroke(255);
+		rect(10,500,540,240);
+		
+		fill(255);
+		//rotary dial for fuel
+		for(int i = 0; i < 3; i++){
+			text("fuel " + i + ":" + ShipState.instance.fuelTankState[i], 15, 520+i*13);
+		}
+		text("fuel connstate: " + ShipState.instance.fuelLineConnectionState, 15, 572);
+			
+		noFill();
+		pushMatrix();
+		translate(50,620);
+		rotate(PI/8 * lowerPanel.fuelValveDirection);
+		ellipse(0,0,40,40);
+		line(0,-10,0,-20);
+		popMatrix();
+		text("fv: " + lowerPanel.fuelValveDirection, 80,  620);
+		
+		
+		
+	}
+	
 	private void doSilliness() {
 		if (shipState.sillinessLevel >= 0 && shipState.poweredOn
 				&& shipState.sillinessInProgress == false) {
@@ -365,6 +394,12 @@ public class EngineerConsole extends PlayerConsole {
 		if(h.event.equals("KEY")){
 			if(h.id == KeyEvent.VK_OPEN_BRACKET && h.value == 1){
 				doSilliness();
+			} else if(h.id == KeyEvent.VK_W && h.value == 1){
+				lowerPanel.fuelValveDirection ++;
+				lowerPanel.fuelValveDirection %= 4;
+				OscMessage msg = new OscMessage("/system/reactor/setFuelValveState");
+				msg.add(lowerPanel.fuelValveDirection);
+				getOscClient().send(msg, getServerAddress());
 			}
 			
 		} else if(h.event.equals("NEWSWITCH")){

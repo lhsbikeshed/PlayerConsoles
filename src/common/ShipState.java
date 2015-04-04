@@ -15,8 +15,12 @@ public class ShipState {
 	public static final int FUEL_FUCKED = 2;
 	public static final int FUEL_CONNECTED = 1;
 	public static final int FUEL_DISCONNECTED = 0;	
+	
+	
+	/* state of the fuel line connector*/
 	public int fuelLineConnectionState = FUEL_DISCONNECTED;
 	
+	public int[] fuelTankState = {1000,1000,1000}; 
 	
 	
 	//power handling
@@ -159,6 +163,10 @@ public class ShipState {
 			lastTransformUpdate = parent.millis();
 		} else if (msg.checkAddrPattern("/ship/state/setFuelConnectionState")){
 			fuelLineConnectionState = msg.get(0).intValue();
+		} else if (msg.checkAddrPattern("/ship/state/fuelState")){
+			fuelTankState[0] = msg.get(0).intValue();
+			fuelTankState[1] = msg.get(1).intValue();
+			fuelTankState[2] = msg.get(2).intValue();
 		}
 	}
 }
