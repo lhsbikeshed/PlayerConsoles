@@ -226,7 +226,7 @@ public class PilotConsole extends PlayerConsole {
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
 		displayMap.put("collisionradar", new CollisionRadarDisplay(this));
 		displayMap.put("slingshot", new SlingshotDisplay(this));
-		
+		displayMap.put("landingDisplay", new LandingDisplay(this));
 		
 		//configure the pilot console hardware stuff
 		pilotHardware = new PilotHardwareController("mainconsole", "COM8", 115200, this);
