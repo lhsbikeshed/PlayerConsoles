@@ -170,7 +170,7 @@ public class NewHyperSpaceDisplay extends Display {
 		}
 		else {
 			parent.fill(255, 0, 0);
-			tunnelStability -= 0.004f;
+			tunnelStability -= 0.003f;
 			goodTimer -= 0.001f;
 		}
 		if(haveFailed){
