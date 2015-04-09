@@ -40,5 +40,6 @@
 	<classpathentry kind="lib" path="lib/core/jogl-all-natives-windows-i586.jar"/>
 	<classpathentry kind="lib" path="lib/core/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jyaml-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/OBJLoader.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

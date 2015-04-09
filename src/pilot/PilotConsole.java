@@ -247,7 +247,7 @@ public class PilotConsole extends PlayerConsole {
 		oscP5.send(myMessage, serverAddress);
 
 		// set initial screen
-		Display d = displayMap.get("slingshot");
+		Display d = displayMap.get("landingDisplay");
 		changeDisplay(d);
 
 	}
