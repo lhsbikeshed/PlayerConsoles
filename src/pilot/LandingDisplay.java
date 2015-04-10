@@ -4,10 +4,14 @@ import com.jogamp.opengl.math.Quaternion;
 
 import oscP5.OscMessage;
 import processing.core.PApplet;
+import processing.core.PConstants;
+import processing.core.PGraphics;
+import processing.core.PImage;
 import processing.core.PVector;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.ShipState;
 import common.util.LerpedRot;
 import common.util.LerpedVector;
 import common.util.Rot;
@@ -22,117 +26,139 @@ public class LandingDisplay extends Display {
 	
 	PVector shipScreenSpace = new PVector();
 	
+	PImage overlayImage;
+	
+	PGraphics landingGraphics;
 	
 	public LandingDisplay(PlayerConsole parent) {
 		super(parent);
-
+		overlayImage = parent.loadImage("data/pilotconsole/landing_overlay.png");
+		landingGraphics = parent.createGraphics(parent.width, parent.height, PConstants.P3D);
 		
 	}
 
 	@Override
 	public void draw() {
-		parent.hint(PApplet.ENABLE_DEPTH_TEST);
+		landingGraphics.beginDraw();
+		landingGraphics.background(0,30,0);
+		landingGraphics.hint(PApplet.ENABLE_DEPTH_TEST);
 
 		long now = parent.millis();
-		parent.textFont(parent.getGlobalFont(), 20);
-		parent.text("LANDING", 20, 20);
+		landingGraphics.textFont(parent.getGlobalFont(), 20);
 	
-		parent.pushMatrix();
+		landingGraphics.pushMatrix();
 		
-		parent.noStroke();
-		parent.translate(parent.width / 2, parent.height / 2);
-		parent.rotateX(PApplet.radians(55)); // 326
+		landingGraphics.noStroke();
+		landingGraphics.translate(landingGraphics.width / 2, landingGraphics.height / 2);
+		landingGraphics.rotateX(PApplet.radians(55)); // 326
 		
 		
-		//parent.rotateY(PApplet.radians(-180));
+		//landingGraphics.rotateY(PApplet.radians(-180));
 		
-		parent.fill(0,50,0);
-		parent.rect(-400,-400,800,800);
-		parent.noFill();
-		parent.strokeWeight(3);
+		
+		landingGraphics.fill(0,50,0);
+		landingGraphics.rect(-400,-400,800,800);
+		
+		landingGraphics.noFill();
+		landingGraphics.strokeWeight(3);
 		for(int i = 0; i < 5; i++){
-			parent.stroke(0,128,0);
+			landingGraphics.stroke(0,128,0);
 			if((parent.millis() % 1000 ) / 200 == (4 - i)){
-				parent.stroke(0,255,0);	//pulse inward
+				landingGraphics.stroke(0,255,0);	//pulse inward
 			}
-			parent.ellipse(0, 0, 150 + i * 120, 150 + i * 120);
+			landingGraphics.ellipse(0, 0, 150 + i * 120, 150 + i * 120);
 		}
-		parent.line(-400,0,400,0);
-		parent.line(0, -400,0,400);
+		landingGraphics.line(-400,0,400,0);
+		landingGraphics.line(0, -400,0,400);
 
 		
-		parent.stroke(0,255,0);
-		parent.fill(0,128,0);
+		landingGraphics.stroke(0,255,0);
+		landingGraphics.fill(0,128,0);
 		PVector pos = shipOffset.getValue(now);
 		pos.mult(10f);	//slight fudge
 		
 		//save ship screen space coords for drawing gui elements later
-		shipScreenSpace.x = parent.screenX(pos.x, pos.y, pos.z);
-		shipScreenSpace.y = parent.screenY(pos.x, pos.y, pos.z);
+		shipScreenSpace.x = landingGraphics.screenX(pos.x, pos.y, pos.z);
+		shipScreenSpace.y = landingGraphics.screenY(pos.x, pos.y, pos.z);
 
 
-		parent.pushMatrix();
-		parent.translate(pos.x, pos.y, pos.z);
+		landingGraphics.pushMatrix();
+		landingGraphics.translate(pos.x, pos.y, pos.z);
 		
 		
-		parent.line(0,0,0, 0,0, -pos.z);
-		parent.pushMatrix();
-		parent.translate(0,0,-pos.z +1);
-		parent.ellipse(0,0,40,40);
-		parent.popMatrix();
+		landingGraphics.line(0,0,0, 0,0, -pos.z);
+		landingGraphics.pushMatrix();
+		landingGraphics.translate(0,0,-pos.z +1);
+		landingGraphics.ellipse(0,0,40,40);
+		landingGraphics.popMatrix();
 		
 		
 		float[] ang = localRotation.getValue(now).getAngles(RotOrder.XYZ);
 		if (ang != null) {
-			parent.rotateX(ang[0]);
-			parent.rotateY(ang[1]);
-			parent.rotateZ(ang[2]);
+			landingGraphics.rotateX(ang[0]);
+			landingGraphics.rotateY(ang[1]);
+			landingGraphics.rotateZ(ang[2]);
 		}
 		
 		/*
-		parent.stroke(255,0,0);
-		parent.line(0,0,0,-100,0,0);
-		parent.stroke(0,255,0);
-		parent.line(0,0,0,0,100,0);
-		parent.stroke(0,0,100);
-		parent.line(0,0,0,0,0,100);
+		landingGraphics.stroke(255,0,0);
+		landingGraphics.line(0,0,0,-100,0,0);
+		landingGraphics.stroke(0,255,0);
+		landingGraphics.line(0,0,0,0,100,0);
+		landingGraphics.stroke(0,0,100);
+		landingGraphics.line(0,0,0,0,0,100);
 		*/
 		
-		//draw the ship body
-		parent.strokeWeight(1);
-		parent.pushMatrix();
-		parent.scale(1, 1, 1.3f);
-		parent.box(50);
-		parent.popMatrix();
+		//---------draw the ship body
+		landingGraphics.strokeWeight(1);
+		landingGraphics.pushMatrix();
+		landingGraphics.translate(0,9.5f,0);
+		landingGraphics.scale(1, 0.7f, 1.3f);
+		landingGraphics.box(50);
+		landingGraphics.popMatrix();
 		
 		//legs
 		for(int x = -1; x < 1; x++){
 			
 			for(int y = -1; y < 1; y++){
 				
-				parent.pushMatrix();
-				parent.translate(30+x*60,-10,25+ y*40);
-				parent.box(10);
-				parent.popMatrix();
+				landingGraphics.pushMatrix();
+				landingGraphics.translate(27+x*60,-6,25+ y*40);
+				landingGraphics.box(10);
+				landingGraphics.popMatrix();
 			}
 		}
 		//tail
-		parent.pushMatrix();
-		parent.translate(0,31,-30);
-		parent.scale(0.4f, 1.4f, 2.3f);
-		parent.box(10);
-		parent.popMatrix();
+		landingGraphics.pushMatrix();
+		landingGraphics.translate(0,31,-30);
+		landingGraphics.scale(0.4f, 1.4f, 2.3f);
+		landingGraphics.box(10);
+		landingGraphics.popMatrix();
 		
-		parent.popMatrix();
+		//-----------body done
 		
-		parent.popMatrix();
-		parent.hint(PApplet.DISABLE_DEPTH_TEST);
-		parent.textFont(font, 18);
-		parent.fill(255);
-		parent.translate(shipScreenSpace.x, shipScreenSpace.y);
+		landingGraphics.popMatrix();
+		
+		landingGraphics.popMatrix();
+		landingGraphics.hint(PApplet.DISABLE_DEPTH_TEST);
+		landingGraphics.textFont(font, 18);
+		landingGraphics.fill(255);
+		landingGraphics.translate(shipScreenSpace.x, shipScreenSpace.y);
 		PVector sp = shipOffset.getValue(now);
-		parent.text(String.format("X:%.2f\r\nY:%.2f\r\nZ:%.2f", sp.x, sp.y, sp.z),20,50);
+		landingGraphics.text(String.format("X:%.2f\r\nY:%.2f\r\nZ:%.2f", sp.x, sp.y, sp.z),20,50);
 
+		landingGraphics.endDraw();
+		
+		parent.image(landingGraphics, 0,0);
+
+		parent.image(overlayImage, 10,10);
+		
+		//stats in bottom left
+		parent.textFont(font, 14);
+		ShipState shipState = parent.getShipState();
+		String ls = ShipState.undercarriageStrings[ shipState.undercarriageState];
+		
+		parent.text("Landing gear: " + ls, 37, 560);
 	}
 
 	@Override

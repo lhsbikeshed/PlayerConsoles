@@ -86,6 +86,10 @@ public class ShipState {
 	public LerpedFloat altitude = new LerpedFloat(2000f, 0, 250);
 	private PlayerConsole parent;
 	
+	public int undercarriageState = 0;
+	public static final String[] undercarriageStrings = { "up", "down", "Lowering..",
+	"Raising.." };
+	
 	public static ShipState instance;
 	
 	public ShipState(PlayerConsole parent) {
@@ -167,6 +171,8 @@ public class ShipState {
 			fuelTankState[0] = msg.get(0).intValue();
 			fuelTankState[1] = msg.get(1).intValue();
 			fuelTankState[2] = msg.get(2).intValue();
+		} else if (msg.checkAddrPattern("/ship/undercarriage")) {
+			undercarriageState = msg.get(0).intValue();
 		}
 	}
 }
