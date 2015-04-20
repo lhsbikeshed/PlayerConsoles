@@ -87,6 +87,7 @@ public class ShipState {
 	private PlayerConsole parent;
 	
 	public int undercarriageState = 0;
+	private boolean undercarriageLockState;
 	public static final String[] undercarriageStrings = { "up", "down", "Lowering..",
 	"Raising.." };
 	
@@ -173,6 +174,8 @@ public class ShipState {
 			fuelTankState[2] = msg.get(2).intValue();
 		} else if (msg.checkAddrPattern("/ship/undercarriage")) {
 			undercarriageState = msg.get(0).intValue();
+		} else if (msg.checkAddrPattern("/ship/undercarriage/locked")){	//is the undercarriage locked to a surface?
+			undercarriageLockState = msg.get(0).intValue() == 1;
 		}
 	}
 }

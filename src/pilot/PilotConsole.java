@@ -41,7 +41,6 @@ public class PilotConsole extends PlayerConsole {
 	DropDisplay dropDisplay;
 	WarpDisplay warpDisplay;
 	RadarDisplay radarDisplay;
-	LaunchDisplay launchDisplay;
 	CablePuzzleDisplay cablePuzzleDisplay;
 	SlingshotDisplay slingShotDisplay;
 
@@ -211,13 +210,13 @@ public class PilotConsole extends PlayerConsole {
 		dropDisplay = new DropDisplay(this);
 		radarDisplay = new RadarDisplay(this);
 		warpDisplay = new WarpDisplay(this);
-		launchDisplay = new LaunchDisplay(this);
+		
 
 		joy = new Joystick(oscP5, this, joystickTestMode);
 
 		displayMap.put("radar", radarDisplay);
 		displayMap.put("drop", dropDisplay);
-		displayMap.put("docking", launchDisplay);
+		//displayMap.put("docking", launchDisplay);
 		displayMap.put("hyperspace", warpDisplay);
 		displayMap.put("selfdestruct", new DestructDisplay(this));
 		displayMap.put("dockingtest", new DockingDisplay(this));
@@ -247,7 +246,7 @@ public class PilotConsole extends PlayerConsole {
 		oscP5.send(myMessage, serverAddress);
 
 		// set initial screen
-		Display d = displayMap.get("landingDisplay");
+		Display d = displayMap.get("radar");
 		changeDisplay(d);
 
 	}
@@ -262,7 +261,7 @@ public class PilotConsole extends PlayerConsole {
 	protected void gameReset() {
 		super.gameReset();
 		currentScreen.stop();
-		currentScreen = launchDisplay;
+		currentScreen = radarDisplay;
 		currentScreen.start();
 		shipState.areWeDead = false;
 		pilotHardware.setJumpLightState(false);

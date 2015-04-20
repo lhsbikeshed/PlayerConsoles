@@ -39,6 +39,9 @@ public class LandingDisplay extends Display {
 
 	@Override
 	public void draw() {
+		//testCode();
+		
+		
 		landingGraphics.beginDraw();
 		landingGraphics.background(0,30,0);
 		landingGraphics.hint(PApplet.ENABLE_DEPTH_TEST);
@@ -64,11 +67,26 @@ public class LandingDisplay extends Display {
 		for(int i = 0; i < 5; i++){
 			landingGraphics.stroke(0,128,0);
 			if((parent.millis() % 1000 ) / 200 == (4 - i)){
-				landingGraphics.stroke(0,255,0);	//pulse inward
+				landingGraphics.stroke(0,200,0);	//pulse inward
 			}
 			landingGraphics.ellipse(0, 0, 150 + i * 120, 150 + i * 120);
 		}
+		
+		//crosshair - highlight axis separately based on closeness to centre
+		
+		if(PApplet.abs(shipOffset.getValue(now).y) < 5){
+			landingGraphics.stroke(0,255,0);
+		} else {
+			landingGraphics.stroke(0,128,0);
+
+		}
 		landingGraphics.line(-400,0,400,0);
+		if(PApplet.abs(shipOffset.getValue(now).x) < 5){
+			landingGraphics.stroke(0,255,0);
+		} else {
+			landingGraphics.stroke(0,128,0);
+
+		}
 		landingGraphics.line(0, -400,0,400);
 
 		
@@ -123,7 +141,7 @@ public class LandingDisplay extends Display {
 			for(int y = -1; y < 1; y++){
 				
 				landingGraphics.pushMatrix();
-				landingGraphics.translate(27+x*60,-6,25+ y*40);
+				landingGraphics.translate(30+x*60,-6,25+ y*40);
 				landingGraphics.box(10);
 				landingGraphics.popMatrix();
 			}
@@ -159,6 +177,18 @@ public class LandingDisplay extends Display {
 		String ls = ShipState.undercarriageStrings[ shipState.undercarriageState];
 		
 		parent.text("Landing gear: " + ls, 37, 560);
+	}
+
+	private void testCode() {
+		// TODO Auto-generated method stub
+		long now = parent.millis();
+		PVector r = new PVector(PApplet.map(parent.mouseX, 0, 1024, -15, 15),
+				PApplet.map(parent.mouseY, 0, 768, -15, 15),
+				10f
+				
+				);
+		shipOffset.update(r,now);
+		
 	}
 
 	@Override
