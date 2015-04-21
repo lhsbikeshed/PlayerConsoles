@@ -155,6 +155,7 @@ public class LandingDisplay extends Display {
 		
 		//-----------body done
 		
+		//---- screen space stuff
 		landingGraphics.popMatrix();
 		
 		landingGraphics.popMatrix();
@@ -165,6 +166,17 @@ public class LandingDisplay extends Display {
 		PVector sp = shipOffset.getValue(now);
 		landingGraphics.text(String.format("X:%.2f\r\nY:%.2f\r\nZ:%.2f", sp.x, sp.y, sp.z),20,50);
 
+		if(ShipState.instance.shipDocked){
+			if(parent.globalBlinker){
+				landingGraphics.fill(255,0,0);
+				
+			} else {
+				landingGraphics.fill(255);
+				
+			}
+			landingGraphics.text("*DOCKED*", 0,110);
+		}
+		
 		landingGraphics.endDraw();
 		
 		parent.image(landingGraphics, 0,0);
