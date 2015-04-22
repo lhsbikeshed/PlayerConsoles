@@ -91,17 +91,21 @@ public class NewHyperSpaceDisplay extends Display {
 	@Override
 	public void draw() {
 		parent.textFont(font, 12);
-
+		playerFreq = 3;
+		targetFreq = 3;
 		
 		//update graphs
 		targetLerpRot = PApplet.lerp(targetLerpRot, targetRot, 0.1f);
 		targetLerpFreq = PApplet.lerp(targetLerpFreq, targetFreq * 0.5f, 0.1f);
 		
 		//rotate the target on a nice wobbly sin wave
-		targetRot = (float) (Math.PI + Math.sin(parent.frameCount / 80f));
+		/*targetRot = (float) (Math.PI + Math.sin(parent.frameCount / 80f));
 		targetRot += (float) (Math.PI + Math.cos(parent.frameCount / 40f));
 		targetRot *= PApplet.map(tunnelStability, 0f, 5f, 1f, 1.5f);
-		targetRot *= 0.4f;
+		targetRot *= 0.4f;*/
+		
+		float diffMod = PApplet.map(tunnelStability, 0f, 5f, 0.1f, 0.8f);
+		targetRot = (float) (Math.PI + Math.sin(parent.frameCount / 80f)) * diffMod;
 		
 		
 		
@@ -128,15 +132,7 @@ public class NewHyperSpaceDisplay extends Display {
 		
 		parent.stroke(255);
 		
-		//draw peak lines for player
-		int peaks = countPeaks(playerFreq* 0.5f);	  
-		float angleOffset = getPeakAngle(peaks);
-		for(int i =0; i < peaks; i++){
-		    PVector p = new PVector(0,1);
-		    p.rotate(angleOffset * i - playerRot);
-		    p.mult(350);
-		  //  parent.line(centreX, centreY, centreX + p.x, centreY + p.y);
-		}
+		//warnings
 		if(tunnelStability < 1.0f && parent.globalBlinker){
 			parent.fill(255,0,0,100);
 			parent.noStroke();
@@ -150,29 +146,24 @@ public class NewHyperSpaceDisplay extends Display {
 		
 		//draw the graphs
 		parent.noStroke();
-		parent.fill(180);
+		parent.stroke(180);
 		drawShape(targetPoints);
 		
 		//work out the colour of the graph, red = bad
 		// yellow = right number of peaks
 		// green  = matches
 		float angDiff = angularDifference();
-		if(countPeaks(targetFreq * 0.5f) == countPeaks(playerFreq * 0.5f)){
-			if(angDiff <= 0.1f){
-				parent.fill(0, 255, 0);	
-				tunnelStability += 0.005f;
-				goodTimer += 0.001f;
-			} else {
-				parent.fill(255, 255, 0);
-				tunnelStability -= 0.004f;;
-				goodTimer -= 0.001f;
-			}
-		}
-		else {
-			parent.fill(255, 0, 0);
-			tunnelStability -= 0.003f;
+		if(angDiff <= 0.1f){
+			parent.stroke(0, 255, 0);	
+			tunnelStability += 0.005f;
+			goodTimer += 0.001f;
+		} else {
+			parent.stroke(255, 255, 0);
+			tunnelStability -= 0.004f;;
 			goodTimer -= 0.001f;
 		}
+	
+		
 		if(haveFailed){
 			tunnelStability = parent.random(2,4);
 		}
@@ -183,16 +174,7 @@ public class NewHyperSpaceDisplay extends Display {
 			tunnelStability = 0.0f;			
 		}
 		
-		/* switch "gears" */
-		int tf = (int)PApplet.map(tunnelStability, 5.0f, 0.0f, 1, 8);
-		if(tf < targetFreq){
-			tunnelStability += 0.5f;
-			//ConsoleLogger.log(this, "switch");
-		} else if (tf < targetFreq){
-			tunnelStability -= 0.5f;
-		}
 		
-		targetFreq = (int)tf;
 		
 		
 		drawShape(playerPoints);
@@ -222,6 +204,11 @@ public class NewHyperSpaceDisplay extends Display {
 		if(haveFailed){
 			parent.image(overlayImage, 152, 146);
 		}
+		
+		parent.fill(255);
+		parent.textFont(font, 15);
+		parent.text("Match the glowing graph to the grey graph to keep the hyperspace system running", 76, 749);
+		
 	}
 	
 	void drawStability(){
@@ -259,7 +246,6 @@ public class NewHyperSpaceDisplay extends Display {
 		//lines
 		parent.strokeWeight(20);
 		parent.line(-50,20, -29,20);
-		parent.line(-50,220, -29,220);
 		parent.strokeWeight(1);
 		
 		//dial indicators
@@ -267,18 +253,15 @@ public class NewHyperSpaceDisplay extends Display {
 		parent.stroke(255);
 		parent.ellipse(20,20,100,100);
 		
-		parent.ellipse(20,220,100,100);
 		
 		
 		parent.fill(255);
 		parent.textFont(font, 22);
 		parent.text("Angle", -25,90);
-		parent.text("Peaks", -25,290);
 		
 		//now the contents of the dial bits
 		int peaks = countPeaks(playerFreq * 0.5f);
 		parent.textFont(font, 30);
-		parent.text(peaks, 8,230);
 		
 		int angle = (int)parent.degrees(playerRot);
 		if(angle > 360){
@@ -288,7 +271,11 @@ public class NewHyperSpaceDisplay extends Display {
 		}
 		parent.textFont(font, 20);
 		parent.text(angle, 8, 20);
+		
 		parent.popMatrix();
+		
+		
+		
 	}
 	
 	//get the angular difference between the target and player graphs
@@ -328,12 +315,16 @@ public class NewHyperSpaceDisplay extends Display {
 	
 	//draw a set of points
 	void drawShape(PVector[] pts) {
+		PVector prev = null;
 		  for (int i = 0; i < pts.length; i++) {
 
-
+			
 		    PVector p = pts[i];
 		    
-		    parent.rect(centreX + p.x, centreY + p.y, 4 , 4);
+		    if(prev != null){
+		    	parent.line( centreX + p.x, centreY + p.y, centreX + prev.x, centreY +  prev.y);
+		    }
+		    prev = p;
 		    
 		  }
 		}
@@ -426,7 +417,7 @@ public class NewHyperSpaceDisplay extends Display {
 				
 			} else if (evt.id == 1){
 				//change the freq
-				playerFreq = (int)PApplet.map(evt.value, 0f, 1024f, 1, 9);
+				//playerFreq = (int)PApplet.map(evt.value, 0f, 1024f, 1, 9);
 				
 			}
 		}
