@@ -1,6 +1,8 @@
 package common;
 
 import common.util.LerpedFloat;
+import common.util.LerpedRot;
+import common.util.LerpedVector;
 import common.util.Rot;
 import oscP5.OscMessage;
 import processing.core.PVector;
@@ -45,7 +47,10 @@ public class ShipState {
 	//ships world velocity magnitude
 	public float shipVelocity = 0;
 	public float lastShipVel = 0;
-
+	//position and rotation relative to something we are docking with
+	public LerpedVector dockingOffset = new LerpedVector(new PVector(), 0, 250);
+	public LerpedRot dockingRotation = new LerpedRot(Rot.IDENTITY, 0, 250);
+	
 	public long lastTransformUpdate = 0;
 	
 	//how many emp blasts left
@@ -179,6 +184,22 @@ public class ShipState {
 			undercarriageLockState = msg.get(0).intValue() == 1;
 		} else if (msg.checkAddrPattern("/ship/state/docked")){
 			shipDocked = msg.get(0).intValue() == 1;
+		} else if(msg.checkAddrPattern("/ship/state/dockingTransform")){
+			long now = parent.millis();
+			PVector r = new PVector(msg.get(0).floatValue(),
+									msg.get(1).floatValue(),
+									msg.get(2).floatValue());
+			dockingOffset.update(r,now);
+			
+			//rotation as a quaternion
+			float w = msg.get(3).floatValue();
+			float x = msg.get(4).floatValue();
+			float y = msg.get(5).floatValue();
+			float z = msg.get(6).floatValue();
+		
+			Rot rot = new Rot(w, x, y, z, false);
+			dockingRotation.update(rot, now);
+			
 		}
 	}
 }

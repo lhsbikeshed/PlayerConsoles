@@ -20,8 +20,7 @@ import common.util.UsefulShit;
 
 public class LandingDisplay extends Display {
 	
-	LerpedVector shipOffset = new LerpedVector(new PVector(), 0, 250);
-	LerpedRot localRotation = new LerpedRot(Rot.IDENTITY, 0, 250);
+
 	long lastQuaternionTime = 0;
 	
 	PVector shipScreenSpace = new PVector();
@@ -73,6 +72,9 @@ public class LandingDisplay extends Display {
 		}
 		
 		//crosshair - highlight axis separately based on closeness to centre
+		
+		LerpedVector shipOffset = parent.getShipState().dockingOffset;
+		LerpedRot localRotation = parent.getShipState().dockingRotation;
 		
 		if(PApplet.abs(shipOffset.getValue(now).y) < 5){
 			landingGraphics.stroke(0,255,0);
@@ -189,39 +191,17 @@ public class LandingDisplay extends Display {
 		String ls = ShipState.undercarriageStrings[ shipState.undercarriageState];
 		
 		parent.text("Landing gear: " + ls, 37, 560);
+		
 	}
 
 	private void testCode() {
-		// TODO Auto-generated method stub
-		long now = parent.millis();
-		PVector r = new PVector(PApplet.map(parent.mouseX, 0, 1024, -15, 15),
-				PApplet.map(parent.mouseY, 0, 768, -15, 15),
-				10f
-				
-				);
-		shipOffset.update(r,now);
+		
 		
 	}
 
 	@Override
 	public void oscMessage(OscMessage msg) {
-		if(msg.checkAddrPattern("/screen/landingDisplay/shipTransform")){
-			long now = parent.millis();
-			PVector r = new PVector(msg.get(0).floatValue(),
-									msg.get(1).floatValue(),
-									msg.get(2).floatValue());
-			shipOffset.update(r,now);
-			
-			//rotation as a quaternion
-			float w = msg.get(3).floatValue();
-			float x = msg.get(4).floatValue();
-			float y = msg.get(5).floatValue();
-			float z = msg.get(6).floatValue();
 		
-			Rot rot = new Rot(w, x, y, z, false);
-			localRotation.update(rot, now);
-			
-		}
 
 	}
 

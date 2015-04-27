@@ -356,9 +356,12 @@ public class RefuelDisplay extends Display {
 	}
 	
 	@Override
-	public void start() {
-		// TODO Auto-generated method stub
-		headPos = getNewStartPos(0.5f);
+	public void start() {		
+		
+		PVector startPos = parent.getShipState().dockingOffset.getValue(parent.millis());
+		headPos.z = 0;
+		headPos.x = PApplet.map(startPos.x, -22,22,-600,0); //PApplet.constrain(headPos.x, -600, 0);
+		headPos.y = PApplet.map(startPos.y, -22, 22, -946, 0);// PApplet.constrain(headPos.y, -946, 0);
 		
 	}
 
