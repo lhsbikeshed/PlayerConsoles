@@ -332,7 +332,7 @@ public class EngineerConsole extends PlayerConsole {
 		
 
 		// set initial screen, probably gets overwritten from game shortly
-		changeDisplay(displayMap.get("hyperspace"));
+		changeDisplay(displayMap.get("jamming"));
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/EngineerStation");

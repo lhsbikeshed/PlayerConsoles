@@ -43,6 +43,7 @@ public class JamDisplay extends Display {
 							// to smoothly change the graph
 	int attempts = 3;
 
+	int gameDuration = 35000;
 	int nextChangeTime = 4500; // time between changes of the graph
 
 	int dialA = 1;
@@ -58,10 +59,10 @@ public class JamDisplay extends Display {
 		this.p5 = parent.getOscClient();
 		serverIP = parent.getServerIP();
 		myRemoteLocation = new NetAddress(serverIP, 12000);
-		bgImage = parent.loadImage("engineerconsole/jammingscreen.png");
+		bgImage = parent.loadImage("engineerconsole/screens/jamming/background.png");
 		intruderOverlay = parent
-				.loadImage("engineerconsole/intruderoverlay.png");
-		jammingOverlay = parent.loadImage("engineerconsole/jammingoverlay.png");
+				.loadImage("engineerconsole/screens/jamming/intruderoverlay.png");
+		jammingOverlay = parent.loadImage("engineerconsole/screens/jamming/jammingoverlay.png");
 		for (int i = 0; i < 10; i++) {
 
 			prevData[0][i] = 0;
@@ -71,24 +72,30 @@ public class JamDisplay extends Display {
 		scanStart = parent.millis();
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void draw() {
+		
+		//removeme
+		//playStart = parent.millis();
 		// dialA =(int) map(mouseX, 0, width, 0, 12);
 		// dialB = (int) map(mouseY, 0, height, 0, 12);
+		
+		int progress = (int) parent.map(parent.millis() - playStart, gameDuration,0f, 396, 0);
+		parent.fill(0,128,10);
+		parent.rect(873, 267, 120, progress);
 
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
 		parent.textFont(font, 20);
 		// text("test " + mouseX + ":" + mouseY, mouseX, mouseY);
 
 		if (gameState == STATE_SCAN) {
-			if (scanStart + 5000 < parent.millis()) {
-				gameState = STATE_PLAYING;
-				playStart = parent.millis();
-				parent.getConsoleAudio().setToneState(true);
-			} else {
-				parent.textFont(font, 30);
-				parent.text("Scanning frequencies..", 460, 355);
-			}
+				if(playStart + 5000 < parent.millis()){
+					gameState = STATE_PLAYING;
+					
+					parent.getConsoleAudio().setToneState(true);
+				}
+			
 		} else if (gameState == STATE_PLAYING) {
 			if (lastChangeTime + nextChangeTime < parent.millis()) {
 				newValues();
@@ -99,7 +106,7 @@ public class JamDisplay extends Display {
 					PApplet.map(dialA, 0, 12, 150, 220),
 					PApplet.map(dialB, 0f, 12f, 0.1f, 15f));
 
-			if (playStart + 35000 < parent.millis()) {
+			if (playStart + gameDuration < parent.millis()) {
 				// failed, beam aboard
 				gameState = STATE_FAIL;
 				parent.getConsoleAudio().setToneState(false);
@@ -114,6 +121,9 @@ public class JamDisplay extends Display {
 			// draw the graphs
 
 			parent.textFont(font, 10);
+			parent.pushMatrix();
+			parent.rotate(PApplet.radians(90));
+			parent.translate(182,-505);
 			for (int i = 0; i < 10; i++) {
 				int graphHeightA = 0;
 				int graphHeightB = 0;
@@ -152,25 +162,31 @@ public class JamDisplay extends Display {
 					graphHeightB = -(int) parent.random(150);
 				}
 				parent.fill(0, 255, 0);
-				parent.text(i + 1, 340 + 60 * i, 430);
+				parent.text(i + 1, 10 + 35 * i, 100);
+				parent.text(i + 1, 10 + 35 * i, 80);
+
+				int val = (int) parent.map(parent.sin(parent.frameCount * 0.8f), -1f, 1f, 0, 255);
+				int col = parent.color(val, val, 0);
 				if (dialA == i) {
-					parent.fill(0, 255, 255);
+					parent.fill(col);
 				}
-				parent.rect(330 + 60 * i, 415, 40, graphHeightA);
+				parent.rect(35 * i, 50, 28, graphHeightA);
+				
 
 				parent.fill(0, 255, 0);
-				parent.text(i + 1, 340 + 60 * i, 655);
 				if (dialB  == i) {
-					parent.fill(0, 255, 255);
+					parent.fill(col);
 				}
 				parent.noStroke();
-				parent.rect(330 + 60 * i, 640, 40, graphHeightB);
+				parent.rect( 35 * i, 120, 28, -graphHeightB);
 			}
 
+			parent.popMatrix();
+			
 			parent.fill(0, 255, 0);
 			parent.textFont(font, 35);
-			parent.text(dialA, 124, 390);
-			parent.text(dialB, 124, 600);
+			parent.text(dialA, 197, 653);
+			parent.text(dialB, 606, 653);
 
 			if (jamAttempt) {
 				// overlay
