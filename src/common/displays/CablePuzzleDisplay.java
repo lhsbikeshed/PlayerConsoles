@@ -173,6 +173,16 @@ public class CablePuzzleDisplay extends Display {
 			int plugId = msg.get(0).intValue();
 			int socketId = msg.get(1).intValue();
 			setConnectionState(plugId, socketId, 0);
+		} else if (msg.checkAddrPattern("/system/cablePuzzle/currentState")){
+			String[] vals = msg.get(0).stringValue().split(",");
+			
+			selectedPatch = Integer.parseInt(vals[0]);
+			
+			for(int i = 1; i < vals.length; i++){
+				connectionState[i-1] = vals[i].equals("1") ? true : false;
+			}
+			
+			ConsoleLogger.log(this, "received status update");
 		}
 
 	}
@@ -185,6 +195,11 @@ public class CablePuzzleDisplay extends Display {
 
 	@Override
 	public void start() {
+		
+		OscMessage msg = new OscMessage("/system/cablePuzzle/getCurrentState");
+		parent.getOscClient().send(msg, parent.getServerAddress());
+		
+		
 
 	}
 
