@@ -38,7 +38,7 @@ public class TacticalHardwareController extends HardwareController {
 	public static final int KP_D = 68;
 	
 	
-	
+	/* for screen switching using hardware, at some point this will be moved out of here */
 	String[] screenNames = {"weapons", "plottingDisplay"};
 	int screenIndex = 1;
 	
@@ -138,6 +138,8 @@ public class TacticalHardwareController extends HardwareController {
 		} else if ( c == 'W'){
 			sendWeaponChange(true);
 		} else if (c == 'S'){
+			//TODO: control for this will be switched with a toggle soon, its value determins which
+			//display to use
 			cycleScreen();
 		}
 		
