@@ -7,6 +7,7 @@ import processing.core.PImage;
 import processing.core.PVector;
 import common.ConsoleLogger;
 import common.Display;
+import common.DrawUtilities;
 import common.HardwareEvent;
 import common.PlayerConsole;
 import common.ShipState;
@@ -65,6 +66,7 @@ public class RadarDisplay extends Display {
 		parent.background(0, 0, 0);
 		zoomLevel = 0.5f; // map(mouseY, 0, height, 0.01f, 1.0f);
 		drawRadar();
+		DrawUtilities.drawPilotDamageGrid(parent, 19, 622);
 		if(parent.getShipState().thrustReverser ){
 			if(parent.globalBlinker){
 		
@@ -185,7 +187,9 @@ public class RadarDisplay extends Display {
 		parent.ambientLight(255, 255, 255);
 		parent.noTint();
 		// move the camera --------------------------------------
-		parent.translate(parent.width / 2, parent.height / 2);
+		
+		//move z axis based on extents of radar targets
+		parent.translate(parent.width / 2 , parent.height / 2 -105, -300f);
 		parent.rotateX(PApplet.radians(325)); // 326
 		parent.rotateY(PApplet.radians(180));
 
@@ -209,7 +213,7 @@ public class RadarDisplay extends Display {
 		parent.strokeWeight(2);
 		parent.stroke(20, 20, 20);
 		parent.fill(12, 30, 15);
-		parent.box(1500);
+		parent.box(3000);
 
 		parent.popMatrix();
 
@@ -353,11 +357,6 @@ public class RadarDisplay extends Display {
 						parent.rect(-15, -15, 30, 30);
 						parent.popMatrix();
 
-						int midX = (int) ((660 - rItem.screenPos.x) * 0.33f);
-						parent.stroke(255, 255, 0);
-						parent.line(660, 190, rItem.screenPos.x + midX, 190);
-						parent.line(rItem.screenPos.x + midX, 190,
-								rItem.screenPos.x, rItem.screenPos.y);
 					}
 
 					// if this target is "pinging" then draw a radiobeacon
@@ -445,7 +444,7 @@ public class RadarDisplay extends Display {
 		parent.text("speed: " + (int) shipState.shipVelocity, 680, 660);
 
 		
-		
+		//afterburner charge state
 		parent.text("Afterburner: ", 690, 742);
 		
 		String state = "";
@@ -462,15 +461,13 @@ public class RadarDisplay extends Display {
 		}
 		
 		parent.text( state, 857, 742);
+		
+		
+		//sector text
 		parent.fill(255, 255, 0);
-		if (targetted != null) {
-			parent.textFont(font, 20);
-			parent.text(targetted.name, 675, 70);
-			parent.textFont(font, 15);
-			parent.text(targetted.statusText, 675, 100);
-		}
+
 		parent.text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")",
-				41, 740);
+				21, 40);
 
 		drawGuides();
 		
@@ -479,6 +476,9 @@ public class RadarDisplay extends Display {
 		
 	}
 
+	
+	
+	
 	protected void clearDeadItems(RadarObject rItem) {
 		if (rItem.lastUpdateTime < parent.millis() - 500.0f) {
 			// its dead jim
