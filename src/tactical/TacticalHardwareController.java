@@ -232,6 +232,10 @@ public class TacticalHardwareController extends HardwareController {
 		if(parent.testMode) return;
 		
 		if(powerOn){
+			setBankName(0, weaponNames[0]);
+			setBankName(1, weaponNames[1]);
+			setBankName(2, weaponNames[2]);
+			setBankName(3, weaponNames[3]);
 			serialPort.write("W,");
 			weaponPanelState = true;
 		} else {

@@ -44,7 +44,10 @@ public class LowerPanelHardware extends HardwareController {
 				h.id = Integer.parseInt(sw[0]);
 				h.value = Integer.parseInt(sw[1]);
 				parent.hardwareEvent(h);
-				parent.getConsoleAudio().randomBeep();
+				
+				if(h.value < 13 && h.value > 14){
+					parent.getConsoleAudio().randomBeep();	//no beeps for stick buttons
+				}
 				
 				if(h.id == 9){	//9 is hardcoded to the jump system toggle
 					//send that message now but pass it on to rest of console in case something wants it
@@ -152,7 +155,7 @@ public class LowerPanelHardware extends HardwareController {
 		if(parent.testMode){
 			return;
 		} 
-
+		parent.getConsoleAudio().muteBeeps = true;
 		serialPort.write('P');
 	
 		

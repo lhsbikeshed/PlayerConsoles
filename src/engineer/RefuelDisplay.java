@@ -38,6 +38,9 @@ public class RefuelDisplay extends Display {
 	
 	private float MAX_DOCK_SPEED = 0.4f;
 	
+	boolean[] stickDirections = {false,false,false,false};//udlr
+	
+	
 	public enum PuzzleState {
 		STATE_STARTUP, STATE_PLAYING, STATE_CONNECTED, STATE_FUCKED;
 	}
@@ -156,6 +159,7 @@ public class RefuelDisplay extends Display {
 		OscMessage msg = new OscMessage("/system/reactor/setFuelConnectionState");
 		msg.add(1);
 		parent.getOscClient().send(msg, parent.getServerAddress());
+		parent.getConsoleAudio().playClip("fuelConnected");
 	
 	}
 	
@@ -166,11 +170,13 @@ public class RefuelDisplay extends Display {
 		OscMessage msg = new OscMessage("/system/reactor/setFuelConnectionState");
 		msg.add(0);
 		parent.getOscClient().send(msg, parent.getServerAddress());
+		parent.getConsoleAudio().playClip("fuelDisconnected");
 	}
 	
 	/* forced disconnect, as in "the player flew off with the line connected */
 	void forceDisconnect(){
 		puzzleState = PuzzleState.STATE_FUCKED;
+		parent.getConsoleAudio().playClip("fuelDamage");
 	}
 	
 	/* head crashed into the wall too fast
@@ -340,8 +346,28 @@ public class RefuelDisplay extends Display {
 				break;
 			
 			}
+		} else if(evt.event.equals("NEWSWITCH")){
+				
+				switch(evt.id){
+				case LowerPanelHardware.STICK_UP:
+					
+					headVelTarget.y = -1f * evt.value;
+					break;
+				case LowerPanelHardware.STICK_DOWN:
+					headVelTarget.y = 1f * evt.value;
+					break;
+				case LowerPanelHardware.STICK_LEFT:
+					headVelTarget.x = -1f * evt.value;
+					break;
+				case LowerPanelHardware.STICK_RIGHT:
+					headVelTarget.x = 1f * evt.value;
+					break;
+				
+				
+				}
+			}
 		}
-	}
+	
 
 	PVector getNewStartPos(float accuracy){
 		//tl : -178,0
