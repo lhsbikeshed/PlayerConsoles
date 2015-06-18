@@ -245,7 +245,11 @@ public class PlottingDisplay extends Display {
 		} else {
 
 			// check its distance
-			PVector src = currentRoute.get(currentRoute.size() - 1).pos;
+			int testP = currentRoute.size() - 1;
+			if(testP < 0){
+				return;
+			}
+			PVector src = currentRoute.get(testP).pos;
 			PVector dst = m.pos;
 			PVector diff = PVector.sub(src, dst);
 			if (diff.mag() > 165) { // too far
