@@ -67,8 +67,10 @@ public class DamageEffect {
 	}
 
 	public void clearCracks() {
+		setDamageLevel( 0 );
+
 		synchronized (lock) {
-			
+
 		
 			crackList.clear();
 		}
