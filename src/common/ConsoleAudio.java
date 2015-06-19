@@ -96,6 +96,7 @@ public class ConsoleAudio {
 			ap.setPan(pan);;
 		}
 	}
+	
 
 	public void playClip(String name) {
 		AudioPlayer c = audioList.get(name);
@@ -104,7 +105,8 @@ public class ConsoleAudio {
 				c.setPan(pan);
 				c.rewind();
 				c.play();
-			}
+				
+			} 
 		} else {
 			ConsoleLogger.log(this, "ALERT: tried to play " + name
 					+ " but not found");

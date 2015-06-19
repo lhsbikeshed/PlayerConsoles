@@ -472,7 +472,7 @@ public class RadarDisplay extends Display {
 		parent.text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")",
 				41, 740);
 
-		drawGuides();
+		//drawGuides();
 		
 		
 

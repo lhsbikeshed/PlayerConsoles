@@ -8,6 +8,7 @@ import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
+import common.ConsoleLogger;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
@@ -28,6 +29,8 @@ public class LandingDisplay extends Display {
 	PImage overlayImage;
 	
 	PGraphics landingGraphics;
+	
+	long distancePingTime = 0;
 	
 	public LandingDisplay(PlayerConsole parent) {
 		super(parent);
@@ -191,6 +194,16 @@ public class LandingDisplay extends Display {
 		String ls = ShipState.undercarriageStrings[ shipState.undercarriageState];
 		
 		parent.text("Landing gear: " + ls, 37, 560);
+		
+		
+		if(!ShipState.instance.shipDocked){
+			if(distancePingTime <= 0){
+				distancePingTime = Math.abs((long) (1000 * (shipOffset.getValue(parent.millis()).mag() / 20f)));
+				parent.getConsoleAudio().playClip("shortBlip");
+	
+			}
+			distancePingTime -= 50;	
+		}
 		
 	}
 
