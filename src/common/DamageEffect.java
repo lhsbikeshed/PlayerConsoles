@@ -67,8 +67,16 @@ public class DamageEffect {
 	}
 
 	public void clearCracks() {
-		setDamageLevel( 0 );
+		
+		
 
+		
+		damageTimer =-1000;
+		synchronized (damageSet) {
+			damageSet = 1.0f;
+			
+		}
+		
 		synchronized (lock) {
 
 		
@@ -79,6 +87,7 @@ public class DamageEffect {
 	int lastDistort = 0;
 
 	public void draw() {
+		
 		int now = parent.millis();
 		damageDistortion.set("timer", now);
 		synchronized(doBoom) {

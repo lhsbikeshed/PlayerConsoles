@@ -78,6 +78,7 @@ void main() {
 
 		coords.s -= val;
 	}
+		
 
 	// Active damage moving scanlines
 	if ( boom && cline > scanloc - scanAmt && cline < scanloc + scanAmt ) {
