@@ -90,7 +90,7 @@ public class JamDisplay extends Display {
 		// text("test " + mouseX + ":" + mouseY, mouseX, mouseY);
 
 		if (gameState == STATE_SCAN) {
-				if(playStart + 5000 < parent.millis()){
+				if(playStart + 1000 < parent.millis()){
 					gameState = STATE_PLAYING;
 					
 					parent.getConsoleAudio().setToneState(true);
@@ -297,7 +297,7 @@ public class JamDisplay extends Display {
 
 		newValues();
 		scanStart = -5000;
-		playStart = -5000;
+		playStart = parent.millis(); //-5000;
 		failStart = -2000;
 		gameState = STATE_SCAN;
 		jamMessageDone = false;
