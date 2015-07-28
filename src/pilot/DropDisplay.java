@@ -24,6 +24,8 @@ public class DropDisplay extends Display {
 
 	PVector fireVec = new PVector(0, 0, 0);
 	long turbulenceTime = 0;
+	long turbulenceDuration = 0;
+	
 
 	public DropDisplay(PlayerConsole parent) {
 		super(parent);
@@ -132,7 +134,7 @@ public class DropDisplay extends Display {
 		parent.noTint();
 
 		if (turbulenceTime < parent.millis()
-				&& parent.millis() < turbulenceTime + 1500) {
+				&& parent.millis() < turbulenceTime + turbulenceDuration) {
 
 			parent.image(turbulenceImg, 155, 410);
 
@@ -142,6 +144,18 @@ public class DropDisplay extends Display {
 
 			parent.image(structFailOverlay, 128, 200);
 		}
+		
+		parent.stroke(255);
+		parent.textFont(parent.getGlobalFont(), 15);
+		for(int i = 0; i < 20; i++){
+			int h = (int) ((i * 50) + (alt % 50));
+			
+			parent.line(0,h, 50,  h);
+			
+			parent.line(parent.width,h, parent.width-50,  h);
+
+		}
+		
 	}
 
 	@Override
@@ -163,6 +177,7 @@ public class DropDisplay extends Display {
 		} else if (theOscMessage
 				.checkAddrPattern("/scene/drop/turbulenceWarning")) {
 			turbulenceTime = parent.millis();
+			turbulenceDuration = (long) (theOscMessage.get(0).floatValue() * 1000l);
 			parent.getConsoleAudio().playClip("bannerPopup");
 		}
 	}
