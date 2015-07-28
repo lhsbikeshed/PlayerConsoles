@@ -29,19 +29,21 @@ public class DropDisplay extends Display {
 
 	public DropDisplay(PlayerConsole parent) {
 		super(parent);
-		bg = parent.loadImage("pilotconsole/reentry.png");
+		bg = parent.loadImage("pilotconsole/screens/drop/background.png");
 		font = parent.getGlobalFont(); // loadFont("HanzelExtendedNormal-48.vlw");
 		structFailOverlay = parent
 				.loadImage("pilotconsole/structuralFailure.png");
 		fireballImg = parent.loadImage("pilotconsole/fireball.png");
 		turbulenceImg = parent.loadImage("pilotconsole/turbulence.png");
 
-		labelPos[0] = new Point(217, 307);
-		labelPos[1] = new Point(345, 563);
-		labelPos[2] = new Point(508, 386);
-		labelPos[3] = new Point(819, 384);
-		labelPos[4] = new Point(759, 224);
-		labelPos[5] = new Point(768, 610);
+
+		labelPos[0] = new Point(647,508);
+		labelPos[1] = new Point(422, 519);
+		labelPos[2] = new Point(423, 350);
+		labelPos[3] = new Point(885, 518);
+		labelPos[4] = new Point(764, 322);
+		labelPos[5] = new Point(765, 584);
+		
 	}
 
 	@Override
@@ -51,9 +53,9 @@ public class DropDisplay extends Display {
 		parent.fill(255, 255, 255);
 		parent.image(bg, 0, 0, parent.width, parent.height);
 		parent.fill(255, 255, 255);
-		parent.textFont(font, 60);
+		parent.textFont(font, 20);
 		float alt = parent.getShipState().altitude.getValue(parent.millis());
-		parent.text((int) alt + "m", 448, 704);
+		parent.text((int) alt + "m", 100,623 );
 		parent.textFont(font, 30);
 		for (int t = 0; t < 6; t++) {
 			Point p = labelPos[t];
@@ -71,7 +73,7 @@ public class DropDisplay extends Display {
 			parent.tint(255, (int) (fireVec.z * 255));
 			int randX = (int) parent.random(fireVec.z * 5);
 			int randY = (int) parent.random(fireVec.z * 5);
-			parent.image(fireballImg, 643 + randX, 231 + randY,
+			parent.image(fireballImg, 707 + randX, 225 + randY,
 					fireballImg.width / 2, fireballImg.height / 2);
 		}
 		if (fireVec.z < 0) {
@@ -79,7 +81,7 @@ public class DropDisplay extends Display {
 			int randX = (int) parent.random(Math.abs(fireVec.z * 5));
 			int randY = (int) parent.random(Math.abs(fireVec.z * 5));
 			parent.pushMatrix();
-			parent.translate(643 + randX, 585 + randY);
+			parent.translate(712 + randX, 628+ randY);
 			parent.scale(1, -1);
 			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
 					fireballImg.height / 2);
@@ -90,7 +92,7 @@ public class DropDisplay extends Display {
 			int randX = (int) parent.random(fireVec.x * 5);
 			int randY = (int) parent.random(fireVec.x * 5);
 			parent.pushMatrix();
-			parent.translate(850 + randX, 325 + randY);
+			parent.translate(969 + randX, 357 + randY);
 			parent.rotate(PApplet.radians(90));
 			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
 					fireballImg.height / 2);
@@ -102,7 +104,7 @@ public class DropDisplay extends Display {
 			int randX = Math.abs((int) parent.random(fireVec.x * 5));
 			int randY = Math.abs((int) parent.random(fireVec.x * 5));
 			parent.pushMatrix();
-			parent.translate(587 + randX, 498 + randY);
+			parent.translate(607+ randX, 520 + randY);
 			parent.rotate(PApplet.radians(-90));
 			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
 					fireballImg.height / 2);
@@ -113,7 +115,7 @@ public class DropDisplay extends Display {
 			int randX = (int) parent.random(fireVec.y * 5);
 			int randY = (int) parent.random(fireVec.y * 5);
 			parent.pushMatrix();
-			parent.translate(204 + randX, 324 + randY);
+			parent.translate(371 + randX, 249 + randY);
 			// rotate(radians(90));
 			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
 					fireballImg.height / 2);
@@ -125,7 +127,7 @@ public class DropDisplay extends Display {
 			int randX = Math.abs((int) parent.random(fireVec.y * 5));
 			int randY = Math.abs((int) parent.random(fireVec.y * 5));
 			parent.pushMatrix();
-			parent.translate(362 + randX, 540 + randY);
+			parent.translate(538 + randX, 603 + randY);
 			parent.rotate(PApplet.radians(-180));
 			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
 					fireballImg.height / 2);
@@ -145,16 +147,19 @@ public class DropDisplay extends Display {
 			parent.image(structFailOverlay, 128, 200);
 		}
 		
+		
+		//alt meters
 		parent.stroke(255);
 		parent.textFont(parent.getGlobalFont(), 15);
-		for(int i = 0; i < 20; i++){
-			int h = (int) ((i * 50) + (alt % 50));
+		for(int i = 0; i < 7; i++){
+			int h = 300 + (int) ((i * 50) + (alt % 50));
 			
-			parent.line(0,h, 50,  h);
+			parent.line(94,h, 204,  h);
 			
-			parent.line(parent.width,h, parent.width-50,  h);
-
+			//parent.text(i, 50, h);
 		}
+		
+		
 		
 	}
 
