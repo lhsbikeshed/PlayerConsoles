@@ -29,6 +29,7 @@ public class PilotConsole extends PlayerConsole {
 	boolean joystickTestMode = true;
 
 	PImage autopilotOverlay;
+	public PilotDrawUtilities drawUtils;
 
 	// serial stuff
 	//Serial serialPort;
@@ -240,6 +241,8 @@ public class PilotConsole extends PlayerConsole {
 
 
 		autopilotOverlay = loadImage("pilotconsole/autopilotoverlay.png");
+		
+		drawUtils = new PilotDrawUtilities(this);
 
 		/* sync to current game screen */
 		OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");

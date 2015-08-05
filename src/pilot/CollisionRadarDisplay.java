@@ -30,7 +30,7 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		for(int i = 1; i < 4; i++){
 			rockIcon[i-1] = parent.loadImage("pilotconsole/rockIcon" + i + ".png");
 		}
-		pg = parent.createGraphics(1024, 768, PApplet.P3D);
+		pg = parent.createGraphics(1024, 580, PApplet.P3D);
 	}
 
 	@Override
@@ -42,12 +42,12 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		pg.background(0);
 		pg.stroke(255);
 		pg.strokeWeight(2);
-		
-		pg.line(512, 350, 512, 420);
-		pg.line(480, 384, 544, 384);
+		//580 / 2 = 290
+		pg.line(512, 260, 512, 320);
+		pg.line(480, 290, 544, 290);
 		pg.pushMatrix();
 		
-		pg.translate(512, 384 , 100);
+		pg.translate(512, 290 , 100);
 		pg.fill(20,20,20,120);
 	    pg.hint(PConstants.DISABLE_DEPTH_MASK);
 		for(int i = 0; i < 4; i++){
@@ -130,14 +130,14 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		parent.image(pg, 0, 0);;
 		
 		//gui overlay bits
-		parent.image(overlayImage, 0, 0);
+		//parent.image(overlayImage, 0, 0);
 		parent.textFont(font, 20);
 		
 		//-- distance marker --
 		parent.fill(255);
 		float h = (int)parent.getShipState().altitude.getValue(parent.millis());
 		//when close to the main asteroid constantly show a collision alert
-		if(h < 400f){
+		if(h < 3300f){
 			showCollisionAlert = true;
 			parent.fill(255,0,0);
 		}
@@ -146,9 +146,9 @@ public class CollisionRadarDisplay extends RadarDisplay {
 		int startY = 85;
 		int startX = 40;
 		parent.stroke(255);
-		parent.line(startX, startY, startX, startY + 600);
+		parent.line(startX, startY, startX, startY + 460);
 		int len = 20;
-		for(int i = 0; i <= 600 / 20; i++){
+		for(int i = 0; i <= 460 / 20; i++){
 			if(i % 5 == 0){
 				len = 40;
 			} else {
@@ -157,9 +157,9 @@ public class CollisionRadarDisplay extends RadarDisplay {
 			parent.line(startX, startY + i * 20, startX + len, startY + i * 20);
 			
 		}
-		float markerY = PApplet.map(h, 35000, 0, startY, startY + 600);
+		float markerY = PApplet.map(h, 35000, 0, startY, startY + 460);
 		parent.line(startX, markerY, startX + 50, markerY);
-		
+		if(markerY > startY + 460) markerY = startY + 460;
 		parent.text((int)(parent.getShipState().altitude.getValue(parent.millis()) * 10 )+ "m", 100, markerY);
 		
 		//=------- collision warning -----
@@ -175,7 +175,8 @@ public class CollisionRadarDisplay extends RadarDisplay {
 			parent.getConsoleAudio().playClip("blip");
 			
 		}
-		
+		((PilotConsole)parent).drawUtils.drawPilotBar(parent);
+
 	}
 
 	

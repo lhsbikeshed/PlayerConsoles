@@ -16,10 +16,11 @@ import common.util.UsefulShit;
 
 public class RadarDisplay extends Display {
 	Object lock = new Object();
-	PImage overlayImage, indicatorImage;
+	PImage  indicatorImage;
 	PImage radarBaseImage;
 	
 	protected boolean silenceNewTargets = false;
+	
 	
 	RadarObject targetted;
 	float zoomLevel = 0.1f;
@@ -49,7 +50,6 @@ public class RadarDisplay extends Display {
 	public RadarDisplay(PlayerConsole parent) {
 		super(parent);
 		shipState = parent.getShipState();
-		overlayImage = parent.loadImage("pilotconsole/overlayImage.png");
 		indicatorImage = parent.loadImage("pilotconsole/indicator.png");
 		radarBaseImage = parent.loadImage("pilotconsole/radarBase.png");
 		for (int i = 0; i < 100; i++) {
@@ -64,6 +64,7 @@ public class RadarDisplay extends Display {
 	public void draw() {
 		parent.background(0, 0, 0);
 		zoomLevel = 0.5f; // map(mouseY, 0, height, 0.01f, 1.0f);
+		
 		drawRadar();
 		if(parent.getShipState().thrustReverser ){
 			if(parent.globalBlinker){
@@ -78,6 +79,8 @@ public class RadarDisplay extends Display {
 			}
 			
 		}
+		((PilotConsole)parent).drawUtils.drawPilotBar(parent);
+
 	}
 
 	public void drawAxis(int highlight) {
@@ -185,7 +188,9 @@ public class RadarDisplay extends Display {
 		parent.ambientLight(255, 255, 255);
 		parent.noTint();
 		// move the camera --------------------------------------
-		parent.translate(parent.width / 2, parent.height / 2);
+		
+		//move z axis based on extents of radar targets
+		parent.translate(parent.width / 2 , parent.height / 2 -105, -300f);
 		parent.rotateX(PApplet.radians(325)); // 326
 		parent.rotateY(PApplet.radians(180));
 
@@ -209,7 +214,7 @@ public class RadarDisplay extends Display {
 		parent.strokeWeight(2);
 		parent.stroke(20, 20, 20);
 		parent.fill(12, 30, 15);
-		parent.box(1500);
+		parent.box(3000);
 
 		parent.popMatrix();
 
@@ -353,11 +358,6 @@ public class RadarDisplay extends Display {
 						parent.rect(-15, -15, 30, 30);
 						parent.popMatrix();
 
-						int midX = (int) ((660 - rItem.screenPos.x) * 0.33f);
-						parent.stroke(255, 255, 0);
-						parent.line(660, 190, rItem.screenPos.x + midX, 190);
-						parent.line(rItem.screenPos.x + midX, 190,
-								rItem.screenPos.x, rItem.screenPos.y);
 					}
 
 					// if this target is "pinging" then draw a radiobeacon
@@ -416,69 +416,24 @@ public class RadarDisplay extends Display {
 		}
 
 		// popMatrix();
-		parent.noLights();
-		parent.hint(PConstants.DISABLE_DEPTH_TEST);
-		parent.image(overlayImage, 0, 0, parent.width, parent.height);
-
-		parent.textFont(font, 18);
-		parent.fill(0, 255, 255);
-		int engPower = shipState.powerStates[ShipState.POWER_PROPULSION];
-		int power = (int) PApplet.map(engPower, 0f, 12f, 0f, 180f);
-		float engColor = PApplet.map(engPower, 0, 12, 0, 255);
-		parent.text("Engine power" , 680, 600);
-		parent.noFill();
-		parent.stroke(255);
-		parent.rect(680, 605, 180, 20);
-		parent.fill(255 - engColor, engColor,0);
-		parent.rect(680, 605, power, 20);
-		if(engPower == 0){
-			parent.textFont(font, 13);
-			if(parent.globalBlinker){
-				parent.fill(255,0,0);
-			} else {
-				parent.fill(255);
-			}
-			parent.text("NO POWER", 714, 619);
-		}
-		parent.textFont(font,18);
-		parent.fill(255);
-		parent.text("speed: " + (int) shipState.shipVelocity, 680, 660);
-
 		
 		
-		parent.text("Afterburner: ", 690, 742);
-		
-		String state = "";
-		if(shipState.afterburnerCharging){
-			state = "charging";
-			parent.fill(255,0,0);
-		} else {
-			state = "READY";
-			if(parent.globalBlinker){
-				parent.fill(0,255,0);
-			} else {
-				parent.fill(0,120,0);
-			}
-		}
-		
-		parent.text( state, 857, 742);
+		//sector text
 		parent.fill(255, 255, 0);
-		if (targetted != null) {
-			parent.textFont(font, 20);
-			parent.text(targetted.name, 675, 70);
-			parent.textFont(font, 15);
-			parent.text(targetted.statusText, 675, 100);
-		}
-		parent.text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")",
-				41, 740);
 
-		//drawGuides();
+		parent.text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")",
+				21, 40);
+
+		drawGuides();
 		
 		
 
 		
 	}
 
+	
+	
+	
 	protected void clearDeadItems(RadarObject rItem) {
 		if (rItem.lastUpdateTime < parent.millis() - 500.0f) {
 			// its dead jim
