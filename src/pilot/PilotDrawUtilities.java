@@ -22,7 +22,8 @@ public class PilotDrawUtilities {
 		parent.pushMatrix();
 		parent.translate(xpos, ypos);
 		parent.textFont(parent.getGlobalFont(), 16);
-		parent.text("SYSTEM DAMAGE", 0,-10);
+		parent.fill(255);
+		parent.text("SYSTEM STATUS", 0,-10);
 		
 		parent.noFill();
 		
@@ -33,18 +34,25 @@ public class PilotDrawUtilities {
 		String[] names = {"ENGINE", "  AFTER\r\nBURNER", "LANDING\r\n    GEAR", "ROT/PITCH", "ROT/YAW", "ROT/ROLL"};
 		
 		boolean[] states = {true, false, true, true, true, false};
+		int[] damageOrder = {5,2,3,1,4,0};
+		
+		float damage = parent.getShipState().hullState;
+		int damageCount = (int) PApplet.constrain(PApplet.map(damage, 0, 100, 6, 0), 0, 5);
+		
 		for(int x = 0; x < w / 100; x++){
 			for(int y = 0; y < h / 50; y++){
 				int i = x + y * (w/100);
 				
-				if(states[i]){
+				if(i >= damageCount){
 					parent.fill(0,255,0);
 				} else {
+					
 					if(parent.globalBlinker){
 						parent.fill(255,0,0);
 					} else {
 						parent.fill(255,255,0);
 					}
+				
 				}
 				parent.rect(x*100, y*50, 100, 50);
 				parent.fill(0);

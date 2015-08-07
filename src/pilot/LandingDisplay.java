@@ -184,17 +184,17 @@ public class LandingDisplay extends Display {
 		
 		landingGraphics.endDraw();
 		
-		parent.image(landingGraphics, 0,0);
+		parent.image(landingGraphics, 0,-100);
 
-		parent.image(overlayImage, 10,10);
+		//parent.image(overlayImage, 10,10);
 		
 		//stats in bottom left
 		parent.textFont(font, 14);
 		ShipState shipState = parent.getShipState();
 		String ls = ShipState.undercarriageStrings[ shipState.undercarriageState];
 		
-		parent.text("Landing gear: " + ls, 37, 560);
-		
+		((PilotConsole)parent).drawUtils.drawPilotBar(parent);
+
 		
 		if(!ShipState.instance.shipDocked){
 			if(distancePingTime <= 0){

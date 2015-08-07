@@ -249,7 +249,7 @@ public class PilotConsole extends PlayerConsole {
 		oscP5.send(myMessage, serverAddress);
 
 		// set initial screen
-		Display d = displayMap.get("radar");
+		Display d = displayMap.get("dockingtest");
 		changeDisplay(d);
 
 	}

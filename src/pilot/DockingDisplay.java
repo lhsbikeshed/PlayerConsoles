@@ -3,6 +3,7 @@ package pilot;
 import oscP5.OscMessage;
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PGraphics;
 import processing.core.PImage;
 import processing.core.PVector;
 import common.Display;
@@ -45,6 +46,8 @@ public class DockingDisplay extends Display {
 
 	float distanceScale = 0.9f;
 	float distance = 100.0f;
+	
+	PGraphics pgraphics;
 
 	public DockingDisplay(PlayerConsole parent) {
 		super(parent);
@@ -52,6 +55,7 @@ public class DockingDisplay extends Display {
 		shipImg = parent.loadImage("pilotconsole/shipbehind.png");
 		feetImg = parent.loadImage("pilotconsole/shipfeet.png");
 		overlayImage = parent.loadImage("pilotconsole/dockingOverlay.png");
+		pgraphics = parent.createGraphics(parent.width, parent.height);
 	}
 
 	public float CurveAngle(float start, float end, float step) {
@@ -99,34 +103,37 @@ public class DockingDisplay extends Display {
 		distanceScale = PApplet.map(distance, 0, 350, 0.5f, 4.0f);
 
 		parent.background(0, 0, 0);
-		parent.image(overlayImage, 8, 7);
-		parent.stroke(255);
-		parent.strokeWeight(1);
-		parent.line(parent.width / 2, 85, parent.width / 2, parent.height);
-		parent.line(0, parent.height / 2, parent.width, parent.height / 2);
+	//	parent.image(overlayImage, 8, 7);
+		
+		pgraphics.beginDraw();
+		pgraphics.background(0);
+		
+		pgraphics.stroke(255);
+		pgraphics.strokeWeight(1);
+		pgraphics.line(pgraphics.width / 2, 85, pgraphics.width / 2, pgraphics.height);
+		pgraphics.line(0, pgraphics.height / 2, pgraphics.width, pgraphics.height / 2);
 
 		// image(bgImage, 0, 0, width, height);
-		parent.textFont(font, 15);
-		parent.fill(255, 255, 0);
+		pgraphics.textFont(font, 15);
+		pgraphics.fill(255, 255, 0);
 
-		parent.text("Docking Clamp: "
-				+ (clamped == true ? "Engaged" : "Disengaged"), 60, 110);
-		parent.text("Undercarriage: "
-				+ undercarriageStrings[undercarriageState], 60, 130);
-		parent.text("Bay Gravity: " + (bayGravity == true ? "On" : "Off"), 60,
+		
+		pgraphics.text("Undercarriage: "
+				+ undercarriageStrings[undercarriageState], 20, 130);
+		pgraphics.text("Bay Gravity: " + (bayGravity == true ? "On" : "Off"), 20,
 				150);
 		if (landed) {
-			parent.text("Floor Contact", 60, 170);
+			pgraphics.text("Floor Contact", 20, 170);
 		}
 
-		parent.noFill();
+		pgraphics.noFill();
 		for (int i = 1; i < 4; i++) {
-			parent.ellipse(parent.width / 2, parent.height / 2, i * 150,
+			pgraphics.ellipse(pgraphics.width / 2, pgraphics.height / 2, i * 150,
 					i * 150);
 		}
 
 		if (lockingState != NO_SIGNAL) {
-			parent.pushMatrix();
+			pgraphics.pushMatrix();
 
 			PVector lerpPos = new PVector(0, 0, 0);
 			lerpPos.x = PApplet.lerp(lastShipPos.x, shipPos.x,
@@ -135,38 +142,38 @@ public class DockingDisplay extends Display {
 					(parent.millis() - lastPosUpdate) / 200.0f);
 
 			int screenX = (int) PApplet.map(lerpPos.x, 45.0f, -45.0f, 0f,
-					parent.width);
+					pgraphics.width);
 			int screenY = (int) PApplet.map(lerpPos.y, 45.0f, -45.0f, 0f,
-					parent.height);
+					pgraphics.height);
 
-			parent.translate(screenX, screenY);
-			parent.scale(distanceScale);
+			pgraphics.translate(screenX, screenY);
+			pgraphics.scale(distanceScale);
 			// ship
-			parent.strokeWeight(5);
-			parent.noFill();
+			pgraphics.strokeWeight(5);
+			pgraphics.noFill();
 
 			// calc colour
 			float d = Math.abs(lerpPos.mag());
 			if (d < 3) {
-				parent.stroke(0, 255, 0);
+				pgraphics.stroke(0, 255, 0);
 			} else if (d < 6.0) {
-				parent.stroke(255, 255, 0);
+				pgraphics.stroke(255, 255, 0);
 			} else {
-				parent.stroke(255, 0, 0);
+				pgraphics.stroke(255, 0, 0);
 			}
-			parent.ellipse(0, 0, 100, 100);
-			parent.strokeWeight(2);
-			parent.line(-50, -50, 50, 50);
-			parent.line(-50, 50, 50, -50);
+			pgraphics.ellipse(0, 0, 100, 100);
+			pgraphics.strokeWeight(2);
+			pgraphics.line(-50, -50, 50, 50);
+			pgraphics.line(-50, 50, 50, -50);
 
-			parent.popMatrix();
+			pgraphics.popMatrix();
 		} else {
-			parent.textFont(font, 48);
-			parent.text("NO SIGNAL", 322, 401);
+			pgraphics.textFont(font, 48);
+			pgraphics.text("NO SIGNAL", 322, 401);
 		}
-		parent.textFont(font, 30);
-		parent.text("Range: " + distance, 46, 740);
-		parent.text("Speed: " + (int) parent.getShipState().shipVelocity, 58,
+		pgraphics.textFont(font, 20);
+		//pgraphics.text("Range: " + distance, 366, 654);
+		pgraphics.text("Speed: " + (int) parent.getShipState().shipVelocity, 18,
 				183);
 
 		String s = "";
@@ -180,15 +187,16 @@ public class DockingDisplay extends Display {
 			s = "LOCKED to beacon";
 		}
 
-		parent.text(s, 46, 710);
-
+		pgraphics.text(s, 296, 654);
+		
+		
 		if (lockingState != NO_SIGNAL) {
 			speedWarning = false;
 			int maxSpd = 0;
 			for (int i = warningSpeeds.length - 1; i > 0; i--) {
 				int[] distSpeeds = warningSpeeds[i];
 				if (distance < distSpeeds[0]) {
-
+					
 					maxSpd = distSpeeds[1];
 					if (parent.getShipState().shipVelocity > distSpeeds[1]) {
 						speedWarning = true;
@@ -196,7 +204,7 @@ public class DockingDisplay extends Display {
 					}
 				}
 			}
-			parent.text("Max Speed: " + maxSpd, 44, 678);
+			pgraphics.text("Max Speed: " + maxSpd, 14, 648);
 			if (speedWarning && lastSpeedWarning + 2000 < parent.millis()) {
 				lastSpeedWarning = parent.millis();
 				parent.getConsoleAudio().playClip("reduceSpeed");
@@ -207,6 +215,11 @@ public class DockingDisplay extends Display {
 				parent.getConsoleAudio().playClip("searchingBeacon");
 			}
 		}
+		pgraphics.endDraw();
+		
+		parent.image(pgraphics, 0, -85);
+		((PilotConsole)parent).drawUtils.drawPilotBar(parent);
+
 	}
 
 	@Override
