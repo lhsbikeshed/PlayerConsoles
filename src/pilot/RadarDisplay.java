@@ -62,10 +62,12 @@ public class RadarDisplay extends Display {
 
 	@Override
 	public void draw() {
-		parent.background(0, 0, 0);
-		zoomLevel = 0.5f; // map(mouseY, 0, height, 0.01f, 1.0f);
 		
+		parent.background(0, 0, 0);
+		
+		zoomLevel = 0.5f; // map(mouseY, 0, height, 0.01f, 1.0f);
 		drawRadar();
+		
 		if(parent.getShipState().thrustReverser ){
 			if(parent.globalBlinker){
 		
@@ -79,6 +81,7 @@ public class RadarDisplay extends Display {
 			}
 			
 		}
+
 		((PilotConsole)parent).drawUtils.drawPilotBar(parent);
 
 	}
@@ -113,6 +116,7 @@ public class RadarDisplay extends Display {
 	}
 
 	public void drawGuides() {
+
 		parent.pushMatrix();
 		parent.translate(934, 645);
 		parent.noFill();
@@ -173,7 +177,6 @@ public class RadarDisplay extends Display {
 
 			parent.image(guideArrow, 0, 0);
 		}
-
 		parent.popMatrix();
 
 		parent.noTint();

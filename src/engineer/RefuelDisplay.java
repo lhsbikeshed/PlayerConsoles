@@ -25,7 +25,7 @@ public class RefuelDisplay extends Display {
 	
 	PVector centrePos = new PVector(-304, -447, 400);
 	
-	PImage overlayImage, targetImage, crosshairImage;
+	PImage overlayImage, targetImage, crosshairImage, connectedImage;
 	
 	PGraphics targetGraphics;
 	PShader damageDistortion;
@@ -39,6 +39,7 @@ public class RefuelDisplay extends Display {
 	private float MAX_DOCK_SPEED = 0.4f;
 	
 	boolean[] stickDirections = {false,false,false,false};//udlr
+	private float baseHealth;
 	
 	
 	public enum PuzzleState {
@@ -50,7 +51,7 @@ public class RefuelDisplay extends Display {
 		overlayImage = parent.loadImage("engineerconsole/screens/docking/fuelOverlay.png");
 		targetImage = parent.loadImage("engineerconsole/screens/docking/target.png");
 		crosshairImage = parent.loadImage("engineerconsole/screens/docking/crosshair.png");
-
+		connectedImage = parent.loadImage("engineerconsole/screens/fuel/connected.png");
 
 		targetGraphics = parent.createGraphics(860,530, PApplet.P3D);
 		damageDistortion = targetGraphics.loadShader("common/damageEffects/distort.glsl");
@@ -203,6 +204,35 @@ public class RefuelDisplay extends Display {
 		if(pullAwayTimer > 20){
 			disconnect();
 		}
+		
+		parent.image(connectedImage, 218, 216);
+		parent.fill(0);
+		if(parent.globalBlinker){
+			parent.rect(411,326, 110, 20);
+		}
+		
+		
+		
+		parent.textFont(parent.getGlobalFont(), 20);
+		if(baseHealth < 20f){
+			parent.fill(255,0,0);
+		} else {
+			parent.fill(0,255,0);
+		}
+		String perc = String.format("%.2f", baseHealth * 100);
+		parent.text(perc + "%", 727, 405);
+		
+		parent.fill(0);
+		if(baseHealth < .15f){
+			if(parent.globalBlinker){
+		
+				parent.rect(287,526, 510, 60);
+				parent.getConsoleAudio().playClip("beepLow");
+			}
+		} else {
+			
+			parent.rect(287,526, 510, 60);
+		}
 	}
 	
 	/* was force disconnected, show static and warning text */
@@ -315,6 +345,8 @@ public class RefuelDisplay extends Display {
 			}
 		} else if (msg.checkAddrPattern("/screen/refuelDisplay/resetParams")){
 			resetGame();
+		} else if (msg.checkAddrPattern("/ship/state/dockingStats")){
+			baseHealth = msg.get(0).floatValue();
 		}
 
 	}

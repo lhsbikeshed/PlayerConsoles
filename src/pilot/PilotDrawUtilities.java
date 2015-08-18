@@ -38,12 +38,21 @@ public class PilotDrawUtilities {
 		
 		float damage = parent.getShipState().hullState;
 		int damageCount = (int) PApplet.constrain(PApplet.map(damage, 0, 100, 6, 0), 0, 5);
-		
+		for(int d = 0; d < damageOrder.length; d++){
+			if(d < damageCount){
+				states[damageOrder[d]] = false;
+				
+			} else {
+				states[damageOrder[d]] = true;
+				
+			}
+			
+		}
 		for(int x = 0; x < w / 100; x++){
 			for(int y = 0; y < h / 50; y++){
 				int i = x + y * (w/100);
 				
-				if(i >= damageCount){
+				if(states[i]){
 					parent.fill(0,255,0);
 				} else {
 					
@@ -52,6 +61,7 @@ public class PilotDrawUtilities {
 					} else {
 						parent.fill(255,255,0);
 					}
+				
 				
 				}
 				parent.rect(x*100, y*50, 100, 50);

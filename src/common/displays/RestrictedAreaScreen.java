@@ -17,11 +17,11 @@ public class RestrictedAreaScreen extends Display {
 
 	@Override
 	public void draw() {
-
+		parent.pushStyle();
 		// signalStrength = map(mouseY, 0, height, 0, 1.0f);
 		parent.background(0, 0, 0);
 		parent.image(bgImage, 0, 0, parent.width, parent.height);
-
+		parent.popStyle();	
 	}
 
 	public void keyPressed() {
