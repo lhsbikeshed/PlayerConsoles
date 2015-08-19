@@ -56,6 +56,10 @@ public class DropDisplay extends Display {
 		parent.textFont(font, 20);
 		float alt = parent.getShipState().altitude.getValue(parent.millis());
 		parent.text((int) alt + "m", 100,623 );
+		
+		if(alt < 2000 && parent.globalBlinker){
+			parent.getConsoleAudio().playClip("terrainAlert");
+		}
 		parent.textFont(font, 30);
 		for (int t = 0; t < 6; t++) {
 			Point p = labelPos[t];
@@ -158,6 +162,7 @@ public class DropDisplay extends Display {
 			
 			//parent.text(i, 50, h);
 		}
+		
 		
 		
 		
