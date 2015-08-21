@@ -10,10 +10,12 @@ import processing.core.PVector;
 import common.Display;
 import common.HardwareEvent;
 import common.PlayerConsole;
+import common.util.LerpedVector;
 
 public class DropDisplay extends Display {
 
 	PImage bg, structFailOverlay, fireballImg, turbulenceImg;
+	PImage overlayImage;
 
 	Point[] labelPos = new Point[6];
 	float[] temps = new float[6];
@@ -22,7 +24,7 @@ public class DropDisplay extends Display {
 	long lastUpdate = 0;
 	boolean structFail = false;
 
-	PVector fireVec = new PVector(0, 0, 0);
+	LerpedVector fireVec = new LerpedVector(new PVector(0,0,0),0,250f);
 	long turbulenceTime = 0;
 	long turbulenceDuration = 0;
 	
@@ -33,9 +35,9 @@ public class DropDisplay extends Display {
 		font = parent.getGlobalFont(); // loadFont("HanzelExtendedNormal-48.vlw");
 		structFailOverlay = parent
 				.loadImage("pilotconsole/structuralFailure.png");
-		fireballImg = parent.loadImage("pilotconsole/fireball.png");
+		fireballImg = parent.loadImage("pilotconsole/screens/drop/fireball.png");
 		turbulenceImg = parent.loadImage("pilotconsole/turbulence.png");
-
+		overlayImage = parent.loadImage("pilotconsole/screens/drop/overlay.png");
 
 		labelPos[0] = new Point(647,508);
 		labelPos[1] = new Point(422, 519);
@@ -60,96 +62,8 @@ public class DropDisplay extends Display {
 		if(alt < 2000 && parent.globalBlinker){
 			parent.getConsoleAudio().playClip("terrainAlert");
 		}
-		parent.textFont(font, 30);
-		for (int t = 0; t < 6; t++) {
-			Point p = labelPos[t];
-			if (temps[t] > 200) {
-				parent.fill(255, 0, 0);
-			} else if (temps[t] > 100 && temps[t] <= 200) {
-				parent.fill(255, 255, 0);
-			} else {
-				parent.fill(0, 255, 0);
-			}
-			parent.text((int) temps[t] + "c", p.x, p.y);
-		}
 
-		if (fireVec.z > 0) {
-			parent.tint(255, (int) (fireVec.z * 255));
-			int randX = (int) parent.random(fireVec.z * 5);
-			int randY = (int) parent.random(fireVec.z * 5);
-			parent.image(fireballImg, 707 + randX, 225 + randY,
-					fireballImg.width / 2, fireballImg.height / 2);
-		}
-		if (fireVec.z < 0) {
-			parent.tint(255, (int) (Math.abs(fireVec.z * 255)));
-			int randX = (int) parent.random(Math.abs(fireVec.z * 5));
-			int randY = (int) parent.random(Math.abs(fireVec.z * 5));
-			parent.pushMatrix();
-			parent.translate(712 + randX, 628+ randY);
-			parent.scale(1, -1);
-			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
-					fireballImg.height / 2);
-			parent.popMatrix();
-		}
-		if (fireVec.x > 0) { // right
-			parent.tint(255, (int) (fireVec.x * 255));
-			int randX = (int) parent.random(fireVec.x * 5);
-			int randY = (int) parent.random(fireVec.x * 5);
-			parent.pushMatrix();
-			parent.translate(969 + randX, 357 + randY);
-			parent.rotate(PApplet.radians(90));
-			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
-					fireballImg.height / 2);
-			parent.popMatrix();
-		}
-
-		if (fireVec.x < 0) { // left
-			parent.tint(255, Math.abs((int) (fireVec.x * 255)));
-			int randX = Math.abs((int) parent.random(fireVec.x * 5));
-			int randY = Math.abs((int) parent.random(fireVec.x * 5));
-			parent.pushMatrix();
-			parent.translate(607+ randX, 520 + randY);
-			parent.rotate(PApplet.radians(-90));
-			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
-					fireballImg.height / 2);
-			parent.popMatrix();
-		}
-		if (fireVec.y > 0) { // top
-			parent.tint(255, (int) (fireVec.y * 255));
-			int randX = (int) parent.random(fireVec.y * 5);
-			int randY = (int) parent.random(fireVec.y * 5);
-			parent.pushMatrix();
-			parent.translate(371 + randX, 249 + randY);
-			// rotate(radians(90));
-			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
-					fireballImg.height / 2);
-			parent.popMatrix();
-		}
-
-		if (fireVec.y < 0) { // top
-			parent.tint(255, Math.abs((int) (fireVec.y * 255)));
-			int randX = Math.abs((int) parent.random(fireVec.y * 5));
-			int randY = Math.abs((int) parent.random(fireVec.y * 5));
-			parent.pushMatrix();
-			parent.translate(538 + randX, 603 + randY);
-			parent.rotate(PApplet.radians(-180));
-			parent.image(fireballImg, 0, 0, fireballImg.width / 2,
-					fireballImg.height / 2);
-			parent.popMatrix();
-		}
-		parent.noTint();
-
-		if (turbulenceTime < parent.millis()
-				&& parent.millis() < turbulenceTime + turbulenceDuration) {
-
-			parent.image(turbulenceImg, 155, 410);
-
-		}
-
-		if (structFail) { // show the "structural failure" warning
-
-			parent.image(structFailOverlay, 128, 200);
-		}
+		
 		
 		
 		//alt meters
@@ -166,6 +80,68 @@ public class DropDisplay extends Display {
 		
 		
 		
+		
+		
+		
+		
+		parent.pushMatrix();
+		PVector p = PVector.mult(fireVec.getValue(parent.millis()), 100f);
+		p.x += 643;
+		p.y += 444;
+		parent.translate(p.x, p.y, p.z);
+		parent.fill(128,128,0);
+		parent.noStroke();
+		parent.rotate(parent.millis()*0.001f);
+		parent.scale(1f + parent.random(10)/80f);
+		parent.image(fireballImg, -50,-50,100,100);
+		parent.popMatrix();
+		
+		parent.pushMatrix();
+		parent.translate(643,444);
+		parent.stroke(255);
+		parent.line(-250,0,250,0);
+		parent.line(0,-250,0,250);
+		parent.noFill();
+		parent.ellipse(0, 0, 100,100);
+		parent.ellipse(0, 0, 250,250);
+
+		parent.popMatrix();
+		
+		
+		parent.hint(PApplet.DISABLE_DEPTH_TEST);
+		parent.image(overlayImage, 270,141);
+		//temp text
+		parent.textFont(font, 20);
+		parent.fill(255);
+		//left
+		parent.pushMatrix();
+		parent.translate(346,490);
+		parent.rotate(parent.radians(-90));
+		parent.text(String.format(" LEFT\n%.2fc", temps[2]), 0,0);
+		parent.popMatrix();
+		//right
+		parent.pushMatrix();
+		parent.translate(926,400);
+		parent.rotate(parent.radians(90));
+		parent.text(String.format("RIGHT\n%.2fc", temps[3]), 0,0);
+		parent.popMatrix();
+		
+		//top
+		parent.pushMatrix();
+		parent.translate(600,161);		
+		parent.text(String.format(" TOP\n%.2fc", temps[0]), 0,0);
+		parent.popMatrix();
+		
+		//bottom
+		parent.pushMatrix();
+		parent.translate(580,711);		
+		parent.text(String.format("BOTTOM\n  %.2fc", temps[0]), 0,0);
+		parent.popMatrix();
+
+		if (structFail) { // show the "structural failure" warning
+			
+			parent.image(structFailOverlay, 128, 200);
+		}
 	}
 
 	@Override
@@ -177,9 +153,10 @@ public class DropDisplay extends Display {
 			for (int t = 0; t < 6; t++) {
 				temps[t] = theOscMessage.get(1 + t).floatValue();
 			}
-			fireVec.x = theOscMessage.get(7).floatValue();
-			fireVec.y = theOscMessage.get(8).floatValue();
-			fireVec.z = theOscMessage.get(9).floatValue();
+			PVector temp = new PVector(	theOscMessage.get(7).floatValue(),
+										-theOscMessage.get(8).floatValue(),
+										theOscMessage.get(9).floatValue());
+			fireVec.update(temp, parent.millis());
 
 		} else if (theOscMessage
 				.checkAddrPattern("/scene/drop/structuralFailure") == true) {
