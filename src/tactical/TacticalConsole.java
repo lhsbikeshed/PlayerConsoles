@@ -235,7 +235,7 @@ public class TacticalConsole extends PlayerConsole {
 		displayMap.put("cablepuzzle", new CablePuzzleDisplay(this));
 		displayMap.put("failureScreen", new FailureScreen(this));
 		displayMap.put("restrictedArea", new RestrictedAreaScreen(this));
-		displayMap.put("plottingDisplay", new PlottingDisplay(this));
+		displayMap.put("plottingDisplay", new PlottingDisplay2(this));
 		displayMap.put("slingshot", new SlingshotDisplay(this));
 		
 
@@ -345,7 +345,7 @@ public class TacticalConsole extends PlayerConsole {
 		if(h.event.equals("KEY")){
 			if(h.id == 83 && h.value == 1){
 				ignoreMouse = !ignoreMouse;
-			} else if (h.id == KeyEvent.VK_P  && h.value == 1){
+			} else if (h.id == 80  && h.value == 1){
 				mainPanelHardware.cycleScreen();
 			}
 		} else if (h.event.equals("MOUSECLICK")){
