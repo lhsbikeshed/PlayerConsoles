@@ -71,8 +71,8 @@ public class PlottingDisplay2 extends Display {
 		PVector mousePos = ((TacticalConsole)parent).mousePosition;
 		PVector centre = new PVector (parent.width/2f, parent.height/2f);
 		float dist = PVector.dist(mousePos,  centre);
-		mapOffset.x = mousePos.x - centre.x ;
-		mapOffset.y = mousePos.y - centre.y;
+		mapOffset.x = PApplet.constrain(mousePos.x - centre.x, -200, 67);
+		mapOffset.y = PApplet.constrain(mousePos.y - centre.y,-76, 260);
 		
 		// TODO Auto-generated method stub
 		mapGraphics.strokeWeight(1);
@@ -162,28 +162,64 @@ public class PlottingDisplay2 extends Display {
 		
 		
 		
+		
+		mapGraphics.endDraw();
+		parent.image(mapGraphics,0,0);
+		
+		
+		// ---------------- gui ------------------
+		parent.image(backgroundImage, 0, 0);
+		parent.stroke(255);
+		if(parent.getShipState().undercarriageState == 0){
+			parent.fill(0,255,0);
+		} else {
+			parent.fill( PApplet.sin(parent.frameCount * 0.5f) * 150 + 100, 0,0);
+		}
+		parent.rect(955, 200, 15,15);
+		
+		if(parent.getShipState().weaponState == ShipState.WEAPON_STOWED){
+			parent.fill(0,255,0);
+		} else {
+			parent.fill( PApplet.sin(parent.frameCount * 0.5f) * 150 + 100, 0,0);
+		}
+		parent.rect(955, 220, 15,15);
+		
+		if(routeComplete){
+			parent.fill(0,255,0);
+		} else {
+			parent.fill( PApplet.sin(parent.frameCount * 0.5f) * 150 + 100, 0,0);
+		}
+		parent.rect(955, 240, 15,15);
+		
+		if(parent.getShipState().jumpCharging){
+			parent.fill(0,255,0);
+		} else {
+			parent.fill( PApplet.sin(parent.frameCount * 0.5f) * 150 + 100, 0,0);
+		}
+		parent.rect(955,277, 15,15);
+		
+		
+		
 		// ---------- mouse cursor ----------------
 		
 		PVector pos = ((TacticalConsole)parent).mousePosition;
-		mapGraphics.pushMatrix();
-		mapGraphics.translate(pos.x, pos.y);
-		mapGraphics.noFill();
-		mapGraphics.stroke(255);
-		mapGraphics.line(-20,0, 20,0);
-		mapGraphics.line(0, 20, 0, -20);
+		parent.pushMatrix();
+		parent.translate(pos.x, pos.y);
+		parent.noFill();
+		parent.stroke(255);
+		parent.line(-20,0, 20,0);
+		parent.line(0, 20, 0, -20);
 		float scale = parent.sin(parent.millis() / 200f) * 0.2f + 0.8f;
-		mapGraphics.scale(scale);
+		parent.scale(scale);
 		
-		mapGraphics.ellipse(0, 0,  30, 30);
+		parent.ellipse(0, 0,  30, 30);
 		
-		mapGraphics.popMatrix();
+		parent.popMatrix();
 
 		
-		mapGraphics.text(failReason, 100,100);
-		mapGraphics.endDraw();
+		parent.text(failReason, 100,100);
 		
-		parent.image(mapGraphics,0,0);
-		parent.image(backgroundImage, 0, 0);
+		
 	}
 
 	@Override
@@ -209,6 +245,12 @@ public class PlottingDisplay2 extends Display {
 	}
 
 	private void clickedAt(PVector pos){
+		if(pos.x > 760 && pos.x < 950 && pos.y > 322 && pos.y < 366){
+			ConsoleLogger.log(this, "cleared route");
+			clearRoute();
+			return;
+		}
+		
 		//find out where we clicked
 		MapNode clicked = null;
 		for(MapNode m : mapNodes){

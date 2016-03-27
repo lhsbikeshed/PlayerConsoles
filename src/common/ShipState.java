@@ -94,6 +94,7 @@ public class ShipState {
 	public int undercarriageState = 0;
 	public  boolean undercarriageLockState;
 	public boolean shipDocked = false;
+	public boolean jumpCharging;			//is the jump drive charging at the moment
 	public static final String[] undercarriageStrings = { "up", "down", "Lowering..",
 	"Raising.." };
 	
@@ -200,6 +201,9 @@ public class ShipState {
 			Rot rot = new Rot(w, x, y, z, false);
 			dockingRotation.update(rot, now);
 			
+		} else if (msg.checkAddrPattern("/system/jump/state")){
+			jumpCharging = msg.get(0).intValue() == 1;
 		}
+			
 	}
 }
