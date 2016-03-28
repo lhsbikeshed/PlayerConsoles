@@ -39,6 +39,7 @@ public class PlottingDisplay2 extends Display {
 	
 
 	private String failReason = "";
+	private int failReasonTimer = 0;
 	String lastPlottedScene = "";	//scene that the last successful plot was in
 
 	// debug animation stuff
@@ -64,6 +65,11 @@ public class PlottingDisplay2 extends Display {
 
 	@Override
 	public void draw() {
+		if(failReasonTimer > 0){
+			failReasonTimer --;
+			
+		}
+		
 		parent.clear();
 		mapGraphics.beginDraw();
 		mapGraphics.clear();
@@ -74,13 +80,12 @@ public class PlottingDisplay2 extends Display {
 		mapOffset.x = PApplet.constrain(mousePos.x - centre.x, -200, 67);
 		mapOffset.y = PApplet.constrain(mousePos.y - centre.y,-76, 260);
 		
-		// TODO Auto-generated method stub
 		mapGraphics.strokeWeight(1);
 		mapGraphics.noStroke();
 		mapGraphics.fill(0,40,0);
 		mapGraphics.rect(0, 0, 1015, 757);
 		
-		//a grid
+		//--------------------- a grid
 		int stepX = 102;
 		int stepY = 100;
 		mapGraphics.stroke(0,20,0);
@@ -102,13 +107,41 @@ public class PlottingDisplay2 extends Display {
 			}
 		}
 		
+		//-------- draw earth etc -----------------
+		mapGraphics.stroke(0,255,0);
+		mapGraphics.fill(0,100,0);
+		mapGraphics.ellipse(91 - mapOffset.x, 935 - mapOffset.y, 65,65);
+		mapGraphics.fill(0,200,0);
+		mapGraphics.text("EARTH", 131 - mapOffset.x, 985 - mapOffset.y);
+		
+		mapGraphics.noStroke();
+		mapGraphics.fill(0,30,0);
+		mapGraphics.ellipse(420 - mapOffset.x, 483 - mapOffset.y, 165, 165);
+		mapGraphics.stroke(0,255,0);
+
+		mapGraphics.fill(0,100,0);
+		mapGraphics.ellipse(420 - mapOffset.x, 483 - mapOffset.y, 65,65);
+		
+		mapGraphics.fill(0,200,0);
+		mapGraphics.text("MARS", 420 - mapOffset.x, 440 - mapOffset.y);
+		
+		// comet curve
+		mapGraphics.noFill();
+		mapGraphics.strokeWeight(2);
+		mapGraphics.arc(300 - mapOffset.x,  930 - mapOffset.y, 1300, 1300, -3.5f, 0.1f);
+		mapGraphics.fill(0,200,0);
+		mapGraphics.ellipse(234 - mapOffset.x, 283 - mapOffset.y, 20,20);
+		mapGraphics.noStroke();
+		mapGraphics.text("COMET 122-3NCA", 4 - mapOffset.x, 253 - mapOffset.y );
+		
+		
 		
 		if(routeComplete == false){
 			MapNode lastNode = currentRoute.get(currentRoute.size() - 1);
 			mapGraphics.pushMatrix();
 			float mouseDist = PVector.dist(PVector.sub(lastNode.pos, mapOffset), mousePos);
-			float a = parent.map(mouseDist, 0f, 165f, 255f, 0f);
-			a = parent.constrain(a,0.0f, 255.0f);
+			float a = PApplet.map(mouseDist, 0f, 165f, 255f, 0f);
+			a = PApplet.constrain(a,0.0f, 255.0f);
 			float modVal = 0f;
 			if (mouseDist > 165f) {
 				modVal = (PApplet.sin(parent.frameCount * 0.5f) + 1.0f) /2f;
@@ -123,6 +156,8 @@ public class PlottingDisplay2 extends Display {
 			mapGraphics.popMatrix();
 		}
 		
+		
+		
 		mapGraphics.fill(255);
 		mapGraphics.textFont(font, 18);
 		
@@ -134,11 +169,12 @@ public class PlottingDisplay2 extends Display {
 			mapGraphics.translate(m.posx, m.posy);
 			if(parent.getShipState().currentSceneId.equals(m.id)){
 				mapGraphics.fill(255,0,0);
-				mapGraphics.text(m.id + " <current>", 10, 0);
+				mapGraphics.text(m.id + "\r\n" + m.displayName + " <current>", 10, 0);
 			
 			} else {
 				mapGraphics.fill(255);
-				mapGraphics.text(m.id, 10, 0);
+				String s = m.displayName == null ? "" : m.displayName;
+				mapGraphics.text(m.id + "\r\n" + s, 10, 0);
 
 			}
 			mapGraphics.ellipse(0,0,10,10);
@@ -158,10 +194,6 @@ public class PlottingDisplay2 extends Display {
 			mapGraphics.line(m1.posx , m1.posy, m2.posx, m2.posy);
 			mapGraphics.popMatrix();
 		}
-		
-		
-		
-		
 		
 		mapGraphics.endDraw();
 		parent.image(mapGraphics,0,0);
@@ -216,8 +248,10 @@ public class PlottingDisplay2 extends Display {
 		
 		parent.popMatrix();
 
+		if(failReasonTimer > 0){
+			parent.text(failReason, 100,100);
+		}
 		
-		parent.text(failReason, 100,100);
 		
 		
 	}
@@ -291,6 +325,7 @@ public class PlottingDisplay2 extends Display {
 	private void codeFailed(String reason) {
 	
 		failReason = reason;
+		failReasonTimer = 60;
 		parent.getConsoleAudio().playClip("outOfRange");
 
 	}
@@ -442,6 +477,7 @@ public class PlottingDisplay2 extends Display {
 		}
 		
 		failReason = "";
+		failReasonTimer = 0;
 		routeComplete = false;
 		if(startNode != null){
 			currentRoute.add(startNode);

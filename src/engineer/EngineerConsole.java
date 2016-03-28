@@ -133,7 +133,7 @@ public class EngineerConsole extends PlayerConsole {
 			text("fuel " + i + ":" + ShipState.instance.fuelTankState[i], 15, 520+i*13);
 		}
 		text("fuel connstate: " + ShipState.instance.fuelLineConnectionState, 15, 572);
-			
+		text("main valve:" + lowerPanel.fuelValveState, 15, 592);
 		noFill();
 		pushMatrix();
 		translate(50,620);
@@ -397,9 +397,11 @@ public class EngineerConsole extends PlayerConsole {
 			} else if(h.id == KeyEvent.VK_W && h.value == 1){
 				lowerPanel.fuelValveDirection ++;
 				lowerPanel.fuelValveDirection %= 4;
-				OscMessage msg = new OscMessage("/system/reactor/setFuelValveState");
+				OscMessage msg = new OscMessage("/system/reactor/setFuelValveDirection");
 				msg.add(lowerPanel.fuelValveDirection);
 				getOscClient().send(msg, getServerAddress());
+			} else if(h.id == KeyEvent.VK_E && h.value == 1){
+				lowerPanel.setFuelValveState(!lowerPanel.fuelValveState);
 			}
 			
 		} else if(h.event.equals("NEWSWITCH")){

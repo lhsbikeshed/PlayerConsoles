@@ -17,7 +17,8 @@ public class LowerPanelHardware extends HardwareController {
 	public static final int BTN_JAM = 11;
 	
 	
-	public int fuelValveDirection = 0; //0 off, 1/2/3 are for the other tanks
+	public int fuelValveDirection = 0; //0 to space, 1/2/3 are for the other tanks
+	public boolean fuelValveState = false;	//state of the main fuel transfer valve
 									
 	
 
@@ -30,9 +31,8 @@ public class LowerPanelHardware extends HardwareController {
 	
 	public void bufferComplete(){
 		char p = serialBuffer[0];
-		if (p == 'F') { 		// fuel gauge stuff
-			processFuelGuage();
-		} else if (p == 'P') { // this switch from new panel
+		
+		if (p == 'P') { // this switch from new panel
 			String vals = finalBufferContents;
 			if (vals.substring(0, 2).equals("PS")) { // PS10:1
 				// chop off first two chars, split on the : character
@@ -61,6 +61,19 @@ public class LowerPanelHardware extends HardwareController {
 															// unmute audio for
 															// buttons
 				parent.getConsoleAudio().muteBeeps = false;
+			} else if (p == 'F'){
+				//fuel was pumped, next character should be an integer from 0-10 based on how rapidly its pumped
+				int c = Integer.parseInt(vals.substring (1,2));
+				if(c >= 0 && c <= 9){
+					OscMessage m = new OscMessage("/system/reactor/pumpRate");
+					m.add(c);
+					parent.getOscClient().send(m, parent.getServerAddress());
+	
+				}
+			} else if (p == 'V'){
+				setFuelValveState(true);
+			} else if (p == 'v'){
+				setFuelValveState(false);
 			} else {
 				// its a dial
 				
@@ -81,15 +94,12 @@ public class LowerPanelHardware extends HardwareController {
 	}
 	
 	
-	private void processFuelGuage() {
-		char nextChar = serialBuffer[1];
-		if (nextChar == 'E') {
-			// we ran out of fuel
-			OscMessage myMessage = new OscMessage(
-					"/system/reactor/outOfFuel");
-
-			parent.getOscClient().send(myMessage, parent.getServerAddress());
-		}
+	
+	public void setFuelValveState(boolean b) {
+		fuelValveState = b;
+		OscMessage m = new OscMessage("/system/reactor/setFuelValveState");
+		m.add(b  ? 1 : 0);
+		parent.getOscClient().send(m, parent.getServerAddress());
 		
 	}
 
