@@ -136,7 +136,7 @@ public class PlottingDisplay2 extends Display {
 		
 		
 		
-		if(routeComplete == false){
+		if(routeComplete == false && currentRoute.size() > 0){
 			MapNode lastNode = currentRoute.get(currentRoute.size() - 1);
 			mapGraphics.pushMatrix();
 			float mouseDist = PVector.dist(PVector.sub(lastNode.pos, mapOffset), mousePos);

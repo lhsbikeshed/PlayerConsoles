@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="lib/minim/tritonus_share.jar"/>
 	<classpathentry kind="lib" path="lib/serial/jssc.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="VanConsoles/lib/serial/windows64"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="VanConsoles/lib/serial/windows32"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/serial/serial.jar">
@@ -40,5 +40,10 @@
 	<classpathentry kind="lib" path="lib/core/jogl-all-natives-windows-i586.jar"/>
 	<classpathentry kind="lib" path="lib/core/jogl-all.jar"/>
 	<classpathentry kind="lib" path="lib/jyaml-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/controlP5/library/controlP5.jar"/>
+	<classpathentry kind="lib" path="lib/procontroll/library/procontroll.jar"/>
+	<classpathentry kind="lib" path="lib/video/gstreamer-java.jar"/>
+	<classpathentry kind="lib" path="lib/video/jna.jar"/>
+	<classpathentry kind="lib" path="lib/video/video.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

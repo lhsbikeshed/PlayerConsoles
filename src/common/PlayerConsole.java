@@ -131,6 +131,7 @@ public abstract class PlayerConsole extends PApplet {
 	protected ArrayList<HardwareController> hardwareControllers;
 	protected HardwareController keyboardController;
 	
+	protected CommsOverlay commsOverlay;
 	
 
 	/* switch to a new display */
@@ -158,6 +159,8 @@ public abstract class PlayerConsole extends PApplet {
 
 		// call draw method
 		drawConsole();
+		
+		commsOverlay.draw(this);
 
 		// post-draw
 		damageEffects.setDamageLevel( 100 - shipState.hullState );
@@ -235,6 +238,10 @@ public abstract class PlayerConsole extends PApplet {
 	protected void oscEvent(OscMessage theOscMessage) {
 		//pass to shipstate to parse common ship state messages
 		shipState.processOSCMessage(theOscMessage);
+		if(theOscMessage.addrPattern().startsWith("/ship/comms")){
+			commsOverlay.messageReceived(theOscMessage);
+			
+		}
 		
 		
 		if (theOscMessage.checkAddrPattern("/ship/damage") == true) {
@@ -354,6 +361,8 @@ public abstract class PlayerConsole extends PApplet {
 		globalFont = loadFont("common/HanzelExtendedNormal-48.vlw");
 		bootDisplay = new BootDisplay(this);
 		displayMap.put("boot", bootDisplay); // /THIS
+		
+		commsOverlay = new CommsOverlay(this);
 		
 		
 	}
