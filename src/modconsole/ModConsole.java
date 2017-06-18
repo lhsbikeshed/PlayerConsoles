@@ -27,6 +27,7 @@ public class ModConsole extends PApplet{
 	PFont font;
 	PFont smallFont;
 	
+	CameraServer camServer;
 	
 	NetAddress myRemoteLocation;                            
 	String serverIP = "127.0.0.1";                           
@@ -86,6 +87,8 @@ public class ModConsole extends PApplet{
 
 		joy = new Joystick(oscP5, this, !useXboxController);
 		joy.setEnabled(false);
+		
+		camServer = new CameraServer(this);
 	}
 
 
@@ -160,6 +163,8 @@ public class ModConsole extends PApplet{
 		jp.draw(this);
 		
 		joy.update();
+		
+		camServer.update();
 
 	}
 

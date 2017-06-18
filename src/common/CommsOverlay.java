@@ -1,5 +1,7 @@
 package common;
 
+import java.awt.image.BufferedImage;
+
 import oscP5.OscMessage;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -12,6 +14,7 @@ public class CommsOverlay {
 	MJPEGImagethread imgThread;
 	
 	PlayerConsole parent;
+	PImage camImage;
 	
 	long connectStart = 0;
 	PImage commBg;
@@ -19,7 +22,7 @@ public class CommsOverlay {
 	public CommsOverlay(PlayerConsole p) {
 		parent = p;
 		commBg = p.loadImage("data/common/commpopup.png");
-		
+		camImage = p.createImage(320, 240, PApplet.ARGB);
 	}
 
 	public void draw(PlayerConsole g){
@@ -40,6 +43,22 @@ public class CommsOverlay {
 				
 				g.text("INCOMING MESSAGE", 10, 110);
 			} else {
+				
+				PImage b = imgThread.getImage();
+				if(b != null){
+					//camImage.loadPixels();
+					
+					//b.getRaster().getPixels(0, 0, 320, 240, camImage.pixels);
+					//camImage.updatePixels();
+					camImage = b;
+					g.image(camImage, 15, 10, 200,180);
+				} else {
+					ConsoleLogger.log(this, "null cam frame");
+				}
+				
+				
+				
+				
 				g.textFont(g.getGlobalFont(), 13);
 				if(g.globalBlinker){
 					g.fill(255,255,0);
@@ -57,16 +76,20 @@ public class CommsOverlay {
 		
 	}
 	
-	private void startCall(){
+	public void startCall(){
 		ConsoleLogger.log(this, "incoming video call");			
 		isActive = true;
 		parent.getConsoleAudio().playClip("commsBeep");
 		connectStart = parent.millis();
+		imgThread = new MJPEGImagethread(parent);
+		Thread t = new Thread(imgThread);
+		t.start();
 	}
 	
-	private void hangup(){
+	public void hangup(){
 		ConsoleLogger.log(this, "video call hung up");
 		isActive = false;
+		imgThread.stop();
 	}
 	
 	public void messageReceived(OscMessage msg){

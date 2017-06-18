@@ -318,6 +318,8 @@ public abstract class PlayerConsole extends PApplet {
 			System.exit(0);
 		} else if (ke.getKeyCode() == KeyEvent.VK_BACK_QUOTE){
 			drawDebugControls = !drawDebugControls;
+		} else if (ke.getKeyCode() == KeyEvent.VK_C){
+			commsOverlay.startCall();
 		}
 		//pass this to the keyboard controller
 		//this will then pass it on to the current consoles "hardwareevent" method
